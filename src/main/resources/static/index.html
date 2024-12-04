@@ -209,6 +209,16 @@
       }
     });
   </script>
+  <script type='text/javascript'>
+    window.addEventListener('beforeunload', async function (e) {
+      e.preventDefault();
+      e.returnValue = '';
+    });
+
+    window.addEventListener('unload', async function (e) {
+      await fetch("blog/close");
+    });
+</script>
 </body>
 
 </html>

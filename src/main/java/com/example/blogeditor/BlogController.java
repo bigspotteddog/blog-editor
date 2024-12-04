@@ -71,6 +71,11 @@ public class BlogController {
     throw new ResponseStatusException(HttpStatus.NOT_FOUND, "entity not found");
   }
 
+  @GetMapping("close")
+  public void close() {
+    System.exit(0);
+  }
+
   @PostMapping("posts")
   public BlogPost post(@RequestBody BlogPost blogPost) throws IOException {
     String token = System.getenv("GITHUB_ACCESS_TOKEN");
