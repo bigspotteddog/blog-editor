@@ -52,15 +52,11 @@
             </ul>
           </li>
         </ul>
-        <form class="d-flex">
-          <input class="form-control me-2" type="search" placeholder="Go" aria-label="Go">
-          <button id="location" class="btn btn-outline-success">Go</button>
-        </form>        
       </div>
     </div>
   </nav>
 
-  <iframe id="preview" allow="fullscreen *; keyboard-map *"></iframe>
+  <iframe id="preview" src="editor/" allow="fullscreen *; keyboard-map *"></iframe>
 
   <div class="modal fade" id="properties-modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
     aria-labelledby="staticBackdropLabel" aria-hidden="true">
@@ -90,12 +86,8 @@
     crossorigin="anonymous"></script>
 
   <script>
-    document.getElementById("location").addEventListener("click", function (ev) {
-      ev.preventDefault();
-      const url = document.querySelector("input[type=search]").value;
-      console.log(url);
-      document.cookie = "proxy=" + url + "; path=/;";
-      iframe.src = "editor/" + "?t=" + new Date().getTime();
+    document.getElementById("new").addEventListener("click", function (ev) {
+      document.getElementById('preview').contentWindow.location.href = 'editor/post.html#new';
     });
 
     const propertiesModal = new bootstrap.Modal(document.getElementById("properties-modal"), {});
@@ -178,14 +170,11 @@
     }
 
     const iframe = document.getElementById("preview");
-
     iframe.addEventListener("load", function (ev) {
       document.getElementById("publish").classList.add("disabled");
       document.getElementById("properties").classList.add("disabled");
 
       const win = document.getElementById('preview').contentWindow;
-      const previewDocument = document.getElementById('preview').contentDocument;
-
       const href = win.location.href;
       const filename = href.split('#')[0].split('?')[0].split('/').pop();
       if (filename === 'post.html') {
@@ -222,12 +211,12 @@
   </script>
   <script type='text/javascript'>
     window.addEventListener('beforeunload', async function (e) {
-      // e.preventDefault();
-      // e.returnValue = '';
+      e.preventDefault();
+      e.returnValue = '';
     });
 
     window.addEventListener('unload', async function (e) {
-      // await fetch("blog/close");
+      await fetch("blog/close");
     });
 </script>
 </body>

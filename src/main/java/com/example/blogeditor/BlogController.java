@@ -73,7 +73,7 @@ public class BlogController {
 
   @GetMapping("close")
   public void close() {
-    System.exit(0);
+    // System.exit(0);
   }
 
   @PostMapping("posts")

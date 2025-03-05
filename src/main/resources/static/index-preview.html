@@ -1,0 +1,2330 @@
+<!DOCTYPE html>
+<html lang="en" class="editable">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Bootstrap Page</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+  <style>
+    .editable {
+      position: relative;
+    }
+
+    .ce-toolbar__actions {
+      position: absolute;
+      display: none;
+      z-index: 10001; /* Higher than selector */
+      opacity: 0.8;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 3px 15px -3px rgba(13, 20, 33, 0.13);
+      padding: 2px;
+    }
+
+    .ce-toolbar__plus,
+    .ce-toolbar__settings-btn {
+      width: 34px;
+      height: 34px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: white;
+      color: #707684;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+
+    .ce-toolbar__plus {
+      border-top-left-radius: 8px;
+      border-bottom-left-radius: 8px;
+    }
+    
+    .ce-toolbar__settings-btn {
+      border-top-right-radius: 8px;
+      border-bottom-right-radius: 8px;
+    }
+
+    .ce-toolbar__plus:hover,
+    .ce-toolbar__settings-btn:hover {
+      background: #EFEFEF;
+      color: #1D202B;
+    }
+
+    /* Dropdown styles */
+    .ce-toolbox {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 3px 15px -3px rgba(13, 20, 33, 0.13);
+      width: 200px;
+      display: none;
+      z-index: 1000;
+    }
+
+    .ce-toolbox.active {
+      display: block;
+    }
+
+    .ce-toolbox__content {
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 3px 15px -3px rgba(13, 20, 33, 0.13);
+    }
+
+    .ce-popover__item {
+      display: flex;
+      align-items: center;
+      padding: 8px 16px;
+      cursor: pointer;
+      color: #707684;
+      transition: background 0.2s ease;
+      position: relative;
+    }
+
+    .ce-popover__item[data-type="header"]::after {
+      content: "›";
+      position: absolute;
+      right: 8px;
+      font-size: 16px;
+      line-height: 1;
+    }
+
+    .ce-popover__item[data-type="container"]::after {
+      content: "›";
+      position: absolute;
+      right: 8px;
+      font-size: 16px;
+      line-height: 1;
+    }
+
+    .ce-popover__item:hover {
+      background: #EFEFEF;
+      color: #1D202B;
+    }
+
+    .ce-popover__item:hover > .ce-popover__submenu {
+      display: block;
+    }
+
+    .ce-popover__submenu {
+      display: none;
+      position: absolute;
+      left: 100%;
+      top: 0;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 3px 15px -3px rgba(13, 20, 33, 0.13);
+      min-width: 100px;
+      z-index: 1001;
+    }
+
+    .ce-popover__submenu-item {
+      padding: 8px 16px;
+      cursor: pointer;
+      color: #707684;
+      transition: background 0.2s ease;
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .ce-popover__submenu-item-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 20px;
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    .ce-popover__submenu-item:hover {
+      background: #EFEFEF;
+      color: #1D202B;
+    }
+
+    .ce-popover__item-icon {
+      width: 20px;
+      height: 20px;
+      margin-right: 12px;
+      display: flex;
+      align-items: center;
+    }
+
+    .ce-popover__item-label {
+      font-size: 14px;
+      line-height: 20px;
+    }
+
+    .ce-settings-menu {
+      position: absolute;
+      top: 100%;
+      left: 36px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 3px 15px -3px rgba(13, 20, 33, 0.13);
+      width: 150px;
+      display: none;
+      z-index: 1000;
+    }
+
+    .ce-settings-menu.active {
+      display: block;
+    }
+
+    /* Component selector styles */
+    .component-selector {
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 4px;
+      padding: 4px 8px;
+      z-index: 1001;
+      font-size: 13px;
+      pointer-events: auto; 
+      align-items: center;
+      height: 300px;
+      overflow: auto;
+    }
+
+    .selector-item {
+      display: flex;
+      align-items: center;
+      padding: 4px 8px;
+      cursor: pointer;
+      border-radius: 4px;
+      margin: 2px 0;
+      transition: all 0.2s ease;
+      user-select: none;
+      line-height: 1;
+    }
+
+    .selector-item:hover {
+      background: rgba(0, 102, 204, 0.1);
+    }
+
+    .selector-item.selected {
+      background: rgba(0, 102, 204, 0.2);
+    }
+
+    .selector-item.dragging {
+      opacity: 0.5;
+      background: rgba(0, 102, 204, 0.1);
+    }
+
+    .selector-item.drag-over {
+      border: 2px dashed #0066cc;
+      background: rgba(0, 102, 204, 0.05);
+    }
+
+    .selector-item.drag-over-top {
+      border-top: 2px solid #0066cc;
+    }
+
+    .selector-item.drag-over-bottom {
+      border-bottom: 2px solid #0066cc;
+    }
+
+    .selector-tree-item {
+      display: none;
+    }
+
+    .selector-tree-item.expanded {
+      display: block;
+    }
+
+    .selector-item.child {
+      padding-left: 20px;
+    }
+
+    .selector-item.selected-child {
+      padding-left: 20px;
+      font-weight: bold;
+      color: #1D202B;
+      background: #F8F9FA;
+    }
+
+    .selector-item.selected-parent {
+      color: #1D202B;
+    }
+
+    .selector-item.selected-path {
+      color: #1D202B;
+    }
+
+    .selector-item-prefix {
+      opacity: 0.7;
+      margin-right: 4px;
+      display: inline-block;
+      width: 12px;
+      text-align: center;
+      font-size: 20px;
+    }
+
+    .selector-item.selected {
+      font-weight: bold;
+      color: #1D202B;
+      background: #F8F9FA;
+    }
+
+    .selector-separator {
+      color: #707684;
+      margin: 0 2px;
+      padding: 2px 6px;
+      user-select: none;
+      pointer-events: none;
+      opacity: 0.5;
+    }
+
+    /* Ensure toolbar and selector stay visible when interacting */
+    .ce-toolbar__actions:hover {
+      display: flex !important;
+    }
+
+    .container, .container-fluid, .container-sm, .container-md, .container-lg, .container-xl, .container-xxl {
+      min-height: 40px;
+    }
+
+    .figure {
+      margin: 1rem 0;
+    }
+
+    [contenteditable="true"] {
+      outline: none;
+    }
+
+    [contenteditable="true"]:focus {
+      outline: none;
+    }
+
+    body {
+      margin: 0px;
+      overflow: hidden;
+    }
+
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+    iframe.content-loaded {
+      pointer-events: all;
+    }
+
+    #editor-styles {
+      display: none;
+    }
+
+    .editor-drag-styles {
+      content: "";
+      display: none;
+    }
+
+    .editor-drag-styles .dragging {
+      opacity: 0.5;
+      outline: 2px solid #0066cc !important;
+    }
+
+    .editor-drag-styles .drag-target {
+      outline: 2px dashed #0066cc !important;
+      background: rgba(0, 102, 204, 0.05) !important;
+    }
+
+    .editor-drag-styles .drag-over-top {
+      border-top: 2px solid #0066cc !important;
+      margin-top: -2px !important;
+    }
+
+    .editor-drag-styles .drag-over-bottom {
+      border-bottom: 2px solid #0066cc !important;
+      margin-bottom: -2px !important;
+    }
+
+    .styles-dialog {
+      width: 400px;
+      background: white;
+      overflow-y: auto;
+      height: 100vh;
+      position: sticky;
+    }
+
+    .styles-dialog.active {
+      display: block;
+    }
+
+    .styles-dialog-header {
+      position: sticky;
+      top: 0;
+      background: white;
+      z-index: 1;
+    }
+
+    .styles-dialog table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      table-layout: fixed;
+    }
+
+    .styles-dialog th,
+    .styles-dialog td {
+      padding: 6px 8px;
+      text-align: left;
+      border-bottom: 1px solid #eee;
+      word-break: break-word;
+    }
+
+    .styles-dialog th:first-child,
+    .styles-dialog td:first-child {
+      width: 50%;
+    }
+
+    .styles-dialog-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-top: 1px solid #eee;
+      border-bottom: 1px solid #eee;
+    }
+
+    .styles-dialog-title {
+      font-weight: 600;
+      color: #1D202B;
+    }
+
+    .styles-dialog-close {
+      cursor: pointer;
+      padding: 4px;
+      border-radius: 4px;
+      color: #707684;
+    }
+
+    .styles-dialog-close:hover {
+      background: #f8f9fa;
+      color: #1D202B;
+    }
+
+    .styles-dialog-element {
+      font-family: monospace;
+      padding: 8px;
+      margin: 8px 0;
+      background: #f8f9fa;
+      border-radius: 4px;
+      color: #1D202B;
+      word-break: break-all;
+    }
+
+    .component-highlight {
+      position: fixed;
+      border: 2px solid #0066cc;
+      background: rgba(0, 102, 204, 0.1);
+      pointer-events: none;
+      z-index: 1000;
+      transition: all 0.2s ease;
+    }
+
+    .drag-target {
+      border: 2px dashed #0066cc !important;
+      background: rgba(0, 102, 204, 0.05) !important;
+    }
+
+    .drag-over-top {
+      border-top: 3px solid #0066cc !important;
+      margin-top: -3px !important;
+      position: relative;
+    }
+
+    .drag-over-top::before {
+      content: '';
+      position: absolute;
+      top: -20px;
+      left: 0;
+      right: 0;
+      height: 40px;
+      background: linear-gradient(to bottom, 
+        rgba(0, 102, 204, 0.3),
+        rgba(0, 102, 204, 0.1) 50%,
+        transparent
+      );
+      pointer-events: none;
+      border-radius: 4px;
+    }
+
+    /* Add a drop arrow indicator */
+    .drag-over-top::after {
+      content: '▼';
+      position: absolute;
+      top: -20px;
+      left: 50%;
+      transform: translateX(-50%);
+      color: #0066cc;
+      font-size: 16px;
+      text-shadow: 0 0 3px white;
+    }
+
+    .drag-over-bottom {
+      border-bottom: 3px solid #0066cc !important;
+      margin-bottom: -3px !important;
+      position: relative;
+    }
+
+    .drag-over-bottom::before {
+      content: '';
+      position: absolute;
+      bottom: -20px;
+      left: 0;
+      right: 0;
+      height: 40px;
+      background: linear-gradient(to top,
+        rgba(0, 102, 204, 0.3),
+        rgba(0, 102, 204, 0.1) 50%,
+        transparent
+      );
+      pointer-events: none;
+      border-radius: 4px;
+    }
+
+    /* Add a drop arrow indicator */
+    .drag-over-bottom::after {
+      content: '▼';
+      position: absolute;
+      bottom: -20px;
+      left: 50%;
+      transform: translateX(-50%);
+      color: #0066cc;
+      font-size: 16px;
+      text-shadow: 0 0 3px white;
+    }
+
+    .dragging {
+      opacity: 0.5;
+      outline: 3px solid #0066cc;
+    }
+
+    .mini-selector {
+      position: fixed;
+      background: white;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      padding: 4px;
+      font-size: 13px;
+      display: none;
+      max-width: 300px;
+      z-index: 1000;
+    }
+      
+    .mini-selector .selector-item {
+      padding: 2px 4px;
+      padding-left: 20px;
+      cursor: pointer;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      position: relative;
+    }
+
+    .mini-selector .selector-item::before {
+      content: '';
+      position: absolute;
+      left: 8px;
+      top: 50%;
+      width: 8px;
+      height: 1px;
+      background: #ccc;
+    }
+    
+    .mini-selector .selector-item.parent {
+      padding-left: 4px;
+      border-bottom: 1px solid #eee;
+      margin-bottom: 4px;
+      padding-bottom: 4px;
+      color: #666;
+    }
+
+    .mini-selector .selector-item.parent::before {
+      display: none;
+    }
+
+    .mini-selector .siblings-group {
+      border-bottom: 1px solid #eee;
+      margin-bottom: 4px;
+      padding-bottom: 4px;
+    }
+
+    .mini-selector .children-group .selector-item {
+      padding-left: 36px;
+    }
+
+    .mini-selector .children-group .selector-item::before {
+      left: 24px;
+    }
+
+    .mini-selector .selector-item.child {
+      color: #666;
+    }
+      
+    .mini-selector .selector-item:hover {
+      background: #f0f0f0;
+    }
+      
+    .mini-selector .selector-item.selected-child {
+      background: #e0e0e0;
+    }
+
+    .drag-over-top {
+      border-top: 3px solid #0066cc !important;
+      margin-top: -3px !important;
+      position: relative;
+    }
+
+    .drag-over-top::before {
+      content: '';
+      position: absolute;
+      top: -20px;
+      left: 0;
+      right: 0;
+      height: 40px;
+      background: linear-gradient(to bottom, 
+        rgba(0, 102, 204, 0.3),
+        rgba(0, 102, 204, 0.1) 50%,
+        transparent
+      );
+      pointer-events: none;
+      border-radius: 4px;
+    }
+
+    .drag-over-top::after {
+      content: '▼';
+      position: absolute;
+      top: -20px;
+      left: 50%;
+      transform: translateX(-50%);
+      color: #0066cc;
+      font-size: 16px;
+      text-shadow: 0 0 3px white;
+    }
+
+    .drag-over-bottom {
+      border-bottom: 3px solid #0066cc !important;
+      margin-bottom: -3px !important;
+      position: relative;
+    }
+
+    .drag-over-bottom::after {
+      content: '▼';
+      position: absolute;
+      bottom: -20px;
+      left: 50%;
+      transform: translateX(-50%);
+      color: #0066cc;
+      font-size: 16px;
+      text-shadow: 0 0 3px white;
+    }
+
+    .drag-target {
+      outline: 3px dashed #0066cc !important;
+      background: rgba(0, 102, 204, 0.1) !important;
+      position: relative;
+    }
+
+    /* Add a "drop here" indicator */
+    .drag-target::after {
+      content: '⊕';
+      position: absolute;
+      top: 50%;
+      right: 10px;
+      transform: translateY(-50%);
+      color: #0066cc;
+      font-size: 16px;
+      text-shadow: 0 0 3px white;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container-fluid p-0">
+    <div class="row">
+      <div class="col-sm-9 p-0">
+        <iframe id="editor-frame" src="/editor/blog/"></iframe>        
+      </div>
+      <div class="col-sm-3 p-2">
+        <!-- Component selector element -->
+        <div class="styles-dialog-header">
+          <div class="styles-dialog-title">Elements</div>
+          <div class="styles-dialog-close">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <path stroke="currentColor" stroke-width="2" d="M6 6l12 12M6 18L18 6"/>
+            </svg>
+          </div>
+        </div>
+      <div id="component-selector" class="component-selector">
+          <div class="hierarchy-menu"></div>
+        </div>
+        <div class="mini-selector"></div>
+        <!-- Styles dialog element -->
+        <div class="styles-dialog">
+          <div class="styles-dialog-header">
+            <div class="styles-dialog-title">Computed Styles</div>
+            <div class="styles-dialog-close">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                <path stroke="currentColor" stroke-width="2" d="M6 6l12 12M6 18L18 6"/>
+              </svg>
+            </div>
+          </div>
+          <div class="styles-dialog-element"></div>
+          <table>
+            <thead>
+              <tr>
+                <th>Property</th>
+                <th>Value</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>              
+      </div>
+    </div>
+  </div>
+
+  <!-- Editor.js style toolbar template -->
+  <template id="toolbar-template">
+    <div class="ce-toolbar__actions">
+      <div class="ce-toolbar__plus">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+          <path stroke="currentColor" stroke-linecap="round" stroke-width="2" d="M12 7V12M12 17V12M17 12H12M12 12H7">
+          </path>
+        </svg>
+        <!-- Dropdown menu -->
+        <div class="ce-toolbox">
+          <div class="ce-popover__item" data-type="header">
+            <div class="ce-popover__item-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24">
+                <path stroke="currentColor" stroke-width="2" d="M4 7h4m4 0h4m4 0h-4m-4 0H8m4 0v10M4 12h2m12 0h2M4 17h2m12 0h2"/>
+              </svg>
+            </div>
+            <div class="ce-popover__item-label">Header</div>
+            <div class="ce-popover__submenu">
+              <div class="ce-popover__submenu-item" data-type="h1">
+                <div class="ce-popover__submenu-item-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                    <text x="4" y="17" fill="currentColor" style="font: bold 14px sans-serif;">H1</text>
+                  </svg>
+                </div>
+                <div class="ce-popover__item-label">Heading 1</div>
+              </div>
+              <div class="ce-popover__submenu-item" data-type="h2">
+                <div class="ce-popover__submenu-item-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                    <text x="4" y="17" fill="currentColor" style="font: bold 14px sans-serif;">H2</text>
+                  </svg>
+                </div>
+                <div class="ce-popover__item-label">Heading 2</div>
+              </div>
+              <div class="ce-popover__submenu-item" data-type="h3">
+                <div class="ce-popover__submenu-item-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                    <text x="4" y="17" fill="currentColor" style="font: bold 14px sans-serif;">H3</text>
+                  </svg>
+                </div>
+                <div class="ce-popover__item-label">Heading 3</div>
+              </div>
+              <div class="ce-popover__submenu-item" data-type="h4">
+                <div class="ce-popover__submenu-item-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                    <text x="4" y="17" fill="currentColor" style="font: bold 14px sans-serif;">H4</text>
+                  </svg>
+                </div>
+                <div class="ce-popover__item-label">Heading 4</div>
+              </div>
+              <div class="ce-popover__submenu-item" data-type="h5">
+                <div class="ce-popover__submenu-item-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                    <text x="4" y="17" fill="currentColor" style="font: bold 14px sans-serif;">H5</text>
+                  </svg>
+                </div>
+                <div class="ce-popover__item-label">Heading 5</div>
+              </div>
+              <div class="ce-popover__submenu-item" data-type="h6">
+                <div class="ce-popover__submenu-item-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                    <text x="4" y="17" fill="currentColor" style="font: bold 14px sans-serif;">H6</text>
+                  </svg>
+                </div>
+                <div class="ce-popover__item-label">Heading 6</div>
+              </div>
+            </div>
+          </div>
+          <div class="ce-popover__item" data-type="container">
+            <div class="ce-popover__item-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24">
+                <rect width="14" height="14" x="5" y="5" stroke="currentColor" stroke-width="2" rx="4"/>
+              </svg>
+            </div>
+            <div class="ce-popover__item-label">Container</div>
+            <div class="ce-popover__submenu">
+              <div class="ce-popover__submenu-item" data-type="container">
+                <div class="ce-popover__submenu-item-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                    <rect x="4" y="6" width="16" height="12" stroke="currentColor" stroke-width="2"/>
+                  </svg>
+                </div>
+                <div class="ce-popover__item-label">Default Container</div>
+              </div>
+              <div class="ce-popover__submenu-item" data-type="container-fluid">
+                <div class="ce-popover__submenu-item-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                    <rect x="2" y="6" width="20" height="12" stroke="currentColor" stroke-width="2"/>
+                  </svg>
+                </div>
+                <div class="ce-popover__item-label">Fluid Container</div>
+              </div>
+              <div class="ce-popover__submenu-item" data-type="container-sm">
+                <div class="ce-popover__submenu-item-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                    <rect x="6" y="6" width="12" height="12" stroke="currentColor" stroke-width="2"/>
+                    <text x="9" y="15" fill="currentColor" style="font: bold 8px sans-serif;">SM</text>
+                  </svg>
+                </div>
+                <div class="ce-popover__item-label">Small Container</div>
+              </div>
+              <div class="ce-popover__submenu-item" data-type="container-md">
+                <div class="ce-popover__submenu-item-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                    <rect x="5" y="6" width="14" height="12" stroke="currentColor" stroke-width="2"/>
+                    <text x="8" y="15" fill="currentColor" style="font: bold 8px sans-serif;">MD</text>
+                  </svg>
+                </div>
+                <div class="ce-popover__item-label">Medium Container</div>
+              </div>
+              <div class="ce-popover__submenu-item" data-type="container-lg">
+                <div class="ce-popover__submenu-item-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                    <rect x="4" y="6" width="16" height="12" stroke="currentColor" stroke-width="2"/>
+                    <text x="8" y="15" fill="currentColor" style="font: bold 8px sans-serif;">LG</text>
+                  </svg>
+                </div>
+                <div class="ce-popover__item-label">Large Container</div>
+              </div>
+              <div class="ce-popover__submenu-item" data-type="container-xl">
+                <div class="ce-popover__submenu-item-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                    <rect x="3" y="6" width="18" height="12" stroke="currentColor" stroke-width="2"/>
+                    <text x="8" y="15" fill="currentColor" style="font: bold 8px sans-serif;">XL</text>
+                  </svg>
+                </div>
+                <div class="ce-popover__item-label">Extra Large Container</div>
+              </div>
+              <div class="ce-popover__submenu-item" data-type="container-xxl">
+                <div class="ce-popover__submenu-item-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                    <rect x="2" y="6" width="20" height="12" stroke="currentColor" stroke-width="2"/>
+                    <text x="6" y="15" fill="currentColor" style="font: bold 8px sans-serif;">XXL</text>
+                  </svg>
+                </div>
+                <div class="ce-popover__item-label">Extra Extra Large Container</div>
+              </div>
+            </div>
+          </div>
+          <div class="ce-popover__item" data-type="style">
+            <div class="ce-popover__item-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                <path stroke="currentColor" stroke-width="2" d="M4 4h16v16H4z"/>
+                <path stroke="currentColor" stroke-width="2" d="M8 8l2 8h4l2-8"/>
+                <path stroke="currentColor" stroke-width="2" d="M7 12h10"/>
+              </svg>
+            </div>
+            <div class="ce-popover__item-label">Style</div>
+          </div>
+          <div class="ce-popover__item" data-type="div">
+            <div class="ce-popover__item-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                <rect x="4" y="4" width="16" height="16" stroke="currentColor" stroke-width="2"/>
+                <path stroke="currentColor" stroke-width="2" d="M8 8h8M8 12h8M8 16h8"/>
+              </svg>
+            </div>
+            <div class="ce-popover__item-label">Div</div>
+          </div>
+          <div class="ce-popover__item" data-type="row">
+            <div class="ce-popover__item-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24">
+                <path stroke="currentColor" stroke-width="2" d="M5 7h14M5 12h14M5 17h14"/>
+              </svg>
+            </div>
+            <div class="ce-popover__item-label">Row</div>
+          </div>
+          <div class="ce-popover__item" data-type="col">
+            <div class="ce-popover__item-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24">
+                <path stroke="currentColor" stroke-width="2" d="M7 5v14M12 5v14M17 5v14"/>
+              </svg>
+            </div>
+            <div class="ce-popover__item-label">Column</div>
+          </div>
+          <div class="ce-popover__item" data-type="image">
+            <div class="ce-popover__item-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                <path stroke="currentColor" stroke-width="2" d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14z"/>
+                <path stroke="currentColor" stroke-width="2" d="M8 8l2 8h4l2-8"/>
+                <path stroke="currentColor" stroke-width="2" d="M7 12h10"/>
+              </svg>
+            </div>
+            <div class="ce-popover__item-label">Image</div>
+          </div>
+          <div class="ce-popover__item" data-type="text">
+            <div class="ce-popover__item-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24">
+                <path stroke="currentColor" stroke-linecap="round" stroke-width="2.6" d="M8 9V7.2C8 7.08954 8.08954 7 8.2 7L12 7M16 9V7.2C16 7.08954 15.9105 7 15.8 7L12 7M12 7L12 17M12 17H10M12 17H14"/>
+              </svg>
+            </div>
+            <div class="ce-popover__item-label">Text</div>
+          </div>
+          <div class="ce-popover__item" data-type="label">
+            <div class="ce-popover__item-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24">
+                <path stroke="currentColor" stroke-linecap="round" stroke-width="2.6" d="M4 7h16M4 12h8"/>
+              </svg>
+            </div>
+            <div class="ce-popover__item-label">Label</div>
+          </div>
+          <div class="ce-popover__item" data-type="input-text">
+            <div class="ce-popover__item-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                <rect width="14" height="6" x="5" y="9" stroke="currentColor" stroke-width="2" rx="1"/>
+              </svg>
+            </div>
+            <div class="ce-popover__item-label">Input Text</div>
+          </div>
+          <div class="ce-popover__item" data-type="button">
+            <div class="ce-popover__item-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                <rect width="16" height="8" x="4" y="8" stroke="currentColor" stroke-width="2" rx="2"/>
+              </svg>
+            </div>
+            <div class="ce-popover__item-label">Button</div>
+          </div>
+          <div class="ce-popover__item" data-type="form">
+            <div class="ce-popover__item-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                <rect width="14" height="14" x="5" y="5" stroke="currentColor" stroke-width="2" rx="2"/>
+                <path stroke="currentColor" stroke-width="2" d="M9 9h6M9 12h6M9 15h4"/>
+              </svg>
+            </div>
+            <div class="ce-popover__item-label">Form</div>
+          </div>
+        </div>
+      </div>
+      <span class="ce-toolbar__settings-btn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+          <path stroke="currentColor" stroke-linecap="round" stroke-width="2.6" d="M9.40999 7.29999H9.4"></path>
+          <path stroke="currentColor" stroke-linecap="round" stroke-width="2.6" d="M14.6 7.29999H14.59"></path>
+          <path stroke="currentColor" stroke-linecap="round" stroke-width="2.6" d="M9.30999 12H9.3"></path>
+          <path stroke="currentColor" stroke-linecap="round" stroke-width="2.6" d="M14.6 12H14.59"></path>
+          <path stroke="currentColor" stroke-linecap="round" stroke-width="2.6" d="M9.40999 16.7H9.4"></path>
+          <path stroke="currentColor" stroke-linecap="round" stroke-width="2.6" d="M14.6 16.7H14.59"></path>
+        </svg>
+        <!-- Add settings menu -->
+        <div class="ce-settings-menu">
+          <div class="ce-popover__item" data-action="edit">
+            <div class="ce-popover__item-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                <path stroke="currentColor" stroke-width="2" d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+              </svg>
+            </div>
+            <div class="ce-popover__item-label">Edit</div>
+          </div>
+          <div class="ce-popover__item" data-action="paste">
+            <div class="ce-popover__item-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>
+                <rect x="8" y="2" width="8" height="4" rx="1" ry="1"/>
+                <path d="M8 8h8"/>
+                <path d="M8 12h8"/>
+                <path d="M8 16h8"/>
+              </svg>
+            </div>
+            <div class="ce-popover__item-label">Paste</div>
+          </div>
+          <div class="ce-popover__item" data-action="delete">
+            <div class="ce-popover__item-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 6h18"/>
+                <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/>
+                <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>
+                <line x1="10" y1="11" x2="10" y2="17"/>
+                <line x1="14" y1="11" x2="14" y2="17"/>
+              </svg>
+            </div>
+            <div class="ce-popover__item-label">Delete</div>
+          </div>
+        </div>
+      </span>
+    </div>
+  </template>
+  
+  <!-- Bootstrap Bundle with Popper -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+    crossorigin="anonymous"></script>
+
+  <!-- Toolbar initialization script -->
+  <script>
+    const template = document.getElementById('toolbar-template');
+    const toolbar = template.content.cloneNode(true);
+    document.body.appendChild(toolbar);
+    
+    // Initialize component selector
+    const componentSelector = document.getElementById('component-selector');
+    const miniSelector = document.querySelector('.mini-selector');
+    const hierarchyMenu = componentSelector.querySelector('.hierarchy-menu');
+    
+    // Get toolbar elements after they're added to the DOM
+    const toolbarElement = document.querySelector('.ce-toolbar__actions');
+    const plusButton = document.querySelector('.ce-toolbar__plus');
+    const settingsButton = document.querySelector('.ce-toolbar__settings-btn');
+    const toolbox = document.querySelector('.ce-toolbox');
+    const settingsMenu = document.querySelector('.ce-settings-menu');
+    
+    // Track current hovered element and active container
+    let currentHoveredElement = null;
+    let activeContainer = null;
+
+    // Function to position toolbar for an element
+    function positionToolbarForElement(element) {
+
+      const rect = element.getBoundingClientRect();
+      toolbarElement.style.position = 'absolute';
+      toolbarElement.style.top = Math.max(0, rect.top + 30) + 'px';
+      toolbarElement.style.left = Math.max(0, rect.left - 30) + 'px';
+
+      settingsMenu.classList.remove('active');
+      toolbox.classList.remove('active');
+
+      toolbarElement.style.display = 'flex';
+    }
+
+    function getElementDescription(element) {
+      if (element.id) {
+        return `${element.tagName.toLowerCase()}#${element.id}`;
+      } else if (element.className) {
+        return `${element.tagName.toLowerCase()}.${element.className.split(' ')[0]}`;
+      }
+      return element.tagName.toLowerCase();
+    }
+
+    function positionSelectorOverElement(element, selector) {
+      // const rect = element.getBoundingClientRect();
+      
+      // const left = rect.left + window.scrollX;
+      // const top = rect.top + window.scrollY;
+      
+      // selector.style.left = `${left}px`;
+      // selector.style.top = `${top}px`;      
+    }
+
+    function positionToolbarAtMouse(e) {
+      const mouseX = e.clientX;
+      const mouseY = e.clientY;
+      
+      toolbarElement.style.position = 'fixed';
+      toolbarElement.style.left = `${mouseX}px`;
+      toolbarElement.style.top = `${mouseY}px`;
+      
+      const rect = toolbarElement.getBoundingClientRect();
+      const viewportWidth = window.innerWidth;
+      const viewportHeight = window.innerHeight;
+      
+      if (rect.right > viewportWidth) {
+        toolbarElement.style.left = `${mouseX - rect.width}px`;
+      }
+
+      if (rect.bottom > viewportHeight) {
+        toolbarElement.style.top = `${mouseY - rect.height}px`;
+      }
+    }
+
+    function positionSelectorAtMouse(e) {
+      const mouseX = e.clientX;
+      const mouseY = e.clientY;
+      
+      componentSelector.style.position = 'fixed';
+      componentSelector.style.left = `${mouseX}px`;
+      componentSelector.style.top = `${mouseY}px`;
+      
+      const rect = componentSelector.getBoundingClientRect();
+      const viewportWidth = window.innerWidth;
+      const viewportHeight = window.innerHeight;
+      
+      if (rect.right > viewportWidth) {
+        componentSelector.style.left = `${mouseX - rect.width}px`;
+      }
+      if (rect.bottom > viewportHeight) {
+        componentSelector.style.top = `${mouseY - rect.height}px`;
+      }
+    }
+
+    // Add click handlers for container submenu items
+    const containerSubmenuItems = document.querySelectorAll('.ce-popover__submenu-item[data-type^="container"]');
+    containerSubmenuItems.forEach(item => {
+      item.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const type = item.getAttribute('data-type');
+        createContainer(type);
+      });
+    });
+
+    // Add row creation functionality
+    const rowOption = document.querySelector('[data-type="row"]');
+    rowOption.addEventListener('click', () => {
+      if (activeContainer && activeContainer.classList.contains('container')) {
+        // Create row
+        const row = document.createElement('div');
+        row.className = 'row editable';
+        row.style.border = '1px dashed #dedede';
+        row.style.minHeight = '40px';
+        
+        // Add row to active container
+        activeContainer.appendChild(row);
+
+        // Close the toolbox
+        toolbox.classList.remove('active');
+      }
+    });
+
+    // Add column creation functionality
+    const colOption = document.querySelector('[data-type="col"]');
+    colOption.addEventListener('click', () => {
+      if (activeContainer && activeContainer.classList.contains('row')) {
+        // Create column
+        const col = document.createElement('div');
+        col.className = 'col editable';
+        col.style.border = '1px dashed #dedede';
+        col.style.minHeight = '40px';
+        
+        // Add column to active row
+        activeContainer.appendChild(col);
+
+        // Close the toolbox
+        toolbox.classList.remove('active');
+      }
+    });
+
+    // Add header creation functionality
+    function createHeader(level) {
+      if (activeContainer) {
+        const div = document.createElement('div');
+        div.innerHTML = `<h${level}>Heading ${level}</h${level}>`;
+                
+        // Add header to active container or column
+        activeContainer.appendChild(div.firstChild);
+
+        // Close the toolbox
+        toolbox.classList.remove('active');
+      }
+    }
+
+    // Add click handlers for header submenu items
+    const headerSubmenuItems = document.querySelectorAll('.ce-popover__submenu-item[data-type^="h"]');
+    headerSubmenuItems.forEach(item => {
+      item.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const level = item.getAttribute('data-type').substring(1);
+        createHeader(level);
+      });
+    });
+
+    // Add style creation functionality
+    const styleOption = document.querySelector('[data-type="style"]');
+    styleOption.addEventListener('click', () => {
+      const div = document.createElement('div');
+      div.innerHTML = `<style>
+/* Add your CSS rules here */
+.custom-class {
+  color: #333;
+  padding: 1rem;
+  margin: 1rem 0;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+</style>`;
+      
+      activeContainer.appendChild(div.firstChild);
+      
+      // Make the style tag editable immediately
+      const styleTag = activeContainer.lastElementChild;
+      makeElementEditable(styleTag);
+      
+      toolbox.classList.remove('active');
+      toolbarElement.style.display = 'none';
+    });
+
+    // Add div creation functionality
+    const divOption = document.querySelector('[data-type="div"]');
+    divOption.addEventListener('click', () => {
+      const div = document.createElement('div');
+      div.innerHTML = `<div style="min-height: 40px; border: 1px dashed #dedede;"></div>`;
+      
+      activeContainer.appendChild(div.firstChild);
+      
+      toolbox.classList.remove('active');
+      toolbarElement.style.display = 'none';
+    });
+
+    // Add image creation functionality
+    const imageOption = document.querySelector('[data-type="image"]');
+    imageOption.addEventListener('click', () => {
+      const div = document.createElement('div');
+      div.innerHTML = `<figure class="figure">
+          <img src="https://placehold.co/600x400" class="figure-img img-fluid rounded" alt="Image description">
+          <figcaption class="figure-caption">Image caption</figcaption>
+        </figure>
+      `;
+      
+      // Add image to active container
+      activeContainer.appendChild(div.firstChild);
+
+      // Close the toolbox
+      toolbox.classList.remove('active');
+      toolbarElement.style.display = 'none';
+    });
+
+    // Add text creation functionality
+    const textOption = document.querySelector('[data-type="text"]');
+    textOption.addEventListener('click', () => {
+      if (activeContainer) {
+        const div = document.createElement('div');
+        div.innerHTML = '<p>Click to edit text</p>';
+        
+        // Add text element to active container or column
+        activeContainer.appendChild(div.firstChild);
+
+        // Close the toolbox
+        toolbox.classList.remove('active');
+      }
+    });
+
+    // Add label creation functionality
+    const labelOption = document.querySelector('[data-type="label"]');
+    labelOption.addEventListener('click', () => {
+      if (activeContainer) {
+        // Create label element
+        const label = document.createElement('label');
+        label.className = 'form-label editable';
+        label.contentEditable = true;
+        label.textContent = 'Label text';
+        
+        // Add label to active container or column
+        activeContainer.appendChild(label);
+
+        // Close the toolbox
+        toolbox.classList.remove('active');
+      }
+    });
+
+    // Add input text creation functionality
+    const inputTextOption = document.querySelector('[data-type="input-text"]');
+    inputTextOption.addEventListener('click', () => {
+      if (activeContainer) {
+        // Create input element
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.className = 'form-control editable';
+        input.placeholder = 'Type here...';
+        
+        // Add input to active container or column
+        activeContainer.appendChild(input);
+
+        // Close the toolbox
+        toolbox.classList.remove('active');
+      }
+    });
+
+    // Add button creation functionality
+    const buttonOption = document.querySelector('[data-type="button"]');
+    buttonOption.addEventListener('click', () => {
+      if (activeContainer) {
+        // Create button element
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'btn btn-primary editable';
+        button.contentEditable = true;
+        button.textContent = 'Button';
+        
+        // Add button to active container or column
+        activeContainer.appendChild(button);
+
+        // Close the toolbox
+        toolbox.classList.remove('active');
+      }
+    });
+
+    // Add form creation functionality
+    const formOption = document.querySelector('[data-type="form"]');
+    formOption.addEventListener('click', () => {
+      if (activeContainer) {
+        // Create form element
+        const form = document.createElement('form');
+        form.className = 'row editable';
+        form.style.border = '1px dashed #dedede';
+        form.style.minHeight = '40px';
+
+        // Add form to active container or column
+        activeContainer.appendChild(form);
+
+        // Close the toolbox
+        toolbox.classList.remove('active');
+      }
+    });
+
+    // Function to hide highlight overlay
+    function hideHighlight() {
+      highlightOverlay.style.display = 'none';
+    }
+
+    function buildHierarchyChain(element) {
+      const chain = [];
+      
+      let current = element;
+      while (current && current.tagName !== 'HTML' && current.tagName !== 'BODY') {
+        chain.unshift(current);
+        current = current.parentElement;
+      }
+    
+      return chain;
+    }
+
+    function refreshSelector(element) {
+      componentSelector.innerHTML = "";
+      const chain = buildHierarchyChain(element);
+      
+      // Add main first
+      const main = editorDocument.body;
+      const mainHtml = `<div class="selector-item${main === element ? ' selected' : ''}" data-element="div" draggable="true">body</div>`;
+      const mainDiv = document.createElement('div');
+      mainDiv.innerHTML = mainHtml;
+      mainDiv.firstChild.el = main;
+      componentSelector.appendChild(mainDiv.firstChild);
+      
+      // Function to create element HTML with proper indentation and prefix
+      function createElementHtml(el, level, isInChain, isSelected) {
+        const tagName = el.tagName.toLowerCase();
+        const classes = Array.from(el.classList)
+          .filter(cls => cls !== 'editable')
+          .join(' ');
+        const id = el.id ? `#${el.id}` : '';
+        
+        let className = 'selector-item';
+        if (level > 0) className += ' child';
+        if (isSelected) className += ' selected-child';
+        else if (isInChain) className += ' selected-path';
+        
+        const hasChildren = el.children.length > 0;
+        const prefix = hasChildren ? '▸' : '•';
+        const padding = level * 20;
+        
+        return `<div class="${className}" data-element="${tagName}" style="padding-left: ${padding}px" draggable="true">
+          <span class="selector-item-prefix">${prefix}</span>${tagName}${id}${classes ? ` .${classes}` : ''}
+        </div>`;
+      }
+      
+      // Function to recursively build tree
+      function buildTree(parent, level, container) {
+        const children = Array.from(parent.children);
+        if (children.length === 0) return;
+        
+        const treeContainer = document.createElement('div');
+        treeContainer.className = 'selector-tree-item';
+        // Expand if parent is in the chain
+        if (chain.includes(parent) || parent === editorDocument.body) {
+          treeContainer.classList.add('expanded');
+        }
+        
+        for (const child of children) {
+          const isInChain = chain.includes(child);
+          const isSelected = child === element;
+          
+          const childHtml = createElementHtml(child, level, isInChain, isSelected);
+          const childDiv = document.createElement('div');
+          childDiv.innerHTML = childHtml;
+          childDiv.firstChild.el = child;
+          treeContainer.appendChild(childDiv.firstChild);
+          
+          // Recursively build children
+          buildTree(child, level + 1, treeContainer);
+        }
+        
+        container.appendChild(treeContainer);
+      }
+      
+      // Build the entire tree
+      buildTree(editorDocument.body, 1, componentSelector);
+      
+      // Find and scroll to selected element
+      requestAnimationFrame(() => {
+        const selectedElement = componentSelector.querySelector('.selected-child');
+        if (selectedElement) {
+          selectedElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      });
+    }
+
+    // Add delete functionality
+    const deleteOption = document.querySelector('[data-action="delete"]');
+    deleteOption.addEventListener('click', () => {
+      if (activeContainer) {
+        activeContainer.remove();
+        miniSelector.style.display = 'none';
+        hideHighlight();
+        refreshSelector(editorDocument.body);
+        settingsMenu.classList.remove('active');
+        toolbox.classList.remove('active');
+        toolbarElement.style.display = 'none';
+      }
+    });
+
+    function makeElementEditable(element, clickEvent = null) {
+      if (element) {
+        element.contentEditable = true;
+        element.classList.add('editable');
+        
+        // Add blur handler to remove contentEditable
+        const blurHandler = () => {
+          element.contentEditable = false;
+          element.removeEventListener('blur', blurHandler);
+        };
+        element.addEventListener('blur', blurHandler);
+        
+        element.focus();
+        
+        if (clickEvent) {
+          // Place caret at click position
+          const range = document.caretRangeFromPoint(clickEvent.clientX, clickEvent.clientY);
+          if (range) {
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+          }
+        } else {
+          // Default to end of content if no click position
+          const range = document.createRange();
+          range.selectNodeContents(element);
+          range.collapse(false);
+          const selection = window.getSelection();
+          selection.removeAllRanges();
+          selection.addRange(range);
+        }
+      }
+    }
+
+    const editOption = document.querySelector('[data-action="edit"]');
+    editOption.addEventListener('click', () => {
+      if (activeContainer) {
+        makeElementEditable(activeContainer);
+        toolbarElement.style.display = 'none';
+        settingsMenu.classList.remove('active');
+      }
+    });
+
+    const pasteOptionSettings = document.querySelector('[data-action="paste"]');
+    pasteOptionSettings.addEventListener('click', async () => {
+      if (activeContainer) {
+        try {
+          const clipboardData = await navigator.clipboard.readText();
+          activeContainer.innerHTML = clipboardData;
+          
+          // Close the toolbox
+          toolbox.classList.remove('active');
+          toolbarElement.style.display = 'none';
+          settingsMenu.classList.remove('active');
+        } catch (err) {
+          console.error('Failed to read clipboard contents:', err);
+        }
+      }
+    });
+
+    document.addEventListener('click', (e) => {
+      if (toolbox.contains(e.target) || settingsMenu.contains(e.target)) {
+        return;
+      }
+      
+      if (!plusButton.contains(e.target)) {
+        toolbox.classList.remove('active');
+      }
+
+      if (!settingsButton.contains(e.target)) {
+        settingsMenu.classList.remove('active');
+      }
+    });
+
+    plusButton.addEventListener('click', (e) => {
+      e.stopPropagation();
+      settingsMenu.classList.remove('active');
+      toolbox.classList.toggle('active');
+    });
+
+    settingsButton.addEventListener('click', (e) => {
+      e.stopPropagation();
+      toolbox.classList.remove('active');
+      settingsMenu.classList.toggle('active');
+    });
+
+    // Add styles dialog functionality
+    const stylesDialog = document.querySelector('.styles-dialog');
+    const stylesDialogClose = document.querySelector('.styles-dialog-close');
+    const stylesTable = stylesDialog.querySelector('tbody');
+
+    // Function to add style handlers to a cell
+    function addStyleHandlers(valueCell, property) {
+      // Apply style and update value
+      const applyStyle = () => {
+        if (activeContainer) {
+          const newValue = valueCell.textContent.trim();
+          activeContainer.style[property] = newValue;
+          
+          // Update the cell with the actually applied value
+          setTimeout(() => {
+            const appliedValue = window.getComputedStyle(activeContainer).getPropertyValue(property);
+            if (appliedValue !== newValue) {
+              valueCell.textContent = appliedValue;
+            }
+          }, 50);
+        }
+      };
+
+      // Apply on blur
+      valueCell.addEventListener('blur', applyStyle);
+      
+      // Apply on Enter and prevent newline
+      valueCell.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          valueCell.blur();
+        }
+      });
+    }
+
+    // Function to update styles table
+    function updateStylesTable(element) {
+      if (!element) return;
+      
+      // Update element identifier
+      const elementId = element.id ? `#${element.id}` : '';
+      const elementClasses = Array.from(element.classList)
+        .filter(cls => cls !== 'editable')
+        .map(cls => `.${cls}`)
+        .join('');
+      const elementIdentifier = `${element.tagName.toLowerCase()}${elementId}${elementClasses}`;
+      document.querySelector('.styles-dialog-element').textContent = elementIdentifier;
+      
+      // Update styles table
+      const computedStyle = window.getComputedStyle(element);
+      stylesTable.innerHTML = '';
+      
+      // Define shorthand properties we want to show at the top
+      const shorthandProps = [
+        'margin',
+        'padding',
+        'border',
+        'background',
+        'font',
+        'flex',
+        'grid',
+        'transform',
+        'transition'
+      ];
+      
+      // Get shorthand values
+      const shorthandStyles = shorthandProps.map(prop => ({
+        property: prop,
+        value: computedStyle.getPropertyValue(prop)
+      })).filter(style => style.value !== '');  // Only include non-empty values
+      
+      // Add shorthand styles first with a header
+      if (shorthandStyles.length > 0) {
+        const headerRow = document.createElement('tr');
+        headerRow.innerHTML = `
+          <td colspan="2" style="background: #f8f9fa; font-weight: 600; color: #1D202B;">
+            Shorthand Properties
+          </td>
+        `;
+        stylesTable.appendChild(headerRow);
+        
+        shorthandStyles.forEach(({property, value}) => {
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td>${property}</td>
+            <td contenteditable="true">${value}</td>
+          `;
+          
+          // Add change handler for editable value
+          const valueCell = row.querySelector('td[contenteditable="true"]');
+          addStyleHandlers(valueCell, property);
+          
+          stylesTable.appendChild(row);
+        });
+        
+        // Add a separator row
+        const separatorRow = document.createElement('tr');
+        separatorRow.innerHTML = `
+          <td colspan="2" style="background: #f8f9fa; font-weight: 600; color: #1D202B;">
+            All Properties
+          </td>
+        `;
+        stylesTable.appendChild(separatorRow);
+      }
+      
+      // Get all computed styles and sort them
+      const styles = Array.from(computedStyle)
+        .sort()
+        .filter(prop => !prop.startsWith('-')) // Filter out browser-specific properties
+        .map(prop => ({
+          property: prop,
+          value: computedStyle.getPropertyValue(prop)
+        }));
+
+      // Add rows to table
+      styles.forEach(({property, value}) => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${property}</td>
+          <td contenteditable="true">${value}</td>
+        `;
+        
+        // Add change handler for editable value
+        const valueCell = row.querySelector('td[contenteditable="true"]');
+        addStyleHandlers(valueCell, property);
+        
+        stylesTable.appendChild(row);
+      });
+      
+      stylesDialog.classList.add('active');
+    }
+    
+    stylesDialogClose.addEventListener('click', () => {
+      stylesDialog.classList.remove('active');
+    });
+
+    document.addEventListener('mouseout', (e) => {
+      const relatedTarget = e.relatedTarget;
+      if (!relatedTarget || (!componentSelector.contains(relatedTarget) && !toolbarElement.contains(relatedTarget))) {
+        if (toolbarElement.style.display !== 'flex') {
+          // componentSelector.style.display = 'none';
+        }
+        currentHoveredElement = null;
+      }
+    });
+
+    const containerOption = document.querySelector('[data-type="container"]');
+    
+    function createContainer(type) {
+      if (activeContainer) {
+        const div = document.createElement('div');
+        div.innerHTML = `<div class="${type}"></div>`;
+        
+        activeContainer.appendChild(div.firstChild);
+        
+        toolbarElement.style.display = 'none';
+        toolbox.classList.remove('active');
+      }
+    }
+  </script>
+<script>
+  let editorDocument = undefined;
+  const iframe = document.getElementById("editor-frame");
+  let highlightOverlay = null;
+
+  iframe.addEventListener("load", function (ev) {
+    console.log('load', ev);
+    const win = iframe.contentWindow;
+    const href = win.location.href;
+    const filename = href.split('#')[0].split('?')[0].split('/').pop();
+    console.log(filename);
+
+    editorDocument = iframe.contentDocument;
+    console.log('doc', editorDocument);
+
+    iframe.contentWindow.addEventListener('scroll', () => {
+      hideHighlight();
+      miniSelector.style.display = 'none';
+    });
+
+    refreshSelector(editorDocument.body);
+
+    componentSelector.addEventListener('click', (e) => {
+      const selectorItem = e.target.closest('.selector-item');
+      if (!selectorItem || !selectorItem.el) return;
+
+      // Handle expansion if clicking the prefix
+      if (e.target.classList.contains('selector-item-prefix') && selectorItem.el.children.length > 0) {
+        const prefix = e.target;
+        const treeContainer = selectorItem.nextElementSibling;
+        if (treeContainer && treeContainer.classList.contains('selector-tree-item')) {
+          const isExpanded = treeContainer.classList.contains('expanded');
+          treeContainer.classList.toggle('expanded');
+          prefix.textContent = isExpanded ? '▸' : '▾';
+          e.stopPropagation();
+          return;
+        }
+      }
+
+      // Handle selection
+      e.preventDefault();
+      e.stopPropagation();
+      
+      // Save the clicked item's position relative to viewport
+      const rect = selectorItem.getBoundingClientRect();
+      const clickedY = e.clientY - componentSelector.getBoundingClientRect().top + 50;
+
+      // Clear previous selection
+      const prevSelected = componentSelector.querySelector('.selected-child');
+      if (prevSelected) {
+        prevSelected.classList.remove('selected-child');
+      }
+      selectorItem.classList.add('selected-child');
+
+      // Hide highlight while scrolling
+      if (highlightOverlay) {
+        highlightOverlay.style.display = 'none';
+      }
+
+      // First scroll, then highlight
+      selectorItem.el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      
+      const clickX = e.clientX;
+      const clickY = e.clientY;
+      toolbarElement.style.position = 'fixed';
+      toolbarElement.style.left = clickX + 'px';
+      toolbarElement.style.top = (clickY + 10) + 'px'; // Add small offset
+      toolbarElement.style.display = 'flex';
+      
+      activeContainer = selectorItem.el;
+      updateStylesTable(selectorItem.el);
+
+      // Wait for scroll to complete before showing highlight (smooth scroll typically takes ~800ms)
+      setTimeout(() => {
+        showHighlight(selectorItem.el);
+      }, 800);
+    });
+
+    editorDocument.addEventListener('mousedown', (e) => {
+      if (e.detail === 2) {
+        const target = e.target;
+        if (target.contentEditable !== 'true') {
+          makeElementEditable(target, e);
+          e.stopPropagation();
+          e.preventDefault();
+        }
+      } else if (e.detail === 1) {
+        if (e.target.closest('.component-selector')) {
+          return;
+        }
+        refreshSelector(e.target);
+        e.stopPropagation();        
+      }
+    });
+
+    editorDocument.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+
+      const clickedElement = e.target;
+      refreshSelector(clickedElement);
+      
+      // Position toolbar under mouse pointer
+      toolbarElement.style.position = 'fixed';
+      toolbarElement.style.left = e.clientX + 'px';
+      toolbarElement.style.top = (e.clientY + 10) + 'px';
+      toolbarElement.style.display = 'flex';
+      
+      // Show mini selector above mouse
+      showMiniSelector(clickedElement, e.clientX, e.clientY);
+      
+      activeContainer = clickedElement;
+      updateStylesTable(clickedElement);
+
+      return false;
+    }, true);
+
+    // Hide mini selector when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!miniSelector.contains(e.target)) {
+        miniSelector.style.display = 'none';
+      }
+    });
+
+    // Add mouseover handler for component selector items
+    componentSelector.addEventListener('mouseover', (e) => {
+      const selectorItem = e.target.closest('.selector-item');
+      if (selectorItem && selectorItem.el) {
+        showHighlight(selectorItem.el);
+      }
+    });
+
+    editorDocument.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+
+      const clickedElement = e.target;
+      refreshSelector(clickedElement);
+      
+      // Position toolbar under mouse pointer
+      toolbarElement.style.position = 'fixed';
+      toolbarElement.style.left = e.clientX + 'px';
+      toolbarElement.style.top = (e.clientY + 10) + 'px';
+      toolbarElement.style.display = 'flex';
+      
+      // Show mini selector above mouse
+      showMiniSelector(clickedElement, e.clientX, e.clientY);
+      
+      activeContainer = clickedElement;
+      updateStylesTable(clickedElement);
+
+      return false;
+    }, true);
+
+    // Hide mini selector when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!miniSelector.contains(e.target)) {
+        miniSelector.style.display = 'none';
+      }
+    });
+
+    // Add mouseover handler for component selector items
+    componentSelector.addEventListener('mouseover', (e) => {
+      const selectorItem = e.target.closest('.selector-item');
+      if (selectorItem && selectorItem.el) {
+        showHighlight(selectorItem.el);
+      }
+    });
+
+    editorDocument.addEventListener('mouseover', (e) => {
+      const target = e.target;
+      if (target === editorDocument.body || target === editorDocument.documentElement) {
+        return;
+      }
+      showHighlight(target);
+      positionToolbarForElement(target);
+      activeContainer = target;
+      updateStylesTable(target);
+    });
+
+    editorDocument.addEventListener('mouseout', (e) => {
+      const target = e.target;
+      if (target === editorDocument.body || target === editorDocument.documentElement) {
+        return;
+      }
+    });
+
+    editorDocument.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+
+      const clickedElement = e.target;
+      refreshSelector(clickedElement);
+      
+      // Position toolbar under mouse pointer
+      toolbarElement.style.position = 'fixed';
+      toolbarElement.style.left = e.clientX + 'px';
+      toolbarElement.style.top = (e.clientY + 10) + 'px';
+      toolbarElement.style.display = 'flex';
+      
+      // Show mini selector above mouse
+      showMiniSelector(clickedElement, e.clientX, e.clientY);
+      
+      activeContainer = clickedElement;
+      updateStylesTable(clickedElement);
+
+      return false;
+    }, true);
+
+    // Hide mini selector when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!miniSelector.contains(e.target)) {
+        miniSelector.style.display = 'none';
+      }
+    });
+
+    // Add drag and drop functionality to component selector
+    let draggedItem = null;
+    let draggedOverItem = null;
+
+    componentSelector.addEventListener('dragstart', (e) => {
+      if (!e.target.classList.contains('selector-item')) return;
+      draggedItem = e.target;
+      draggedItem.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move';
+    });
+
+    componentSelector.addEventListener('dragend', (e) => {
+      if (!draggedItem) return;
+      draggedItem.classList.remove('dragging');
+      if (draggedOverItem) {
+        draggedOverItem.classList.remove('drag-over');
+        draggedOverItem.classList.remove('drag-over-top');
+        draggedOverItem.classList.remove('drag-over-bottom');
+      }
+      draggedItem = null;
+      draggedOverItem = null;
+    });
+
+    componentSelector.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      if (!draggedItem) return;
+
+      const target = e.target.closest('.selector-item');
+      if (!target || target === draggedItem) return;
+
+      // Get the bounding rectangle of the target
+      const rect = target.getBoundingClientRect();
+      const mouseY = e.clientY;
+      
+      // Determine drop position - top third, middle third, or bottom third
+      const thirdHeight = rect.height / 3;
+      const isTopThird = mouseY < rect.top + thirdHeight;
+      const isBottomThird = rect.bottom - mouseY < thirdHeight;
+      
+      // Remove previous drag-over classes
+      if (draggedOverItem) {
+        draggedOverItem.classList.remove('drag-over');
+        draggedOverItem.classList.remove('drag-over-top');
+        draggedOverItem.classList.remove('drag-over-bottom');
+      }
+
+      // Add appropriate class based on position
+      if (isTopThird) {
+        target.classList.add('drag-over-top');
+      } else if (isBottomThird) {
+        target.classList.add('drag-over-bottom');
+      } else {
+        target.classList.add('drag-over');
+      }
+      draggedOverItem = target;
+    });
+
+    componentSelector.addEventListener('drop', (e) => {
+      e.preventDefault();
+      if (!draggedItem || !draggedOverItem) return;
+
+      const draggedEl = draggedItem.el;
+      const targetEl = draggedOverItem.el;
+      
+      if (!draggedEl || !targetEl || draggedEl === targetEl || draggedEl.contains(targetEl)) return;
+
+      // Get the bounding rectangle of the target
+      const rect = draggedOverItem.getBoundingClientRect();
+      const thirdHeight = rect.height / 3;
+      const mouseY = e.clientY;
+      
+      // Determine drop position - top third, middle third, or bottom third
+      const isTopThird = mouseY < rect.top + thirdHeight;
+      const isBottomThird = rect.bottom - mouseY < thirdHeight;
+
+      if (isTopThird) {
+        targetEl.parentNode.insertBefore(draggedEl, targetEl);
+      } else if (isBottomThird) {
+        targetEl.parentNode.insertBefore(draggedEl, targetEl.nextSibling);
+      } else {
+        // Drop inside the target element
+        targetEl.appendChild(draggedEl);
+      }
+
+      // Clean up
+      draggedOverItem.classList.remove('drag-over', 'drag-over-top', 'drag-over-bottom');
+      draggedItem.classList.remove('dragging');
+      
+      // Refresh the selector to show the new order
+      refreshSelector(draggedEl);
+      
+      draggedItem = null;
+      draggedOverItem = null;
+    });
+  });
+
+  // Create highlight overlay
+  highlightOverlay = document.createElement('div');
+  highlightOverlay.className = 'component-highlight';
+  highlightOverlay.style.display = 'none';
+  document.body.appendChild(highlightOverlay);
+
+  // Function to show highlight overlay for an element
+  function showHighlight(element) {
+    const rect = element.getBoundingClientRect();
+    const frameRect = iframe.getBoundingClientRect();
+    
+    highlightOverlay.style.left = `${frameRect.left + rect.left}px`;
+    highlightOverlay.style.top = `${frameRect.top + rect.top}px`;
+    highlightOverlay.style.width = `${rect.width}px`;
+    highlightOverlay.style.height = `${rect.height}px`;
+    highlightOverlay.style.display = 'block';
+  }
+
+  function getElementDisplayName(element) {
+    let name = element.tagName.toLowerCase();
+    if (element.id) {
+      name += `#${element.id}`;
+    } else if (element.className) {
+      name += `.${element.className.split(' ')[0]}`;
+    }
+    return name;
+  }
+
+  function showMiniSelector(element, mouseX, mouseY, keepPosition = false) {
+    const parent = element.parentElement;
+    if (!parent) return;
+
+    // Store current position if needed
+    const currentLeft = keepPosition ? miniSelector.style.left : null;
+    const currentTop = keepPosition ? miniSelector.style.top : null;
+
+    miniSelector.innerHTML = '';
+    
+    // Add parent first
+    const parentDiv = document.createElement('div');
+    parentDiv.className = 'selector-item parent';
+    parentDiv.textContent = getElementDisplayName(parent);
+    parentDiv.el = parent;
+    parentDiv.addEventListener('click', (e) => {
+      e.stopPropagation();
+      showMiniSelector(parent, e.clientX, e.clientY, true);
+      refreshSelector(parent);
+      showHighlight(parent);
+      activeContainer = parent;
+      updateStylesTable(parent);
+      
+      // Position toolbar under mouse pointer
+      toolbarElement.style.position = 'fixed';
+      toolbarElement.style.left = e.clientX + 'px';
+      toolbarElement.style.top = (e.clientY + 10) + 'px'; // Add small offset
+      toolbarElement.style.display = 'flex';
+    });
+    parentDiv.addEventListener('mouseover', () => showHighlight(parent));
+    parentDiv.addEventListener('mouseout', hideHighlight);
+    miniSelector.appendChild(parentDiv);
+    
+    // Add all siblings (including the element itself)
+    const siblingDiv = document.createElement('div');
+    siblingDiv.className = 'siblings-group';
+    Array.from(parent.children).forEach(child => {
+      const div = document.createElement('div');
+      div.className = 'selector-item';
+      if (child === element) {
+        div.classList.add('selected-child');
+      }
+      div.textContent = getElementDisplayName(child);
+      div.el = child;
+      div.addEventListener('click', (e) => {
+        e.stopPropagation();
+        showMiniSelector(child, e.clientX, e.clientY, true);
+        refreshSelector(child);
+        showHighlight(child);
+        activeContainer = child;
+        updateStylesTable(child);
+        
+        // Position toolbar under mouse pointer
+        toolbarElement.style.position = 'fixed';
+        toolbarElement.style.left = e.clientX + 'px';
+        toolbarElement.style.top = (e.clientY + 10) + 'px';
+        toolbarElement.style.display = 'flex';
+      });
+      div.addEventListener('mouseover', () => showHighlight(child));
+      div.addEventListener('mouseout', hideHighlight);
+      siblingDiv.appendChild(div);
+    });
+    miniSelector.appendChild(siblingDiv);
+
+    // Add children of selected element if any exist
+    if (element.children.length > 0) {
+      const childrenDiv = document.createElement('div');
+      childrenDiv.className = 'children-group';
+      Array.from(element.children).forEach(child => {
+        const div = document.createElement('div');
+        div.className = 'selector-item child';
+        div.textContent = getElementDisplayName(child);
+        div.el = child;
+        div.addEventListener('click', (e) => {
+          e.stopPropagation();
+          showMiniSelector(child, e.clientX, e.clientY, true);
+          refreshSelector(child);
+          showHighlight(child);
+          activeContainer = child;
+          updateStylesTable(child);
+          
+          // Position toolbar under mouse pointer
+          toolbarElement.style.position = 'fixed';
+          toolbarElement.style.left = e.clientX + 'px';
+          toolbarElement.style.top = (e.clientY + 10) + 'px';
+          toolbarElement.style.display = 'flex';
+        });
+        div.addEventListener('mouseover', () => showHighlight(child));
+        div.addEventListener('mouseout', hideHighlight);
+        childrenDiv.appendChild(div);
+      });
+      miniSelector.appendChild(childrenDiv);
+    }
+    
+    // Position mini selector
+    miniSelector.style.position = 'fixed';
+    if (keepPosition && currentLeft && currentTop) {
+      miniSelector.style.left = currentLeft;
+      miniSelector.style.top = currentTop;
+    } else {
+      miniSelector.style.left = mouseX + 'px';
+      miniSelector.style.top = (mouseY - miniSelector.offsetHeight - 10) + 'px';
+    }
+    miniSelector.style.display = 'block';
+  }
+
+  iframe.addEventListener('load', () => {
+    editorDocument.addEventListener('mousedown', (e) => {
+      if (e.button !== 0) return; // Only handle left clicks
+      const target = e.target;
+      
+      if (target === editorDocument.body || target === editorDocument.documentElement) {
+        return;
+      }
+
+      // Make the element draggable
+      target.draggable = true;
+      
+      // Clean up draggable attribute after mouseup
+      const cleanup = () => {
+        target.draggable = false;
+        editorDocument.removeEventListener('mouseup', cleanup);
+      };
+      editorDocument.addEventListener('mouseup', cleanup);
+    });
+
+    editorDocument.addEventListener('dragstart', (e) => {
+      const target = e.target;
+      if (target === editorDocument.body || target === editorDocument.documentElement) {
+        e.preventDefault();
+        return;
+      }
+
+      target.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move';
+      e.dataTransfer.setData('text/plain', ''); // Required for Firefox
+    });
+
+    editorDocument.addEventListener('dragend', (e) => {
+      const target = e.target;
+      target.classList.remove('dragging');
+      
+      // Clean up any remaining drag effect classes
+      Array.from(editorDocument.getElementsByClassName('drag-target')).forEach(el => {
+        el.classList.remove('drag-target');
+      });
+      Array.from(editorDocument.getElementsByClassName('drag-over-top')).forEach(el => {
+        el.classList.remove('drag-over-top');
+      });
+      Array.from(editorDocument.getElementsByClassName('drag-over-bottom')).forEach(el => {
+        el.classList.remove('drag-over-bottom');
+      });
+    });
+
+    editorDocument.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      const target = e.target;
+      
+      if (target === editorDocument.body || target === editorDocument.documentElement) {
+        return;
+      }
+
+      // Don't allow dropping on itself or its children
+      const draggingElement = editorDocument.querySelector('.dragging');
+      if (!draggingElement || target === draggingElement || draggingElement.contains(target)) {
+        return;
+      }
+
+      // Remove previous drag-target classes
+      Array.from(editorDocument.getElementsByClassName('drag-target')).forEach(el => {
+        if (el !== target) el.classList.remove('drag-target');
+      });
+      Array.from(editorDocument.getElementsByClassName('drag-over-top')).forEach(el => {
+        if (el !== target) el.classList.remove('drag-over-top');
+      });
+      Array.from(editorDocument.getElementsByClassName('drag-over-bottom')).forEach(el => {
+        if (el !== target) el.classList.remove('drag-over-bottom');
+      });
+
+      // Get the bounding rectangle of the target
+      const rect = target.getBoundingClientRect();
+      const mouseY = e.clientY;
+      
+      // Calculate drop position with larger top/bottom zones (40% each)
+      const topZoneHeight = rect.height * 0.4;
+      const bottomZoneHeight = rect.height * 0.4;
+      const isInTopZone = mouseY - rect.top < topZoneHeight;
+      const isInBottomZone = rect.bottom - mouseY < bottomZoneHeight;
+
+      if (isInTopZone) {
+        target.classList.remove('drag-target', 'drag-over-bottom');
+        target.classList.add('drag-over-top');
+      } else if (isInBottomZone) {
+        target.classList.remove('drag-target', 'drag-over-top');
+        target.classList.add('drag-over-bottom');
+      } else {
+        target.classList.remove('drag-over-top', 'drag-over-bottom');
+        target.classList.add('drag-target');
+      }
+    });
+
+    editorDocument.addEventListener('dragleave', (e) => {
+      const target = e.target;
+      target.classList.remove('drag-target', 'drag-over-top', 'drag-over-bottom');
+    });
+
+    editorDocument.addEventListener('drop', (e) => {
+      e.preventDefault();
+      const target = e.target;
+      
+      if (target === editorDocument.body || target === editorDocument.documentElement) {
+        return;
+      }
+
+      const draggingElement = editorDocument.querySelector('.dragging');
+      if (!draggingElement || target === draggingElement || draggingElement.contains(target)) {
+        return;
+      }
+
+      // Get the bounding rectangle of the target
+      const rect = target.getBoundingClientRect();
+      const mouseY = e.clientY;
+      
+      // Calculate drop position with larger top/bottom zones (40% each)
+      const topZoneHeight = rect.height * 0.4;
+      const bottomZoneHeight = rect.height * 0.4;
+      const isInTopZone = mouseY - rect.top < topZoneHeight;
+      const isInBottomZone = rect.bottom - mouseY < bottomZoneHeight;
+
+      if (isInTopZone) {
+        target.parentNode.insertBefore(draggingElement, target);
+      } else if (isInBottomZone) {
+        target.parentNode.insertBefore(draggingElement, target.nextSibling);
+      } else {
+        // Drop inside the target element
+        target.appendChild(draggingElement);
+      }
+
+      // Clean up
+      target.classList.remove('drag-target', 'drag-over-top', 'drag-over-bottom');
+      draggingElement.classList.remove('dragging');
+
+      // Update the component selector
+      refreshSelector(draggingElement);
+    });
+  });
+
+  // Function to inject styles into the iframe
+  function injectIframeStyles() {
+    const styleSheet = `
+      .dragging {
+        opacity: 0.5;
+        outline: 3px solid #0066cc !important;
+      }
+
+      .drag-target {
+        outline: 3px dashed #0066cc !important;
+        background: rgba(0, 102, 204, 0.1) !important;
+        position: relative;
+      }
+
+      /* Add a "drop here" indicator */
+      .drag-target::after {
+        content: '⊕';
+        position: absolute;
+        top: 50%;
+        right: 10px;
+        transform: translateY(-50%);
+        color: #0066cc;
+        font-size: 16px;
+        text-shadow: 0 0 3px white;
+      }
+
+      .drag-over-top {
+        border-top: 3px solid #0066cc !important;
+        margin-top: -3px !important;
+        position: relative;
+      }
+
+      .drag-over-top::before {
+        content: '';
+        position: absolute;
+        top: -20px;
+        left: 0;
+        right: 0;
+        height: 40px;
+        background: linear-gradient(to bottom, 
+          rgba(0, 102, 204, 0.3),
+          rgba(0, 102, 204, 0.1) 50%,
+          transparent
+        );
+        pointer-events: none;
+        border-radius: 4px;
+      }
+
+      /* Add a drop arrow indicator */
+      .drag-over-top::after {
+        content: '▼';
+        position: absolute;
+        top: -20px;
+        left: 50%;
+        transform: translateX(-50%);
+        color: #0066cc;
+        font-size: 16px;
+        text-shadow: 0 0 3px white;
+      }
+
+      .drag-over-bottom {
+        border-bottom: 3px solid #0066cc !important;
+        margin-bottom: -3px !important;
+        position: relative;
+      }
+
+      .drag-over-bottom::before {
+        content: '';
+        position: absolute;
+        bottom: -20px;
+        left: 0;
+        right: 0;
+        height: 40px;
+        background: linear-gradient(to top,
+          rgba(0, 102, 204, 0.3),
+          rgba(0, 102, 204, 0.1) 50%,
+          transparent
+        );
+        pointer-events: none;
+        border-radius: 4px;
+      }
+
+      /* Add a drop arrow indicator */
+      .drag-over-bottom::after {
+        content: '▼';
+        position: absolute;
+        bottom: -20px;
+        left: 50%;
+        transform: translateX(-50%);
+        color: #0066cc;
+        font-size: 16px;
+        text-shadow: 0 0 3px white;
+      }
+    `;
+
+    const styleElement = editorDocument.createElement('style');
+    styleElement.textContent = styleSheet;
+    editorDocument.head.appendChild(styleElement);
+  }
+
+  iframe.addEventListener('load', () => {
+    injectIframeStyles();
+  });
+</script>
+</body>
+
+</html>

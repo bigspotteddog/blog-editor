@@ -9,7 +9,7 @@ import org.springframework.boot.web.servlet.context.ServletWebServerInitializedE
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 
-@Service
+// @Service
 public class ServerPortService {
     private int port;
 
