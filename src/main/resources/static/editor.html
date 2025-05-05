@@ -95,7 +95,7 @@
       const url = document.querySelector("input[type=search]").value;
       console.log(url);
       document.cookie = "proxy=" + url + "; path=/;";
-      iframe.src = "/" + "?t=" + new Date().getTime();
+      iframe.src = "editor/" + "?t=" + new Date().getTime();
     });
 
     const propertiesModal = new bootstrap.Modal(document.getElementById("properties-modal"), {});

@@ -2,11 +2,14 @@ package com.example.blogeditor;
 
 import java.io.ByteArrayInputStream;
 import java.util.List;
+
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.MultiValueMapAdapter;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -19,11 +22,18 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
-@RequestMapping("/editor/**")
+@RequestMapping(value = "/**")
+@CrossOrigin(origins = "*")
 public class HttpRequestController {
     @GetMapping
     @ResponseBody
     public ResponseEntity<InputStreamResource> get(HttpServletRequest req) throws Exception {
+        if (req.getServletPath().equals("/editor.html")) {
+            ClassPathResource resource = new ClassPathResource("static/editor.html");
+            return ResponseEntity.ok()
+                .contentType(MediaType.TEXT_HTML)
+                .body(new InputStreamResource(resource.getInputStream()));
+        }
         System.out.println(req.getServletPath());
 
         String proxy = null;
@@ -86,7 +96,7 @@ public class HttpRequestController {
             }
             // Either follow the redirect or pass it back to the client
             return ResponseEntity.status(status)
-                .header(HttpHeaders.LOCATION, "/editor" + redirectLocation.replace(base, ""))
+                .header(HttpHeaders.LOCATION, redirectLocation.replace(base, ""))
                 .build();
         }
 
