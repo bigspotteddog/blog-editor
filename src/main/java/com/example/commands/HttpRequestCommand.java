@@ -191,9 +191,16 @@ public class HttpRequestCommand extends AbstractCommand<HttpResponseModel> {
                 list.add(String.valueOf(total));
             }
 
-            if (responseCode == 303) {
-                responseCode = 401;
+            // Handle redirects (3xx response codes)
+            if (responseCode >= 300 && responseCode < 400) {
+                String redirectUrl = connection.getHeaderField("Location");
+                if (redirectUrl != null) {
+                    log.info("Following redirect to: " + redirectUrl);
+                    // Create new request for redirect location
+                    return request(redirectUrl, Method.GET);
+                }
             }
+            
             log.info("Send Response Code: " + responseCode);
             response.setStatus(responseCode);
         } catch (final Exception e) {
