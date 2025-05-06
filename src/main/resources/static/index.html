@@ -1,13 +1,312 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="editable">
 
 <head>
-  <title>Blog Editor</title>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Bootstrap Page</title>
+  <!-- Bootstrap CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
     integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
   <style>
+    .editable {
+      position: relative;
+    }
+
+    /* div:empty, section:empty, form:empty, ul:empty, ol:empty, li:empty {
+      min-height: 40px;
+      border: 1px dashed #bbbbbb;
+    } */
+
+    .ce-toolbar__actions {
+      position: absolute;
+      display: none;
+      z-index: 10001;
+      /* Higher than selector */
+      opacity: 0.95;
+      background: white;
+      border-radius: 4px;
+      box-shadow: 0 3px 15px -3px rgba(13, 20, 33, 0.13);
+      padding: 2px;
+    }
+
+    .ce-toolbar__plus,
+    .ce-toolbar__settings-btn {
+      width: 34px;
+      height: 34px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: white;
+      color: #707684;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+
+    .ce-toolbar__plus {
+      border-top-left-radius: 8px;
+      border-bottom-left-radius: 8px;
+    }
+
+    .ce-toolbar__settings-btn {
+      border-top-right-radius: 8px;
+      border-bottom-right-radius: 8px;
+    }
+
+    .ce-toolbar__plus:hover,
+    .ce-toolbar__settings-btn:hover {
+      background: #EFEFEF;
+      color: #1D202B;
+    }
+
+    /* Dropdown styles */
+    .ce-toolbox {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 3px 15px -3px rgba(13, 20, 33, 0.13);
+      width: 200px;
+      display: none;
+      z-index: 1000;
+    }
+
+    .ce-toolbox.active {
+      display: block;
+    }
+
+    .ce-toolbox__content {
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 3px 15px -3px rgba(13, 20, 33, 0.13);
+    }
+
+    .ce-popover__item {
+      display: flex;
+      align-items: center;
+      padding: 8px 16px;
+      cursor: pointer;
+      color: #707684;
+      transition: background 0.2s ease;
+      position: relative;
+    }
+
+    .ce-popover__item[data-type="header"]::after {
+      content: "›";
+      position: absolute;
+      right: 8px;
+      font-size: 16px;
+      line-height: 1;
+    }
+
+    .ce-popover__item[data-type="container"]::after {
+      content: "›";
+      position: absolute;
+      right: 8px;
+      font-size: 16px;
+      line-height: 1;
+    }
+
+    .ce-popover__item:hover {
+      background: #EFEFEF;
+      color: #1D202B;
+    }
+
+    .ce-popover__item:hover>.ce-popover__submenu {
+      display: block;
+    }
+
+    .ce-popover__submenu {
+      display: none;
+      position: absolute;
+      left: 100%;
+      top: 0;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 3px 15px -3px rgba(13, 20, 33, 0.13);
+      min-width: 100px;
+      z-index: 1001;
+    }
+
+    .ce-popover__submenu-item {
+      padding: 8px 16px;
+      cursor: pointer;
+      color: #707684;
+      transition: background 0.2s ease;
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .ce-popover__submenu-item-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 20px;
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    .ce-popover__submenu-item:hover {
+      background: #EFEFEF;
+      color: #1D202B;
+    }
+
+    .ce-popover__item-icon {
+      width: 20px;
+      height: 20px;
+      margin-right: 12px;
+      display: flex;
+      align-items: center;
+    }
+
+    .ce-popover__item-label {
+      font-size: 14px;
+      line-height: 20px;
+    }
+
+    .ce-settings-menu {
+      position: absolute;
+      top: 100%;
+      left: 36px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 3px 15px -3px rgba(13, 20, 33, 0.13);
+      width: 150px;
+      display: none;
+      z-index: 1000;
+    }
+
+    .ce-settings-menu.active {
+      display: block;
+    }
+
+    /* Component selector styles */
+    .component-selector {
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 4px;
+      padding: 4px 8px;
+      z-index: 1001;
+      font-size: 13px;
+      pointer-events: auto;
+      align-items: center;
+      height: 300px;
+      overflow: auto;
+    }
+
+    .selector-item {
+      display: flex;
+      align-items: center;
+      padding: 2px 6px;
+      cursor: pointer;
+      color: #1D202B;
+      transition: all 0.2s ease;
+      border-radius: 3px;
+      pointer-events: all;
+      white-space: nowrap;
+      line-height: 1;
+      user-select: none;
+    }
+
+    .selector-item.dragging {
+      opacity: 0.5;
+      background: #f5f5f5;
+    }
+
+    .selector-item.drag-over {
+      border-bottom: 2px solid #0066cc;
+    }
+
+    .selector-item.drag-over-top {
+      border-top: 2px solid #0066cc;
+    }
+
+    .selector-tree-item {
+      display: none;
+    }
+
+    .selector-tree-item.expanded {
+      display: block;
+    }
+
+    .selector-item.child {
+      padding-left: 20px;
+    }
+
+    .selector-item.selected-child {
+      padding-left: 20px;
+      font-weight: bold;
+      color: #1D202B;
+      background: #F8F9FA;
+    }
+
+    .selector-item.selected-parent {
+      color: #1D202B;
+    }
+
+    .selector-item.selected-path {
+      color: #1D202B;
+    }
+
+    .selector-item-prefix {
+      opacity: 0.7;
+      margin-right: 4px;
+      display: inline-block;
+      width: 12px;
+      text-align: center;
+      font-size: 20px;
+    }
+
+    .selector-item:hover {
+      background: #EFEFEF;
+      color: #1D202B;
+    }
+
+    .selector-item.selected {
+      font-weight: bold;
+      color: #1D202B;
+      background: #F8F9FA;
+    }
+
+    .selector-separator {
+      color: #707684;
+      margin: 0 2px;
+      padding: 2px 6px;
+      user-select: none;
+      pointer-events: none;
+      opacity: 0.5;
+    }
+
+    /* Ensure toolbar and selector stay visible when interacting */
+    .ce-toolbar__actions:hover {
+      display: flex !important;
+    }
+
+    .container,
+    .container-fluid,
+    .container-sm,
+    .container-md,
+    .container-lg,
+    .container-xl,
+    .container-xxl {
+      min-height: 40px;
+    }
+
+    .figure {
+      margin: 1rem 0;
+    }
+
+    [contenteditable="true"] {
+      outline: none;
+    }
+
+    [contenteditable="true"]:focus {
+      outline: none;
+    }
+
     body {
       margin: 0px;
       overflow: hidden;
@@ -15,22 +314,194 @@
 
     iframe {
       width: 100%;
-      height: calc(100vh - 56px);
+      height: 100vh;
       border: none;
+      position: relative;
     }
 
-    a.disabled {
-      /* Make the disabled links grayish*/
-      color: gray;
-      /* And disable the pointer events */
+    .styles-dialog {
+      background: white;
+      overflow-y: auto;
+      max-height: calc(100vh - 400px); /* Use max-height instead of height */
+      position: relative;
+      margin-top: 20px;
+      margin-bottom: 20px; /* Add margin at bottom */
+    }
+
+    .styles-dialog.active {
+      display: block;
+    }
+
+    .styles-dialog-header {
+      position: sticky;
+      top: 0;
+      background: white;
+      z-index: 1;
+    }
+
+    .styles-dialog table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      table-layout: fixed;
+    }
+
+    .styles-dialog th,
+    .styles-dialog td {
+      padding: 6px 8px;
+      text-align: left;
+      border-bottom: 1px solid #eee;
+      word-break: break-word;
+    }
+
+    .styles-dialog th:first-child,
+    .styles-dialog td:first-child {
+      width: 50%;
+    }
+
+    .styles-dialog-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-top: 1px solid #eee;
+      border-bottom: 1px solid #eee;
+    }
+
+    .styles-dialog-title {
+      font-weight: 600;
+      color: #1D202B;
+    }
+
+    .styles-dialog-close {
+      cursor: pointer;
+      padding: 4px;
+      border-radius: 4px;
+      color: #707684;
+    }
+
+    .styles-dialog-close:hover {
+      background: #f8f9fa;
+      color: #1D202B;
+    }
+
+    .styles-dialog-element {
+      font-family: monospace;
+      padding: 8px;
+      margin: 8px 0;
+      background: #f8f9fa;
+      border-radius: 4px;
+      color: #1D202B;
+      word-break: break-all;
+    }
+
+
+    .highlight-margin {
+      position: absolute;
+      background: rgba(181, 252, 205, 0.7);
       pointer-events: none;
+      z-index: 9997;
+      transition: all 0.1s ease-in-out;
+      min-height: unset !important;
+    }
+
+    .highlight-element {
+      position: absolute;
+      background: rgba(61, 144, 215, 0.5);
+      pointer-events: none;
+      z-index: 9999;
+      transition: all 0.1s ease-in-out;
+      border-style: solid;
+      border-color: rgba(58, 89, 209, 0.6);
+      /* border-color: rgba(122, 198, 210, 0.6); */
+      min-height: unset !important;
+    }
+
+    .mini-selector {
+      position: fixed;
+      background: white;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      padding: 4px;
+      font-size: 13px;
+      display: none;
+      max-width: 300px;
+      min-width: 150px;
+      max-height: 400px;
+      overflow: auto;
+      z-index: 10000;
+    }
+
+    .mini-selector .selector-item {
+      padding: 2px 4px;
+      padding-left: 20px;
+      cursor: pointer;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      position: relative;
+      height: 40px;
+    }
+
+    .mini-selector .selector-item::before {
+      content: '';
+      position: absolute;
+      left: 8px;
+      top: 50%;
+      width: 8px;
+      height: 1px;
+      background: #333333;
+    }
+
+    .mini-selector .selector-item.parent {
+      padding-left: 4px;
+      border-bottom: 1px solid #eee;
+      margin-bottom: 4px;
+      padding-bottom: 4px;
+      color: #666;
+    }
+
+    .mini-selector .selector-item.parent::before {
+      display: none;
+    }
+
+    .mini-selector .siblings-group {
+      border-bottom: 1px solid #eee;
+      margin-bottom: 4px;
+      padding-bottom: 4px;
+    }
+
+    .mini-selector .children-group {
+      margin-left: 20px;
+    }
+
+    .mini-selector .children-group .selector-item {
+      padding-left: 16px;
+    }
+
+    .mini-selector .children-group .selector-item::before {
+      left: 4px;
+    }
+
+    .mini-selector .selector-item.child {
+      color: #666;
+    }
+
+    .mini-selector .selector-item:hover {
+      background: #f0f0f0;
+    }
+
+    .mini-selector .selector-item.selected-child {
+      background: #e0e0e0;
     }
   </style>
 </head>
 
 <body>
   <nav class="navbar bg-dark navbar-expand-sm" data-bs-theme="dark">
-    <div class="container px-4 px-lg-5">
+    <div class="container-fluid px-4 px-lg-5">
       <a class="navbar-brand" href="#">My Blog Editor</a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
         aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -60,34 +531,2049 @@
     </div>
   </nav>
 
-  <iframe id="preview" allow="fullscreen *; keyboard-map *"></iframe>
-
-  <div class="modal fade" id="properties-modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
-    aria-labelledby="staticBackdropLabel" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h1 class="modal-title fs-5" id="staticBackdropLabel">Properties Editor</h1>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-sm-9">
+        <iframe id="editor-frame" allow="fullscreen *; keyboard-map *"></iframe>
+      </div>
+      <div class="col-sm-3">
+        <!-- Component selector element -->
+        <div class="styles-dialog-header">
+          <div class="styles-dialog-title">Elements</div>
+          <div class="styles-dialog-close">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <path stroke="currentColor" stroke-width="2" d="M6 6l12 12M6 18L18 6" />
+            </svg>
+          </div>
         </div>
-        <div class="modal-body">
-          <label for="properties-editor" class="form-label">Background Image Url</label>
-          <input type="text" id="background-image-url" class="form-control mb-3"
-            placeholder='Background Image Url'></textarea>
-
-          <label for="properties-editor" class="form-label">Enter additional properties as JSON</label>
-          <textarea id="properties-editor" class="form-control mb-3" placeholder='{ "property1": "value1" }'></textarea>
+        <div id="component-selector" class="component-selector">
+          <div class="hierarchy-menu"></div>
         </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
+        <div class="mini-selector"></div>
+        <!-- Styles dialog element -->
+        <div class="styles-dialog">
+          <div class="styles-dialog-header">
+            <div class="styles-dialog-title">Computed Styles</div>
+            <div class="styles-dialog-close">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                <path stroke="currentColor" stroke-width="2" d="M6 6l12 12M6 18L18 6" />
+              </svg>
+            </div>
+          </div>
+          <div class="styles-dialog-element"></div>
+          <table>
+            <thead>
+              <tr>
+                <th>Property</th>
+                <th>Value</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
         </div>
       </div>
     </div>
   </div>
 
+  <!-- Editor.js style toolbar template -->
+  <template id="toolbar-template">
+    <div class="ce-toolbar__actions">
+      <div class="ce-toolbar__plus">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+          <path stroke="currentColor" stroke-linecap="round" stroke-width="2" d="M12 7V12M12 17V12M17 12H12M12 12H7">
+          </path>
+        </svg>
+        <!-- Dropdown menu -->
+        <div class="ce-toolbox">
+          <div class="ce-popover__item" data-type="navbar">
+            <div class="ce-popover__item-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                <rect x="4" y="4" width="16" height="16" stroke="currentColor" stroke-width="2" />
+                <path stroke="currentColor" stroke-width="2" d="M8 8h8M8 12h8M8 16h8" />
+              </svg>
+            </div>
+            <div class="ce-popover__item-label">Navbar</div>
+          </div>
+          <div class="ce-popover__item" data-type="jumbotron">
+            <div class="ce-popover__item-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                <rect x="4" y="4" width="16" height="16" stroke="currentColor" stroke-width="2" />
+                <path stroke="currentColor" stroke-width="2" d="M8 8h8M8 12h8M8 16h8" />
+              </svg>
+            </div>
+            <div class="ce-popover__item-label">Jumbotron</div>
+          </div>
+          <div class="ce-popover__item" data-type="section">
+            <div class="ce-popover__item-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                <rect x="4" y="4" width="16" height="16" stroke="currentColor" stroke-width="2" />
+                <path stroke="currentColor" stroke-width="2" d="M8 8h8M8 12h8M8 16h8" />
+              </svg>
+            </div>
+            <div class="ce-popover__item-label">Section</div>
+          </div>
+          <div class="ce-popover__item" data-type="header">
+            <div class="ce-popover__item-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24">
+                <path stroke="currentColor" stroke-width="2"
+                  d="M4 7h4m4 0h4m4 0h-4m-4 0H8m4 0v10M4 12h2m12 0h2M4 17h2m12 0h2" />
+              </svg>
+            </div>
+            <div class="ce-popover__item-label">Header</div>
+            <div class="ce-popover__submenu">
+              <div class="ce-popover__submenu-item" data-type="h1">
+                <div class="ce-popover__submenu-item-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                    <text x="4" y="17" fill="currentColor" style="font: bold 14px sans-serif;">H1</text>
+                  </svg>
+                </div>
+                <div class="ce-popover__item-label">Heading 1</div>
+              </div>
+              <div class="ce-popover__submenu-item" data-type="h2">
+                <div class="ce-popover__submenu-item-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                    <text x="4" y="17" fill="currentColor" style="font: bold 14px sans-serif;">H2</text>
+                  </svg>
+                </div>
+                <div class="ce-popover__item-label">Heading 2</div>
+              </div>
+              <div class="ce-popover__submenu-item" data-type="h3">
+                <div class="ce-popover__submenu-item-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                    <text x="4" y="17" fill="currentColor" style="font: bold 14px sans-serif;">H3</text>
+                  </svg>
+                </div>
+                <div class="ce-popover__item-label">Heading 3</div>
+              </div>
+              <div class="ce-popover__submenu-item" data-type="h4">
+                <div class="ce-popover__submenu-item-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                    <text x="4" y="17" fill="currentColor" style="font: bold 14px sans-serif;">H4</text>
+                  </svg>
+                </div>
+                <div class="ce-popover__item-label">Heading 4</div>
+              </div>
+              <div class="ce-popover__submenu-item" data-type="h5">
+                <div class="ce-popover__submenu-item-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                    <text x="4" y="17" fill="currentColor" style="font: bold 14px sans-serif;">H5</text>
+                  </svg>
+                </div>
+                <div class="ce-popover__item-label">Heading 5</div>
+              </div>
+              <div class="ce-popover__submenu-item" data-type="h6">
+                <div class="ce-popover__submenu-item-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                    <text x="4" y="17" fill="currentColor" style="font: bold 14px sans-serif;">H6</text>
+                  </svg>
+                </div>
+                <div class="ce-popover__item-label">Heading 6</div>
+              </div>
+            </div>
+          </div>
+          <div class="ce-popover__item" data-type="container">
+            <div class="ce-popover__item-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24">
+                <rect width="14" height="14" x="5" y="5" stroke="currentColor" stroke-width="2" rx="4" />
+              </svg>
+            </div>
+            <div class="ce-popover__item-label">Container</div>
+            <div class="ce-popover__submenu">
+              <div class="ce-popover__submenu-item" data-type="container">
+                <div class="ce-popover__submenu-item-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                    <rect x="4" y="6" width="16" height="12" stroke="currentColor" stroke-width="2" />
+                  </svg>
+                </div>
+                <div class="ce-popover__item-label">Default Container</div>
+              </div>
+              <div class="ce-popover__submenu-item" data-type="container-fluid">
+                <div class="ce-popover__submenu-item-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                    <rect x="2" y="6" width="20" height="12" stroke="currentColor" stroke-width="2" />
+                  </svg>
+                </div>
+                <div class="ce-popover__item-label">Fluid Container</div>
+              </div>
+              <div class="ce-popover__submenu-item" data-type="container-sm">
+                <div class="ce-popover__submenu-item-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                    <rect x="6" y="6" width="12" height="12" stroke="currentColor" stroke-width="2" />
+                    <text x="9" y="15" fill="currentColor" style="font: bold 8px sans-serif;">SM</text>
+                  </svg>
+                </div>
+                <div class="ce-popover__item-label">Small Container</div>
+              </div>
+              <div class="ce-popover__submenu-item" data-type="container-md">
+                <div class="ce-popover__submenu-item-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                    <rect x="5" y="6" width="14" height="12" stroke="currentColor" stroke-width="2" />
+                    <text x="8" y="15" fill="currentColor" style="font: bold 8px sans-serif;">MD</text>
+                  </svg>
+                </div>
+                <div class="ce-popover__item-label">Medium Container</div>
+              </div>
+              <div class="ce-popover__submenu-item" data-type="container-lg">
+                <div class="ce-popover__submenu-item-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                    <rect x="4" y="6" width="16" height="12" stroke="currentColor" stroke-width="2" />
+                    <text x="8" y="15" fill="currentColor" style="font: bold 8px sans-serif;">LG</text>
+                  </svg>
+                </div>
+                <div class="ce-popover__item-label">Large Container</div>
+              </div>
+              <div class="ce-popover__submenu-item" data-type="container-xl">
+                <div class="ce-popover__submenu-item-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                    <rect x="3" y="6" width="18" height="12" stroke="currentColor" stroke-width="2" />
+                    <text x="8" y="15" fill="currentColor" style="font: bold 8px sans-serif;">XL</text>
+                  </svg>
+                </div>
+                <div class="ce-popover__item-label">Extra Large Container</div>
+              </div>
+              <div class="ce-popover__submenu-item" data-type="container-xxl">
+                <div class="ce-popover__submenu-item-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                    <rect x="2" y="6" width="20" height="12" stroke="currentColor" stroke-width="2" />
+                    <text x="6" y="15" fill="currentColor" style="font: bold 8px sans-serif;">XXL</text>
+                  </svg>
+                </div>
+                <div class="ce-popover__item-label">Extra Extra Large Container</div>
+              </div>
+            </div>
+          </div>
+          <div class="ce-popover__item" data-type="style">
+            <div class="ce-popover__item-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                <path stroke="currentColor" stroke-width="2" d="M4 4h16v16H4z" />
+                <path stroke="currentColor" stroke-width="2" d="M8 8l2 8h4l2-8" />
+                <path stroke="currentColor" stroke-width="2" d="M7 12h10" />
+              </svg>
+            </div>
+            <div class="ce-popover__item-label">Style</div>
+          </div>
+          <div class="ce-popover__item" data-type="div">
+            <div class="ce-popover__item-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                <rect x="4" y="4" width="16" height="16" stroke="currentColor" stroke-width="2" />
+                <path stroke="currentColor" stroke-width="2" d="M8 8h8M8 12h8M8 16h8" />
+              </svg>
+            </div>
+            <div class="ce-popover__item-label">Div</div>
+          </div>
+          <div class="ce-popover__item" data-type="row">
+            <div class="ce-popover__item-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24">
+                <path stroke="currentColor" stroke-width="2" d="M5 7h14M5 12h14M5 17h14" />
+              </svg>
+            </div>
+            <div class="ce-popover__item-label">Row</div>
+          </div>
+          <div class="ce-popover__item" data-type="col">
+            <div class="ce-popover__item-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24">
+                <path stroke="currentColor" stroke-width="2" d="M7 5v14M12 5v14M17 5v14" />
+              </svg>
+            </div>
+            <div class="ce-popover__item-label">Column</div>
+          </div>
+          <div class="ce-popover__item" data-type="image">
+            <div class="ce-popover__item-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                <path stroke="currentColor" stroke-width="2"
+                  d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14z" />
+                <path stroke="currentColor" stroke-width="2" d="M8 8l2 8h4l2-8" />
+                <path stroke="currentColor" stroke-width="2" d="M7 12h10" />
+              </svg>
+            </div>
+            <div class="ce-popover__item-label">Image</div>
+          </div>
+          <div class="ce-popover__item" data-type="text">
+            <div class="ce-popover__item-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24">
+                <path stroke="currentColor" stroke-linecap="round" stroke-width="2"
+                  d="M8 9V7.2C8 7.08954 8.08954 7 8.2 7L12 7M16 9V7.2C16 7.08954 15.9105 7 15.8 7L12 7M12 7L12 17M12 17H10M12 17H14" />
+              </svg>
+            </div>
+            <div class="ce-popover__item-label">Text</div>
+          </div>
+          <div class="ce-popover__item" data-type="label">
+            <div class="ce-popover__item-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24">
+                <path stroke="currentColor" stroke-linecap="round" stroke-width="2" d="M4 7h16M4 12h8" />
+              </svg>
+            </div>
+            <div class="ce-popover__item-label">Label</div>
+          </div>
+          <div class="ce-popover__item" data-type="input-text">
+            <div class="ce-popover__item-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                <rect width="14" height="6" x="5" y="9" stroke="currentColor" stroke-width="2" rx="1" />
+              </svg>
+            </div>
+            <div class="ce-popover__item-label">Input Text</div>
+          </div>
+          <div class="ce-popover__item" data-type="button">
+            <div class="ce-popover__item-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                <rect width="16" height="8" x="4" y="8" stroke="currentColor" stroke-width="2" rx="2" />
+              </svg>
+            </div>
+            <div class="ce-popover__item-label">Button</div>
+          </div>
+          <div class="ce-popover__item" data-type="form">
+            <div class="ce-popover__item-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                <rect width="14" height="14" x="5" y="5" stroke="currentColor" stroke-width="2" rx="2" />
+                <path stroke="currentColor" stroke-width="2" d="M9 9h6M9 12h6M9 15h4" />
+              </svg>
+            </div>
+            <div class="ce-popover__item-label">Form</div>
+          </div>
+        </div>
+      </div>
+      <span class="ce-toolbar__settings-btn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+          <path stroke="currentColor" stroke-linecap="round" stroke-width="2.6" d="M9.40999 7.29999H9.4"></path>
+          <path stroke="currentColor" stroke-linecap="round" stroke-width="2.6" d="M14.6 7.29999H14.59"></path>
+          <path stroke="currentColor" stroke-linecap="round" stroke-width="2.6" d="M9.30999 12H9.3"></path>
+          <path stroke="currentColor" stroke-linecap="round" stroke-width="2.6" d="M14.6 12H14.59"></path>
+          <path stroke="currentColor" stroke-linecap="round" stroke-width="2.6" d="M9.40999 16.7H9.4"></path>
+          <path stroke="currentColor" stroke-linecap="round" stroke-width="2.6" d="M14.6 16.7H14.59"></path>
+        </svg>
+        <!-- Add settings menu -->
+        <div class="ce-settings-menu">
+          <div class="ce-popover__item" data-action="edit">
+            <div class="ce-popover__item-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                <path stroke="currentColor" stroke-width="2"
+                  d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" />
+              </svg>
+            </div>
+            <div class="ce-popover__item-label">Edit</div>
+          </div>
+          <div class="ce-popover__item" data-action="cut">
+            <div class="ce-popover__item-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" 
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="6" cy="6" r="3"></circle>
+                <circle cx="6" cy="18" r="3"></circle>
+                <line x1="20" y1="4" x2="8.12" y2="15.88"></line>
+                <line x1="14.47" y1="14.48" x2="20" y2="20"></line>
+                <line x1="8.12" y1="8.12" x2="12" y2="12"></line>
+              </svg>
+            </div>
+            <div class="ce-popover__item-label">Cut</div>
+          </div>
+          <div class="ce-popover__item" data-action="copy">
+            <div class="ce-popover__item-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+              </svg>
+            </div>
+            <div class="ce-popover__item-label">Copy</div>
+          </div>
+          <div class="ce-popover__item" data-action="paste-before">
+            <div class="ce-popover__item-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
+                <rect x="8" y="2" width="8" height="4" rx="1" ry="1" />
+                <path d="M12 8v8" />
+                <path d="M8 12h8" />
+              </svg>
+            </div>
+            <div class="ce-popover__item-label">Paste Before</div>
+          </div>
+          <div class="ce-popover__item" data-action="paste">
+            <div class="ce-popover__item-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
+                <rect x="8" y="2" width="8" height="4" rx="1" ry="1" />
+                <path d="M8 8h8" />
+                <path d="M8 12h8" />
+                <path d="M8 16h8" />
+              </svg>
+            </div>
+            <div class="ce-popover__item-label">Paste Inside</div>
+          </div>
+          <div class="ce-popover__item" data-action="paste-after">
+            <div class="ce-popover__item-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
+                <rect x="8" y="2" width="8" height="4" rx="1" ry="1" />
+                <path d="M12 8v8" />
+                <path d="M8 12h8" />
+              </svg>
+            </div>
+            <div class="ce-popover__item-label">Paste After</div>
+          </div>
+          <div class="ce-popover__item" data-action="delete">
+            <div class="ce-popover__item-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 6h18" />
+                <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
+                <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
+                <line x1="10" y1="11" x2="10" y2="17" />
+                <line x1="14" y1="11" x2="14" y2="17" />
+              </svg>
+            </div>
+            <div class="ce-popover__item-label">Delete</div>
+          </div>
+        </div>
+      </span>
+    </div>
+  </template>
+
+  <!-- Bootstrap Bundle with Popper -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
     integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
     crossorigin="anonymous"></script>
+
+  <!-- Toolbar initialization script -->
+  <script>
+    const template = document.getElementById('toolbar-template');
+    const toolbar = template.content.cloneNode(true);
+    document.body.appendChild(toolbar);
+
+    // Initialize component selector
+    const componentSelector = document.getElementById('component-selector');
+    const miniSelector = document.querySelector('.mini-selector');
+    const hierarchyMenu = componentSelector.querySelector('.hierarchy-menu');
+
+    // Get toolbar elements after they're added to the DOM
+    const toolbarElement = document.querySelector('.ce-toolbar__actions');
+    const plusButton = document.querySelector('.ce-toolbar__plus');
+    const settingsButton = document.querySelector('.ce-toolbar__settings-btn');
+    const toolbox = document.querySelector('.ce-toolbox');
+    const settingsMenu = document.querySelector('.ce-settings-menu');
+
+    // Track current hovered element and active container
+    let currentHoveredElement = null;
+    let activeContainer = null;
+    let mouseX = 0;
+    let mouseY = 0;
+
+    function isInViewport(element) {
+      const rect = element.getBoundingClientRect();
+      return (
+        rect.top >= 0 &&
+        rect.left >= 0 &&
+        rect.bottom <= (iframe.contentWindow.innerHeight || editorDocument.documentElement.clientHeight) &&
+        rect.right <= (iframe.contentWindow.innerWidth || editorDocument.documentElement.clientWidth)
+      );
+    }
+
+    function getElementDescription(element) {
+      if (element.id) {
+        return `${element.tagName.toLowerCase()}#${element.id}`;
+      } else if (element.className) {
+        return `${element.tagName.toLowerCase()}.${element.className.split(' ')[0]}`;
+      }
+      return element.tagName.toLowerCase();
+    }
+
+    // Add click handlers for container submenu items
+    const containerSubmenuItems = document.querySelectorAll('.ce-popover__submenu-item[data-type^="container"]');
+    containerSubmenuItems.forEach(item => {
+      item.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const type = item.getAttribute('data-type');
+        createContainer(type);
+      });
+    });
+
+    // Add row creation functionality
+    const rowOption = document.querySelector('[data-type="row"]');
+    rowOption.addEventListener('click', () => {
+      if (activeContainer && (activeContainer.classList.contains('container') || activeContainer.tagName === 'section')) {
+        // Create row
+        const row = document.createElement('div');
+        row.className = 'row editable';
+
+        // Add row to active container
+        activeContainer.appendChild(row);
+        refreshSelector(row);
+        showMiniSelector(activeContainer, mouseX, mouseY, 1);
+
+        // Close the toolbox
+        toolbox.classList.remove('active');
+      }
+    });
+
+    // Add column creation functionality
+    const colOption = document.querySelector('[data-type="col"]');
+    colOption.addEventListener('click', () => {
+      if (activeContainer && activeContainer.classList.contains('row')) {
+        // Create column
+        const col = document.createElement('div');
+        col.className = 'col editable';
+
+        // Add column to active row
+        activeContainer.appendChild(col);
+        refreshSelector(col);
+        showMiniSelector(activeContainer, mouseX, mouseY, 1);
+
+        // Close the toolbox
+        toolbox.classList.remove('active');
+      }
+    });
+
+    function focusSelect() {
+      const range = document.createRange();
+      range.selectNodeContents(this);
+      const selection = window.getSelection();
+      selection.removeAllRanges();
+      selection.addRange(range);
+    }
+
+    // Function to add a new inline style row
+    function addInlineStyle() {
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td contenteditable="true">property</td>
+        <td contenteditable="true">value</td>
+      `;
+      
+      // Add change handlers for both cells
+      const cells = row.querySelectorAll('td[contenteditable="true"]');
+      cells[0].addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          updateInlineStyle(e);
+        }
+      });
+      cells[1].addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          updateInlineStyle(e);
+        } else if (e.key === 'Tab' && !(event.ctrlKey || event.altKey || event.shiftKey || event.metaKey)) {
+          e.preventDefault();
+          updateInlineStyle(e);
+          setTimeout(() => {
+            addInlineStyle();
+          }, 100);
+        }
+      });
+      
+      cells[0].addEventListener('focus', focusSelect);
+      cells[1].addEventListener('focus', focusSelect);
+
+      // Insert after the header row
+      const headerRow = stylesTable.querySelector('tr#stylesheet-rules');
+      headerRow.before(row);
+      
+      // Focus the property cell
+      cells[0].focus();
+    }
+
+    // Function to update inline style when cell loses focus
+    function updateInlineStyle(e) {
+      const row = e.target.closest('tr');
+      const [propertyCell, valueCell] = row.querySelectorAll('td[contenteditable="true"]');
+      const property = propertyCell.textContent.trim();
+      const value = valueCell.textContent.trim();
+      
+      if (activeContainer) {
+        if (property && value) {
+          activeContainer.style[property] = value;
+        } else if (property) {
+          activeContainer.style.removeProperty(property);
+          row.remove();
+        }
+      }
+    }
+
+    function getStylesheetsRules(element) {
+      const matchedRules = [];
+      const allSheets = editorDocument.styleSheets;
+      
+      try {
+        // Loop through all stylesheets
+        for (let i = 0; i < allSheets.length; i++) {
+          let cssRules;
+          try {
+            cssRules = allSheets[i].cssRules || allSheets[i].rules;
+          } catch (e) {
+            // Skip cross-origin stylesheets
+            continue;
+          }
+
+          if (allSheets[i].href === 'http://localhost:8888/website/assets/css/main.css') {
+            console.log('main.css');
+          }
+          // Loop through all rules in the stylesheet
+          for (let j = 0; j < cssRules.length; j++) {
+            const rule = cssRules[j];
+            try {
+              // Check if the rule applies to our element
+              if (rule.selectorText && element.matches(rule.selectorText)) {
+                // Parse cssText to get styles
+                const styles = [];
+                const computedStyle = window.getComputedStyle(element);
+                const cssRules = rule.cssText.split('{')[1].split('}')[0].split(';');
+                
+                cssRules.forEach(rule => {
+                  const [property, value] = rule.split(':').map(s => s.trim());
+                  if (property && value) {
+                    styles.push({
+                      property: property,
+                      value: value,
+                      computedValue: computedStyle.getPropertyValue(property)
+                    });
+                  }
+                });
+                
+                matchedRules.push({
+                  selector: rule.selectorText,
+                  styles: styles,
+                  source: allSheets[i].href || 'inline stylesheet'
+                });
+              }
+            } catch (e) {
+              // Skip rules that can't be processed
+              continue;
+            }
+          }
+        }
+      } catch (e) {
+        console.error('Error accessing stylesheets:', e);
+      }
+      
+      return matchedRules;
+    }
+
+    function updateStylesDialog(element) {
+      const stylesDialogElement = document.querySelector(".styles-dialog-element");
+      stylesDialogElement.innerHTML = getElementDisplayName(element);
+      // Add inline styles section
+      const inlineHeaderRow = document.createElement('tr');
+      inlineHeaderRow.innerHTML = `
+        <td style="background: #f8f9fa; font-weight: 600; color: #1D202B;">Inline Styles</td>
+        <td style="background: #f8f9fa;"><button class="btn btn-sm btn-outline-primary" onclick="addInlineStyle()">+</button></td>
+      `;
+      stylesTable.appendChild(inlineHeaderRow);
+
+      // Add existing inline styles
+      const inlineStyles = [];
+      const computedStyle = window.getComputedStyle(element);
+      const cssRules = element.attributes.style ? ("{" + element.attributes.style.value + "}").split('{')[1].split('}')[0].split(';') : [];
+      
+      cssRules.forEach(rule => {
+        const [property, value] = rule.split(':').map(s => s.trim());
+        if (property && value) {
+          inlineStyles.push({
+            property: property,
+            value: value,
+            computedValue: computedStyle.getPropertyValue(property)
+          });
+        }
+      });
+      const declaredStyles = {};
+      
+      // Get all declared styles
+      for (let i = 0; i < inlineStyles.length; i++) {
+        const property = inlineStyles[i];
+        declaredStyles[property.property] = property.value;
+      }
+
+      // Sort properties alphabetically
+      const sortedProperties = Object.keys(declaredStyles).sort();
+
+      // Create rows for each declared style
+      for (const property of sortedProperties) {
+        const value = declaredStyles[property];
+        
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td contenteditable="true">${property}</td>
+          <td contenteditable="true">${value}</td>
+        `;
+        
+        // Add change handlers for both cells
+        const cells = row.querySelectorAll('td[contenteditable="true"]');
+        cells[0].addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            updateInlineStyle(e);
+          }
+        });
+        cells[1].addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            updateInlineStyle(e);
+          } else if (e.key === 'Tab' && !(event.ctrlKey || event.altKey || event.shiftKey || event.metaKey)) {
+            e.preventDefault();
+            updateInlineStyle(e);
+            setTimeout(() => {
+              addInlineStyle();
+            }, 100);
+          }
+        });
+        
+        cells[0].addEventListener('focus', focusSelect);
+        cells[1].addEventListener('focus', focusSelect);
+
+        stylesTable.appendChild(row);
+      }
+
+      // Get and add stylesheet rules
+      const rules = getStylesheetsRules(element);
+      
+      // Add stylesheet rules section if there are any
+      if (rules.length > 0) {
+        const headerRow = document.createElement('tr');
+        headerRow.id = "stylesheet-rules"; 
+        headerRow.innerHTML = `
+          <td colspan="2" style="background: #f8f9fa; font-weight: 600; color: #1D202B;">
+            Stylesheet Rules
+          </td>
+        `;
+        stylesTable.appendChild(headerRow);
+
+        rules.forEach(({selector, styles, source}) => {
+          // Add selector row
+          const selectorRow = document.createElement('tr');
+          selectorRow.innerHTML = `
+            <td colspan="2" style="color: #666;">
+              ${selector} <span style="opacity: 0.5;">(${source.split('/').pop()})</span>
+            </td>
+          `;
+          stylesTable.appendChild(selectorRow);
+
+          // Add each style rule
+          styles.forEach(({property, value, computedValue}) => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+              <td style="padding-left: 20px;">${property}</td>
+              <td contenteditable="true">${value}</td>
+              `;
+              
+            // Add change handler for editable value
+            const valueCell = row.querySelector('td[contenteditable="true"]');
+            addStyleHandlers(valueCell, property);
+            
+            stylesTable.appendChild(row);
+          });
+        });
+      }
+    }
+
+    function showMiniSelector(element, mouseX, mouseY, detail, keepPosition = false) {
+      const parent = element.parentElement;
+      if (!parent) return;
+
+      // Store current position if needed
+      const currentLeft = keepPosition ? miniSelector.style.left : null;
+      const currentTop = keepPosition ? miniSelector.style.top : null;
+
+      miniSelector.innerHTML = '';
+
+      // Add parent first
+      const parentDiv = document.createElement('div');
+      parentDiv.className = 'selector-item parent';
+      parentDiv.textContent = getElementDisplayName(parent);
+      parentDiv.el = parent;
+      parentDiv.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (e.detail !== 2) {
+          showMiniSelector(parent, e.clientX, e.clientY, e.detail, true);
+        }
+        refreshSelector(parent);
+        if (!isInViewport(parent)) {
+          // parent.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        setTimeout(() => {
+          showHighlight(parent);
+          activeContainer = parent;
+          stylesTable.innerHTML = '';
+          updateStylesDialog(parent);
+        }, 100);
+      });
+      parentDiv.addEventListener('mouseover', () => showHighlight(parent));
+      parentDiv.addEventListener('mouseout', hideHighlight);
+      miniSelector.appendChild(parentDiv);
+
+      // Add siblings group
+      const siblingsGroup = document.createElement('div');
+      siblingsGroup.className = 'siblings-group';
+      
+      // Add all siblings including the selected element
+      Array.from(parent.children).forEach(child => {
+        const div = document.createElement('div');
+        div.className = 'selector-item';
+        if (child === element) {
+          div.classList.add('selected-child');
+          div.textContent = getElementDisplayName(child);
+          div.el = child;
+          
+          div.addEventListener('mouseover', () => showHighlight(child));
+          div.addEventListener('mouseout', hideHighlight);
+          
+          // Only add children for the selected element
+          if (child.children.length > 0) {
+            const childrenGroup = document.createElement('div');
+            childrenGroup.className = 'children-group';
+            
+            Array.from(child.children).forEach(grandchild => {
+              const childDiv = document.createElement('div');
+              childDiv.className = 'selector-item child';
+              childDiv.textContent = getElementDisplayName(grandchild);
+              childDiv.el = grandchild;
+              
+              childDiv.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (e.detail !== 2) {
+                  showMiniSelector(grandchild, e.clientX, e.clientY, e.detail, true);
+                }
+                refreshSelector(grandchild);
+                if (!isInViewport(grandchild)) {
+                  // grandchild.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+                
+                setTimeout(() => {
+                  showHighlight(grandchild);
+                  activeContainer = grandchild;
+                  stylesTable.innerHTML = '';
+                  updateStylesDialog(grandchild);
+                }, 100);
+              });
+              
+              childDiv.addEventListener('mouseover', () => showHighlight(grandchild));
+              childDiv.addEventListener('mouseout', hideHighlight);
+              childrenGroup.appendChild(childDiv);
+            });
+            
+            siblingsGroup.appendChild(div);
+            siblingsGroup.appendChild(childrenGroup);
+          } else {
+            siblingsGroup.appendChild(div);
+          }
+        } else {
+          div.textContent = getElementDisplayName(child);
+          div.el = child;
+          
+          div.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (e.detail !== 2) {
+              showMiniSelector(child, e.clientX, e.clientY, e.detail, true);
+            }
+            refreshSelector(child);
+            if (!isInViewport(child)) {
+              // child.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+            
+            setTimeout(() => {
+              showHighlight(child);
+              activeContainer = child;
+              
+              // Update styles dialog
+              stylesTable.innerHTML = '';
+              updateStylesDialog(child);
+            }, 100);
+          });
+          
+          div.addEventListener('mouseover', () => showHighlight(child));
+          div.addEventListener('mouseout', hideHighlight);
+          siblingsGroup.appendChild(div);
+        }
+      });
+      
+      miniSelector.appendChild(siblingsGroup);
+
+      // Position mini selector
+      miniSelector.style.position = 'fixed';
+      if (keepPosition && currentLeft && currentTop) {
+        miniSelector.style.left = currentLeft;
+        miniSelector.style.top = currentTop;
+      } else {
+        // Calculate position ensuring menu stays in viewport
+        miniSelector.style.left = Math.min(mouseX, window.innerWidth - miniSelector.offsetWidth) + 'px';
+        const proposedTop = mouseY - miniSelector.offsetHeight - 10;
+        miniSelector.style.top = Math.max(0, proposedTop) + 'px';
+      }
+      if (editorDocument.activeElement === element && element.classList.contains('editable')) {
+        miniSelector.style.display = 'none';
+        toolbarElement.style.display = 'none';
+      } else {
+        miniSelector.style.display = 'block';
+        
+        // Position toolbar next to selected item after mini-selector is visible
+        requestAnimationFrame(() => {
+          const selectedItem = miniSelector.querySelector('.selected-child');
+          if (selectedItem) {
+            const selectedRect = selectedItem.getBoundingClientRect();
+            const miniSelectorRect = miniSelector.getBoundingClientRect();
+            
+            toolbarElement.style.position = 'fixed';
+            toolbarElement.style.top = selectedRect.top + 'px';
+            toolbarElement.style.left = (miniSelectorRect.right) + 'px';
+            toolbarElement.style.display = 'flex';
+          }
+        });
+      }
+    }
+
+    // Add header creation functionality
+    function createHeader(level) {
+      if (activeContainer) {
+        const div = document.createElement('div');
+        div.innerHTML = `<h${level}>Heading ${level}</h${level}>`;
+
+        // Add header to active container or column
+        const newElement = div.firstChild;
+        activeContainer.appendChild(newElement);
+        refreshSelector(newElement);
+        showMiniSelector(activeContainer, mouseX, mouseY, 1);
+
+        // Close the toolbox
+        toolbox.classList.remove('active');
+      }
+    }
+
+    // Add click handlers for header submenu items
+    const headerSubmenuItems = document.querySelectorAll('.ce-popover__submenu-item[data-type^="h"]');
+    headerSubmenuItems.forEach(item => {
+      item.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const level = item.getAttribute('data-type').substring(1);
+        createHeader(level);
+      });
+    });
+
+    // Add style creation functionality
+    const styleOption = document.querySelector('[data-type="style"]');
+    styleOption.addEventListener('click', () => {
+      const div = document.createElement('div');
+      div.innerHTML = `<style>
+/* Add your CSS rules here */
+.custom-class {
+  color: #333;
+  padding: 1rem;
+  margin: 1rem 0;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+</style>`;
+
+      const newElement = div.firstChild;
+      activeContainer.appendChild(newElement);
+      refreshSelector(newElement);
+      showMiniSelector(activeContainer, mouseX, mouseY, 1);
+
+      // Make the style tag editable immediately
+      const styleTag = activeContainer.lastElementChild;
+      makeElementEditable(styleTag);
+
+      toolbox.classList.remove('active');
+      toolbarElement.style.display = 'none';
+    });
+
+    // Add navbar creation functionality
+    const navbarOption = document.querySelector('[data-type="navbar"]');
+    navbarOption.addEventListener('click', () => {
+      const div = document.createElement('div');
+      div.innerHTML = `<div class="bd-example m-0 border-0">
+  <nav class="navbar navbar-expand-lg bg-body-tertiary">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="#">Navbar</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="#">Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">Link</a>
+          </li>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              Dropdown
+            </a>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" href="#">Action</a></li>
+              <li><a class="dropdown-item" href="#">Another action</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item" href="#">Something else here</a></li>
+            </ul>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link disabled" aria-disabled="true">Disabled</a>
+          </li>
+        </ul>
+        <form class="d-flex" role="search">
+          <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+          <button class="btn btn-outline-success" type="submit">Search</button>
+        </form>
+      </div>
+    </div>
+  </nav>
+</div>`;
+
+      const newElement = div.firstChild;
+      activeContainer.appendChild(newElement);
+      refreshSelector(newElement);
+      showMiniSelector(activeContainer, mouseX, mouseY, 1);
+
+      toolbox.classList.remove('active');
+      toolbarElement.style.display = 'none';
+    });
+
+
+    // Add navbar creation functionality
+    const jumbotronOption = document.querySelector('[data-type="jumbotron"]');
+    jumbotronOption.addEventListener('click', () => {
+      const div = document.createElement('div');
+      div.innerHTML = `<div><svg xmlns="http://www.w3.org/2000/svg" class="d-none">
+  <symbol id="bootstrap" viewBox="0 0 118 94">
+    <title>Bootstrap</title>
+    <path fill-rule="evenodd" clip-rule="evenodd" d="M24.509 0c-6.733 0-11.715 5.893-11.492 12.284.214 6.14-.064 14.092-2.066 20.577C8.943 39.365 5.547 43.485 0 44.014v5.972c5.547.529 8.943 4.649 10.951 11.153 2.002 6.485 2.28 14.437 2.066 20.577C12.794 88.106 17.776 94 24.51 94H93.5c6.733 0 11.714-5.893 11.491-12.284-.214-6.14.064-14.092 2.066-20.577 2.009-6.504 5.396-10.624 10.943-11.153v-5.972c-5.547-.529-8.934-4.649-10.943-11.153-2.002-6.484-2.28-14.437-2.066-20.577C105.214 5.894 100.233 0 93.5 0H24.508zM80 57.863C80 66.663 73.436 72 62.543 72H44a2 2 0 01-2-2V24a2 2 0 012-2h18.437c9.083 0 15.044 4.92 15.044 12.474 0 5.302-4.01 10.049-9.119 10.88v.277C75.317 46.394 80 51.21 80 57.863zM60.521 28.34H49.948v14.934h8.905c6.884 0 10.68-2.772 10.68-7.727 0-4.643-3.264-7.207-9.012-7.207zM49.948 49.2v16.458H60.91c7.167 0 10.964-2.876 10.964-8.281 0-5.406-3.903-8.178-11.425-8.178H49.948z"></path>
+  </symbol>
+  <symbol id="arrow-right-short" viewBox="0 0 16 16">
+    <path fill-rule="evenodd" d="M4 8a.5.5 0 0 1 .5-.5h5.793L8.146 5.354a.5.5 0 1 1 .708-.708l3 3a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708-.708L10.293 8.5H4.5A.5.5 0 0 1 4 8z"></path>
+  </symbol>
+  <symbol id="check2-circle" viewBox="0 0 16 16">
+    <path d="M2.5 8a5.5 5.5 0 0 1 8.25-4.764.5.5 0 0 0 .5-.866A6.5 6.5 0 1 0 14.5 8a.5.5 0 0 0-1 0 5.5 5.5 0 1 1-11 0z"></path>
+    <path d="M15.354 3.354a.5.5 0 0 0-.708-.708L8 9.293 5.354 6.646a.5.5 0 1 0-.708.708l3 3a.5.5 0 0 0 .708 0l7-7z"></path>
+  </symbol>
+</svg>
+<div class="container my-5">
+  <div class="p-5 text-center bg-body-tertiary rounded-3">
+    <svg class="bi mt-4 mb-3" style="color: var(--bs-indigo);" width="100" height="100" aria-hidden="true"><use xlink:href="#bootstrap" style="fill: currentColor;"></use></svg>
+    <h1 class="text-body-emphasis">Jumbotron with icon</h1>
+    <p class="col-lg-8 mx-auto fs-5 text-muted">
+      This is a custom jumbotron featuring an SVG image at the top, some longer text that wraps early thanks to a responsive <code>.col-*</code> class, and a customized call to action.
+    </p>
+    <div class="d-inline-flex gap-2 mb-5">
+      <button class="d-inline-flex align-items-center btn btn-primary btn-lg px-4 rounded-pill" type="button">
+        Call to action
+        <svg class="bi ms-2" width="24" height="24" aria-hidden="true"><use xlink:href="#arrow-right-short" style="fill: currentColor;"></use></svg>
+      </button>
+      <button class="btn btn-outline-secondary btn-lg px-4 rounded-pill" type="button">
+        Secondary link
+      </button>
+    </div>
+  </div>
+</div></div>`;
+
+      const newElement = div.firstChild;
+      activeContainer.appendChild(newElement);
+      refreshSelector(newElement);
+      showMiniSelector(activeContainer, mouseX, mouseY, 1);
+
+      toolbox.classList.remove('active');
+      toolbarElement.style.display = 'none';
+    });
+
+    // Add section creation functionality
+    const sectionOption = document.querySelector('[data-type="section"]');
+    sectionOption.addEventListener('click', () => {
+      const div = document.createElement('div');
+      div.innerHTML = `<section></section>`;
+
+      const newElement = div.firstChild;
+      activeContainer.appendChild(newElement);
+      refreshSelector(newElement);
+      showMiniSelector(activeContainer, mouseX, mouseY, 1);
+
+      toolbox.classList.remove('active');
+      toolbarElement.style.display = 'none';
+    });
+
+    // Add div creation functionality
+    const divOption = document.querySelector('[data-type="div"]');
+    divOption.addEventListener('click', () => {
+      const div = document.createElement('div');
+      div.innerHTML = `<div></div>`;
+
+      const newElement = div.firstChild;
+      activeContainer.appendChild(div.firstChild);
+      refreshSelector(newElement);
+      showMiniSelector(activeContainer, mouseX, mouseY, 1);
+
+      toolbox.classList.remove('active');
+      toolbarElement.style.display = 'none';
+    });
+
+    // Add image creation functionality
+    const imageOption = document.querySelector('[data-type="image"]');
+    imageOption.addEventListener('click', () => {
+      const div = document.createElement('div');
+      div.innerHTML = `<figure class="figure">
+          <img src="https://placehold.co/600x400" class="figure-img img-fluid rounded" alt="Image description">
+          <figcaption class="figure-caption">Image caption</figcaption>
+        </figure>
+      `;
+
+      const newElement = div.firstChild;
+      activeContainer.appendChild(div.firstChild);
+      refreshSelector(newElement);
+      showMiniSelector(activeContainer, mouseX, mouseY, 1);
+
+      // Close the toolbox
+      toolbox.classList.remove('active');
+      toolbarElement.style.display = 'none';
+    });
+
+    // Add text creation functionality
+    const textOption = document.querySelector('[data-type="text"]');
+    textOption.addEventListener('click', () => {
+      if (activeContainer) {
+        const div = document.createElement('div');
+        div.innerHTML = '<p>Click to edit text</p>';
+
+        // Add text element to active container or column
+        const newElement = div.firstChild;
+        activeContainer.appendChild(newElement);
+        refreshSelector(newElement);
+        showMiniSelector(activeContainer, mouseX, mouseY, 1);
+
+        // Close the toolbox
+        toolbox.classList.remove('active');
+      }
+    });
+
+    // Add label creation functionality
+    const labelOption = document.querySelector('[data-type="label"]');
+    labelOption.addEventListener('click', () => {
+      if (activeContainer) {
+        // Create label element
+        const label = document.createElement('label');
+        label.className = 'form-label editable';
+        label.contentEditable = true;
+        label.textContent = 'Label text';
+        label.style.outline = 'none';
+
+        // Add label to active container or column
+        activeContainer.appendChild(label);
+        refreshSelector(label);
+        showMiniSelector(activeContainer, mouseX, mouseY, 1);
+
+        // Close the toolbox
+        toolbox.classList.remove('active');
+      }
+    });
+
+    // Add input text creation functionality
+    const inputTextOption = document.querySelector('[data-type="input-text"]');
+    inputTextOption.addEventListener('click', () => {
+      if (activeContainer) {
+        // Create input element
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.className = 'form-control editable';
+        input.placeholder = 'Type here...';
+
+        // Add input to active container or column
+        activeContainer.appendChild(input);
+        refreshSelector(input);
+        showMiniSelector(activeContainer, mouseX, mouseY, 1);
+
+        // Close the toolbox
+        toolbox.classList.remove('active');
+      }
+    });
+
+    // Add button creation functionality
+    const buttonOption = document.querySelector('[data-type="button"]');
+    buttonOption.addEventListener('click', () => {
+      if (activeContainer) {
+        // Create button element
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'btn btn-primary editable';
+        button.contentEditable = true;
+        button.textContent = 'Button';
+        button.style.outline = 'none';
+
+        // Add button to active container or column
+        activeContainer.appendChild(button);
+        refreshSelector(button);
+        showMiniSelector(activeContainer, mouseX, mouseY, 1);
+
+        // Close the toolbox
+        toolbox.classList.remove('active');
+      }
+    });
+
+    // Add form creation functionality
+    const formOption = document.querySelector('[data-type="form"]');
+    formOption.addEventListener('click', () => {
+      if (activeContainer) {
+        // Create form element
+        const form = document.createElement('form');
+        form.className = 'row editable';
+
+        // Add form to active container or column
+        activeContainer.appendChild(form);
+        refreshSelector(form);
+        showMiniSelector(activeContainer, mouseX, mouseY, 1);
+
+        // Close the toolbox
+        toolbox.classList.remove('active');
+      }
+    });
+
+    let highlightOverlay = null;
+
+    // Function to hide highlight overlay
+    function hideHighlight() {
+      highlightOverlay.margin.top.style.display = 'none';
+      highlightOverlay.margin.right.style.display = 'none';
+      highlightOverlay.margin.bottom.style.display = 'none';
+      highlightOverlay.margin.left.style.display = 'none';
+      highlightOverlay.element.style.display = 'none';
+    }
+
+    function buildHierarchyChain(element) {
+      const chain = [];
+
+      let current = element;
+      while (current && current.tagName !== 'HTML' && current.tagName !== 'BODY') {
+        chain.unshift(current);
+        current = current.parentElement;
+      }
+
+      return chain;
+    }
+
+    function refreshSelector(element) {
+      componentSelector.innerHTML = "";
+      const chain = buildHierarchyChain(element);
+
+      // Add main first
+      const main = editorDocument.body;
+      const mainHtml = `<div class="selector-item${main === element ? ' selected' : ''}" data-element="div" draggable="true">body</div>`;
+      const mainDiv = document.createElement('div');
+      mainDiv.innerHTML = mainHtml;
+      mainDiv.firstChild.el = main;
+      componentSelector.appendChild(mainDiv.firstChild);
+
+      // Function to create element HTML with proper indentation and prefix
+      function createElementHtml(el, level, isInChain, isSelected) {
+        const tagName = el.tagName.toLowerCase();
+        const classes = Array.from(el.classList)
+          .filter(cls => cls !== 'editable')
+          .join(' ');
+        const id = el.id ? `#${el.id}` : '';
+
+        let className = 'selector-item';
+        if (level > 0) className += ' child';
+        if (isSelected) className += ' selected-child';
+        else if (isInChain) className += ' selected-path';
+
+        const hasChildren = el.children.length > 0;
+        const prefix = hasChildren ? '▸' : '•';
+        const padding = level * 20;
+
+        return `<div class="${className}" data-element="${tagName}" style="padding-left: ${padding}px" draggable="true">
+          <span class="selector-item-prefix">${prefix}</span>${tagName}${id}${classes ? ` .${classes}` : ''}
+        </div>`;
+      }
+
+      // Function to recursively build tree
+      function buildTree(parent, level, container) {
+        const children = Array.from(parent.children);
+        if (children.length === 0) return;
+
+        const treeContainer = document.createElement('div');
+        treeContainer.className = 'selector-tree-item';
+        // Expand if parent is in the chain
+        if (chain.includes(parent) || parent === editorDocument.body) {
+          treeContainer.classList.add('expanded');
+        }
+
+        for (const child of children) {
+          const isInChain = chain.includes(child);
+          const isSelected = child === element;
+
+          const childHtml = createElementHtml(child, level, isInChain, isSelected);
+          const childDiv = document.createElement('div');
+          childDiv.innerHTML = childHtml;
+          childDiv.firstChild.el = child;
+          treeContainer.appendChild(childDiv.firstChild);
+
+          // Recursively build children
+          buildTree(child, level + 1, treeContainer);
+        }
+
+        container.appendChild(treeContainer);
+      }
+
+      // Build the entire tree
+      buildTree(editorDocument.body, 1, componentSelector);
+
+      // Find and scroll to selected element
+      requestAnimationFrame(() => {
+        const selectedElement = componentSelector.querySelector('.selected-child');
+        if (selectedElement) {
+          if (!isInViewport(selectedElement)) {
+            // selectedElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
+        }
+      });
+    }
+
+    // Add delete functionality
+    const deleteOption = document.querySelector('[data-action="delete"]');
+    deleteOption.addEventListener('click', () => {
+      if (activeContainer) {
+        const parentElement = activeContainer.parentElement;
+        setTimeout(() => {
+          activeContainer.remove();
+          miniSelector.style.display = 'none';
+          hideHighlight();
+          refreshSelector(editorDocument.body);
+          // Show mini-selector for parent after deletion
+          showMiniSelector(parentElement, mouseX, mouseY, 1);
+          settingsMenu.classList.remove('active');
+          toolbox.classList.remove('active');
+          toolbarElement.style.display = 'none';
+        }, 100);
+      }
+    });
+
+    function makeElementEditable(element, clickEvent = null) {
+      if (element) {
+        element.contentEditable = true;
+        element.classList.add('editable');
+        element.style.outline = 'none';
+
+        // Add blur handler to remove contentEditable
+        const blurHandler = () => {
+          element.contentEditable = false;
+          element.removeEventListener('blur', blurHandler);
+          element.classList.remove('editable');
+        };
+        element.addEventListener('blur', blurHandler);
+
+        element.focus();
+        miniSelector.style.display = 'none';
+        toolbarElement.style.display = 'none';
+
+        if (clickEvent) {
+          // Place caret at click position
+          const range = document.caretRangeFromPoint(clickEvent.clientX, clickEvent.clientY);
+          if (range) {
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+          }
+        } else {
+          // Default to end of content if no click position
+          const range = document.createRange();
+          range.selectNodeContents(element);
+          range.collapse(false);
+          const selection = window.getSelection();
+          selection.removeAllRanges();
+          selection.addRange(range);
+        }
+      }
+    }
+
+    const editOption = document.querySelector('[data-action="edit"]');
+    editOption.addEventListener('click', () => {
+      if (activeContainer) {
+        setTimeout(() => {
+          miniSelector.style.display = 'none';
+          toolbarElement.style.display = 'none';
+          settingsMenu.classList.remove('active');
+          makeElementEditable(activeContainer);
+        }, 100);
+      }
+    });
+
+    // Add cut functionality
+    const cutOptionSettings = document.querySelector('[data-action="cut"]');
+    cutOptionSettings.addEventListener('click', async () => {
+      if (activeContainer) {
+        try {
+          await navigator.clipboard.writeText(activeContainer.outerHTML);
+          const parentElement = activeContainer.parentElement;
+          activeContainer.remove();
+          miniSelector.style.display = 'none';
+          hideHighlight();
+          refreshSelector(editorDocument.body);
+          // Show mini-selector for parent after cut
+          showMiniSelector(parentElement, mouseX, mouseY, 1);
+          settingsMenu.classList.remove('active');
+          toolbox.classList.remove('active');
+          toolbarElement.style.display = 'none';
+        } catch (err) {
+          console.error('Failed to cut element:', err);
+        }
+      }
+    });
+
+    // Add copy functionality 
+    const copyOptionSettings = document.querySelector('[data-action="copy"]');
+    copyOptionSettings.addEventListener('click', async () => {
+      if (activeContainer) {
+        try {
+          await navigator.clipboard.writeText(activeContainer.outerHTML);
+          settingsMenu.classList.remove('active');
+          toolbarElement.style.display = 'none';
+        } catch (err) {
+          console.error('Failed to copy element:', err);
+        }
+      }
+    });
+
+    // Add paste before functionality
+    const pasteBeforeOption = document.querySelector('[data-action="paste-before"]');
+    pasteBeforeOption.addEventListener('click', async () => {
+      if (activeContainer) {
+        try {
+          const clipboardData = await navigator.clipboard.readText();
+          const tempDiv = document.createElement('div');
+          tempDiv.innerHTML = clipboardData;
+          const newElement = tempDiv.firstChild;
+          
+          // Insert before the active container
+          activeContainer.parentNode.insertBefore(newElement, activeContainer);
+          refreshSelector(newElement);
+          showMiniSelector(activeContainer.parentNode, mouseX, mouseY, 1);
+
+          // Close menus
+          toolbox.classList.remove('active');
+          toolbarElement.style.display = 'none';
+          settingsMenu.classList.remove('active');
+
+          // Show highlight for the new element
+          setTimeout(() => {
+            showHighlight(newElement);
+            activeContainer = newElement;
+          }, 100);
+        } catch (err) {
+          console.error('Failed to read clipboard contents:', err);
+        }
+      }
+    });
+
+    // Add paste inside (original paste) functionality
+    const pasteInsideOption = document.querySelector('[data-action="paste"]');
+    pasteInsideOption.addEventListener('click', async () => {
+      if (activeContainer) {
+        try {
+          const clipboardData = await navigator.clipboard.readText();
+          const tempDiv = document.createElement('div');
+          tempDiv.innerHTML = clipboardData;
+          const newElement = tempDiv.firstChild;
+          
+          // Insert inside the active container
+          activeContainer.appendChild(newElement);
+          refreshSelector(newElement);
+          showMiniSelector(activeContainer, mouseX, mouseY, 1);
+
+          // Close menus
+          toolbox.classList.remove('active');
+          toolbarElement.style.display = 'none';
+          settingsMenu.classList.remove('active');
+
+          // Show highlight for the new element
+          setTimeout(() => {
+            showHighlight(newElement);
+            activeContainer = newElement;
+          }, 100);
+        } catch (err) {
+          console.error('Failed to read clipboard contents:', err);
+        }
+      }
+    });
+
+    // Add paste after functionality
+    const pasteAfterOption = document.querySelector('[data-action="paste-after"]');
+    pasteAfterOption.addEventListener('click', async () => {
+      if (activeContainer) {
+        try {
+          const clipboardData = await navigator.clipboard.readText();
+          const tempDiv = document.createElement('div');
+          tempDiv.innerHTML = clipboardData;
+          const newElement = tempDiv.firstChild;
+          
+          // Insert after the active container
+          activeContainer.parentNode.insertBefore(newElement, activeContainer.nextSibling);
+          refreshSelector(newElement);
+          showMiniSelector(activeContainer.parentNode, mouseX, mouseY, 1);
+
+          // Close menus
+          toolbox.classList.remove('active');
+          toolbarElement.style.display = 'none';
+          settingsMenu.classList.remove('active');
+
+          // Show highlight for the new element
+          setTimeout(() => {
+            showHighlight(newElement);
+            activeContainer = newElement;
+          }, 100);
+        } catch (err) {
+          console.error('Failed to read clipboard contents:', err);
+        }
+      }
+    });
+
+    document.addEventListener('click', (e) => {
+      if (toolbox.contains(e.target) || settingsMenu.contains(e.target)) {
+        return;
+      }
+
+      if (!plusButton.contains(e.target)) {
+        toolbox.classList.remove('active');
+      }
+
+      if (!settingsButton.contains(e.target)) {
+        settingsMenu.classList.remove('active');
+      }
+    });
+
+    plusButton.addEventListener('click', (e) => {
+      e.stopPropagation();
+      settingsMenu.classList.remove('active');
+      toolbox.classList.toggle('active');
+    });
+
+    settingsButton.addEventListener('click', (e) => {
+      e.stopPropagation();
+      toolbox.classList.remove('active');
+      settingsMenu.classList.toggle('active');
+    });
+
+    // Add styles dialog functionality
+    const stylesDialog = document.querySelector('.styles-dialog');
+    const stylesDialogClose = document.querySelector('.styles-dialog-close');
+    const stylesTable = stylesDialog.querySelector('tbody');
+
+    // Function to add style handlers to a cell
+    function addStyleHandlers(valueCell, property) {
+      // Apply style and update value
+      const applyStyle = () => {
+        if (activeContainer) {
+          const newValue = valueCell.textContent.trim();
+          activeContainer.style[property] = newValue;
+
+          // Update the cell with the actually applied value
+          setTimeout(() => {
+            const appliedValue = window.getComputedStyle(activeContainer).getPropertyValue(property);
+            if (appliedValue !== newValue) {
+              valueCell.textContent = appliedValue;
+            }
+          }, 50);
+        }
+      };
+
+      // Apply on blur
+      valueCell.addEventListener('blur', applyStyle);
+
+      // Apply on Enter and prevent newline
+      valueCell.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          valueCell.blur();
+        }
+      });
+    }
+
+    stylesDialogClose.addEventListener('click', () => {
+      stylesDialog.classList.remove('active');
+    });
+
+    document.addEventListener('mouseout', (e) => {
+      const relatedTarget = e.relatedTarget;
+      if (!relatedTarget || (!componentSelector.contains(relatedTarget) && !toolbarElement.contains(relatedTarget))) {
+        if (toolbarElement.style.display !== 'flex') {
+          // componentSelector.style.display = 'none';
+        }
+        currentHoveredElement = null;
+      }
+    });
+
+    const containerOption = document.querySelector('[data-type="container"]');
+
+    function createContainer(type) {
+      if (activeContainer) {
+        const div = document.createElement('div');
+        div.innerHTML = `<div class="${type}"></div>`;
+
+        // Add header to active container or column
+        const newElement = div.firstChild;
+        activeContainer.appendChild(newElement);
+        refreshSelector(newElement);
+        showMiniSelector(activeContainer, mouseX, mouseY, 1);
+
+        toolbarElement.style.display = 'none';
+        toolbox.classList.remove('active');
+      }
+    }
+  </script>
+  <script>
+    let editorDocument = undefined;
+    const iframe = document.getElementById("editor-frame");
+
+    iframe.addEventListener("load", function (ev) {
+      console.log('load', ev);
+      const win = iframe.contentWindow;
+      const href = win.location.href;
+      const filename = href.split('#')[0].split('?')[0].split('/').pop();
+      console.log(filename);
+
+      editorDocument = iframe.contentDocument;
+      console.log('doc', editorDocument);
+
+      const iframeDocument = this.contentDocument || this.contentWindow.document;  
+      // Create a style element
+      const styleElement = iframeDocument.createElement('style');
+      styleElement.textContent = `
+        div:empty, section:empty, form:empty, ul:empty, ol:empty, li:empty {
+          min-height: 40px;
+          border: 1px dashed lightgray;
+        }
+      `;
+      // Append style to iframe's head
+      iframeDocument.head.appendChild(styleElement);
+
+      // Hide mini-selector when contenteditable has focus
+      document.addEventListener('focus', (e) => {
+        console.log('focus', e.target);
+        // if (e.target.contentEditable === 'true') {
+        //   miniSelector.style.display = 'none';
+        // }
+      });
+
+      iframe.contentWindow.addEventListener('scroll', () => {
+        hideHighlight();
+        miniSelector.style.display = 'none';
+        toolbarElement.style.display = 'none';
+      });
+
+      refreshSelector(editorDocument.body);
+
+      componentSelector.addEventListener('click', (e) => {
+        const selectorItem = e.target.closest('.selector-item');
+        if (!selectorItem || !selectorItem.el) return;
+
+        // Handle expansion if clicking the prefix
+        if (e.target.classList.contains('selector-item-prefix') && selectorItem.el.children.length > 0) {
+          const prefix = e.target;
+          const treeContainer = selectorItem.nextElementSibling;
+          if (treeContainer && treeContainer.classList.contains('selector-tree-item')) {
+            const isExpanded = treeContainer.classList.contains('expanded');
+            treeContainer.classList.toggle('expanded');
+            prefix.textContent = isExpanded ? '▸' : '▾';
+            e.stopPropagation();
+            return;
+          }
+        }
+
+        // Handle selection
+        e.preventDefault();
+        e.stopPropagation();
+
+        // Clear previous selection
+        const prevSelected = componentSelector.querySelector('.selected-child');
+        if (prevSelected) {
+          prevSelected.classList.remove('selected-child');
+        }
+        selectorItem.classList.add('selected-child');
+
+        // Hide highlight while scrolling
+        if (highlightOverlay && highlightOverlay.style) {
+          highlightOverlay.style.display = 'none';
+        }
+
+        // First scroll, then highlight
+        if (!isInViewport(selectorItem.el)) {
+          // selectorItem.el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+        
+        activeContainer = selectorItem.el;
+
+        // Wait for scroll to complete before showing highlight (smooth scroll typically takes ~800ms)
+        setTimeout(() => {
+          showHighlight(selectorItem.el);
+        }, 800);
+      });
+
+      editorDocument.addEventListener('mousedown', (e) => {
+        if (e.detail === 2) {
+          const target = e.target;
+          if (target.contentEditable !== 'true' && target.tagName !== 'BODY') {
+            e.stopPropagation();
+            e.preventDefault();
+            setTimeout(() => {
+              miniSelector.style.display = 'none';
+              toolbarElement.style.display = 'none';
+              makeElementEditable(target, e);
+            }, 100);
+          }
+        } else if (e.detail === 1) {
+          if (e.target.closest('.component-selector')) {
+            return;
+          }
+          refreshSelector(e.target);
+          e.stopPropagation();
+        }
+      });
+
+      editorDocument.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+        const clickedElement = e.target;
+        refreshSelector(clickedElement);
+
+        // Show mini selector above mouse
+        if (e.detail !== 2) {
+          showMiniSelector(clickedElement, e.clientX, e.clientY, e.detail);
+        }
+
+        // Clear existing styles and update dialog
+        stylesTable.innerHTML = '';
+        updateStylesDialog(clickedElement);
+        activeContainer = clickedElement;
+
+        return false;
+      }, true);
+
+      // Hide mini selector when clicking outside
+      document.addEventListener('click', (e) => {
+        if (!miniSelector.contains(e.target)) {
+          miniSelector.style.display = 'none';
+        }
+      });
+
+      // Close mini-selector and toolbar on Escape key
+      editorDocument.addEventListener('keydown', (e) => {
+        console.log('keydown', e);
+        if (e.key === 'Escape') {
+          setTimeout(() => {
+            miniSelector.style.display = 'none';
+            toolbarElement.style.display = 'none';
+            hideHighlight();
+            activeElement = undefined;
+          }, 100);
+        }
+      });
+
+      // Close mini-selector and toolbar on Escape key
+      document.addEventListener('keydown', (e) => {
+        console.log('keydown', e);
+        if (e.key === 'Escape') {
+          miniSelector.style.display = 'none';
+          toolbarElement.style.display = 'none';
+          hideHighlight();
+          activeElement = undefined;
+        }
+      });
+
+      // Add mouseover handler for component selector items
+      componentSelector.addEventListener('mouseover', (e) => {
+        const selectorItem = e.target.closest('.selector-item');
+        if (selectorItem && selectorItem.el) {
+          showHighlight(selectorItem.el);
+        }
+      });
+
+      editorDocument.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        const clickedElement = e.target;
+        refreshSelector(clickedElement);
+
+        if (e.detail !== 2) {
+          // Show mini selector above mouse
+          showMiniSelector(clickedElement, e.clientX, e.clientY, e.detail);
+        }
+
+        activeContainer = clickedElement;
+
+        return false;
+      }, true);
+
+      // Hide mini selector when clicking outside
+      document.addEventListener('click', (e) => {
+        if (!miniSelector.contains(e.target)) {
+          miniSelector.style.display = 'none';
+        }
+      });
+
+      // Add mouseover handler for component selector items
+      componentSelector.addEventListener('mouseover', (e) => {
+        const selectorItem = e.target.closest('.selector-item');
+        if (selectorItem && selectorItem.el) {
+          showHighlight(selectorItem.el);
+        }
+      });
+
+      editorDocument.addEventListener('mouseover', (e) => {
+        const target = e.target;
+        // if (target === editorDocument.body || target === editorDocument.documentElement) {
+        if (target === editorDocument.documentElement) {
+          return;
+        }
+        showHighlight(target);
+      });
+
+      editorDocument.addEventListener('mouseout', (e) => {
+        const target = e.target;
+        // if (target === editorDocument.body || target === editorDocument.documentElement) {
+        if (target === editorDocument.documentElement) {
+          return;
+        }
+      });
+
+      editorDocument.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        const element = e.target;
+        refreshSelector(element);
+
+        if (e.detail === 1) {
+          console.log('show toolbar');
+          // Show mini selector above mouse
+          showMiniSelector(element, e.clientX, e.clientY, e.detail);
+
+          activeContainer = element;
+        } else if (e.detail === 2) {
+          setTimeout(() => {
+            miniSelector.style.display = 'none';
+            toolbarElement.style.display = 'none';
+            makeElementEditable(element, e);
+          }, 100);
+        }
+        
+        return false;
+      }, true);
+
+      // Hide mini selector when clicking outside
+      document.addEventListener('click', (e) => {
+        if (!miniSelector.contains(e.target)) {
+          miniSelector.style.display = 'none';
+        }
+      });
+
+      // Add drag and drop functionality to component selector
+      let draggedItem = null;
+      let draggedOverItem = null;
+
+      componentSelector.addEventListener('dragstart', (e) => {
+        if (!e.target.classList.contains('selector-item')) return;
+        draggedItem = e.target;
+        draggedItem.classList.add('dragging');
+        e.dataTransfer.effectAllowed = 'move';
+      });
+
+      componentSelector.addEventListener('dragend', (e) => {
+        if (!draggedItem) return;
+        draggedItem.classList.remove('dragging');
+        if (draggedOverItem) {
+          draggedOverItem.classList.remove('drag-over');
+          draggedOverItem.classList.remove('drag-over-top');
+        }
+        draggedItem = null;
+        draggedOverItem = null;
+      });
+
+      componentSelector.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        if (!draggedItem) return;
+
+        const target = e.target.closest('.selector-item');
+        if (!target || target === draggedItem) return;
+
+        // Get the bounding rectangle of the target
+        const rect = target.getBoundingClientRect();
+        const midY = rect.top + (rect.height / 2);
+
+        // Determine if we're in the top or bottom half
+        const isTop = e.clientY < midY;
+
+        // Remove previous drag-over classes
+        if (draggedOverItem) {
+          draggedOverItem.classList.remove('drag-over');
+          draggedOverItem.classList.remove('drag-over-top');
+        }
+
+        // Add appropriate class based on position
+        target.classList.add(isTop ? 'drag-over-top' : 'drag-over');
+        draggedOverItem = target;
+      });
+
+      componentSelector.addEventListener('drop', (e) => {
+        e.preventDefault();
+        if (!draggedItem || !draggedOverItem) return;
+
+        const draggedEl = draggedItem.el;
+        const targetEl = draggedOverItem.el;
+
+        if (!draggedEl || !targetEl || draggedEl === targetEl) return;
+
+        // Determine if dropping above or below the target
+        const rect = draggedOverItem.getBoundingClientRect();
+        const isTop = e.clientY < (rect.top + (rect.height / 2));
+
+        // Move the element in the DOM
+        if (isTop) {
+          targetEl.parentNode.insertBefore(draggedEl, targetEl);
+        } else {
+          targetEl.parentNode.insertBefore(draggedEl, targetEl.nextSibling);
+        }
+
+        // Clean up
+        draggedOverItem.classList.remove('drag-over');
+        draggedOverItem.classList.remove('drag-over-top');
+        draggedItem.classList.remove('dragging');
+
+        // Refresh the selector to show the new order
+        refreshSelector(draggedEl);
+      });
+    });
+
+    // Create highlight overlays
+    highlightOverlay = {
+      margin: {
+        top: document.createElement('div'),
+        right: document.createElement('div'),
+        bottom: document.createElement('div'),
+        left: document.createElement('div')
+      },
+      element: document.createElement('div')
+    };
+
+    // Set classes for each element
+    highlightOverlay.margin.top.className = 'highlight-margin highlight-margin-top';
+    highlightOverlay.margin.right.className = 'highlight-margin highlight-margin-right';
+    highlightOverlay.margin.bottom.className = 'highlight-margin highlight-margin-bottom';
+    highlightOverlay.margin.left.className = 'highlight-margin highlight-margin-left';
+    highlightOverlay.element.className = 'highlight-element';
+
+    // Add all elements to the document
+    document.body.appendChild(highlightOverlay.margin.top);
+    document.body.appendChild(highlightOverlay.margin.right);
+    document.body.appendChild(highlightOverlay.margin.bottom);
+    document.body.appendChild(highlightOverlay.margin.left);
+    document.body.appendChild(highlightOverlay.element);
+
+    // Function to show highlight overlay for an element
+    function showHighlight(element) {
+      const rect = element.getBoundingClientRect();
+      const frameRect = iframe.getBoundingClientRect();
+      const computedStyle = window.getComputedStyle(element);
+
+      // Get margin values
+      const marginTop = parseInt(computedStyle.marginTop);
+      const marginRight = parseInt(computedStyle.marginRight);
+      const marginBottom = parseInt(computedStyle.marginBottom);
+      const marginLeft = parseInt(computedStyle.marginLeft);
+
+      // Get padding values
+      const paddingTop = parseInt(computedStyle.paddingTop);
+      const paddingRight = parseInt(computedStyle.paddingRight);
+      const paddingBottom = parseInt(computedStyle.paddingBottom);
+      const paddingLeft = parseInt(computedStyle.paddingLeft);
+
+      // Log the dimensions after getting the values
+      console.log('Element Dimensions:', {
+        element: element.tagName,
+        rect: {
+          top: rect.top,
+          right: rect.right, 
+          bottom: rect.bottom,
+          left: rect.left,
+          width: rect.width,
+          height: rect.height
+        },
+        margins: {
+          top: marginTop,
+          right: marginRight,
+          bottom: marginBottom,
+          left: marginLeft
+        },
+        padding: {
+          top: paddingTop,
+          right: paddingRight,
+          bottom: paddingBottom,
+          left: paddingLeft
+        }
+      });
+
+      // Position and size top margin if present
+      if (marginTop > 0) {
+        highlightOverlay.margin.top.style.left = `${frameRect.left + rect.left - marginLeft}px`;
+        highlightOverlay.margin.top.style.top = `${frameRect.top + rect.top - marginTop}px`;
+        highlightOverlay.margin.top.style.width = `${rect.width + marginLeft + marginRight}px`;
+        highlightOverlay.margin.top.style.height = `${marginTop}px`;
+        highlightOverlay.margin.top.style.display = 'block';
+      } else {
+        highlightOverlay.margin.top.style.display = 'none';
+      }
+
+      // Position and size bottom margin if present
+      if (marginBottom > 0) {
+        highlightOverlay.margin.bottom.style.left = `${frameRect.left + rect.left - marginLeft}px`;
+        highlightOverlay.margin.bottom.style.top = `${frameRect.top + rect.top + rect.height}px`;
+        highlightOverlay.margin.bottom.style.width = `${rect.width + marginLeft + marginRight}px`;
+        highlightOverlay.margin.bottom.style.height = `${marginBottom}px`;
+        highlightOverlay.margin.bottom.style.display = 'block';
+      } else {
+        highlightOverlay.margin.bottom.style.display = 'none';
+      }
+
+      // Position and size left margin if present
+      if (marginLeft > 0) {
+        highlightOverlay.margin.left.style.left = `${frameRect.left + rect.left - marginLeft}px`;
+        highlightOverlay.margin.left.style.top = `${frameRect.top + rect.top}px`;
+        highlightOverlay.margin.left.style.width = `${marginLeft}px`;
+        highlightOverlay.margin.left.style.height = `${rect.height}px`;
+        highlightOverlay.margin.left.style.display = 'block';
+      } else {
+        highlightOverlay.margin.left.style.display = 'none';
+      }
+
+      // Position and size right margin if present
+      if (marginRight > 0) {
+        highlightOverlay.margin.right.style.left = `${frameRect.left + rect.left + rect.width}px`;
+        highlightOverlay.margin.right.style.top = `${frameRect.top + rect.top}px`;
+        highlightOverlay.margin.right.style.width = `${marginRight}px`;
+        highlightOverlay.margin.right.style.height = `${rect.height}px`;
+        highlightOverlay.margin.right.style.display = 'block';
+      } else {
+        highlightOverlay.margin.right.style.display = 'none';
+      }
+
+      // Position and size element highlight with padding as borders
+      highlightOverlay.element.style.left = `${frameRect.left + rect.left}px`;
+      highlightOverlay.element.style.top = `${frameRect.top + rect.top}px`;
+      highlightOverlay.element.style.width = `${rect.width}px`;
+      highlightOverlay.element.style.height = `${rect.height}px`;
+      highlightOverlay.element.style.borderTopWidth = `${paddingTop}px`;
+      highlightOverlay.element.style.borderRightWidth = `${paddingRight}px`;
+      highlightOverlay.element.style.borderBottomWidth = `${paddingBottom}px`;
+      highlightOverlay.element.style.borderLeftWidth = `${paddingLeft}px`;
+      highlightOverlay.element.style.display = 'block';
+    }
+
+    function getElementDisplayName(element) {
+      let name = element.tagName.toLowerCase();
+      if (element.id) {
+        name += `#${element.id}`;
+      } else if (element.className && typeof element.className === 'string') {
+        name += `.${element.className.split(' ')[0]}`;
+      }
+      return name;
+    }
+  </script>
 
   <script>
     document.getElementById("location").addEventListener("click", function (ev) {
@@ -95,141 +2581,9 @@
       const url = document.querySelector("input[type=search]").value;
       console.log(url);
       document.cookie = "proxy=" + url + "; path=/;";
-      iframe.src = "/" + "?t=" + new Date().getTime();
-    });
-
-    const propertiesModal = new bootstrap.Modal(document.getElementById("properties-modal"), {});
-    document.getElementById("properties").addEventListener("click", function (ev) {
-      propertiesModal.show();
-    });
-
-    document.getElementById("properties-modal").addEventListener('hidden.bs.modal', ev => {
-      const doc = document.getElementById('preview').contentDocument;
-      const current = doc.querySelector("header.masthead").style.backgroundImage;
-      const backgroundImage = document.getElementById("background-image-url").value;
-
-      if (!current.includes(backgroundImage)) {
-        doc.querySelector("header.masthead").style.backgroundImage = `url(${backgroundImage})`;
-      }
-
-      console.log(ev);
-    });
-
-    document.getElementById("publish").addEventListener("click", function (ev) {
-      const doc = document.getElementById('preview').contentDocument;
-      const el = doc.getElementById('editor');
-      if (el) {
-        const editor = el.editor;
-
-        editor.save().then(savedData => {
-          const title = doc.getElementById("title").innerText;
-          const subtitle = doc.getElementById("subtitle").innerText;
-          const author = doc.getElementById("author").innerText;
-          const content = savedData;
-
-          const backgroundImage = document.getElementById("background-image-url").value;
-
-          let properties = document.getElementById("properties-editor").value || "{}";
-          properties = JSON.parse(properties);
-
-          if (backgroundImage) {
-            properties['background-image'] = backgroundImage;
-          }
-
-          const data = { title: title, subtitle: subtitle, author: author, content: content, properties: properties };
-          postJSON(data);
-        });
-      }
-    });
-
-    async function postJSON(data) {
-      try {
-        const response = await fetch("blog/posts", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(data),
-        });
-
-        console.log(response);
-
-        if (response.status === 200) {
-          const result = await response.json();
-          console.log("Success:", result);
-          document.getElementById('preview').contentWindow.location.href = `editor/post.html#${result.name}`;
-          alert(`"${result.title}" successfully published!`);
-        } else {
-          console.error("Error:", response);
-          alert(`Error publishing "${result.title}."`);
-        }
-      } catch (error) {
-        console.error("Error:", error);
-      }
-    }
-
-    const newPost = function (doc, editor) {
-      doc.getElementById('title').innerText = 'Title';
-      doc.getElementById('subtitle').innerText = 'Subtitle';
-      doc.getElementById('author').innerText = 'Author';
-      doc.getElementById("created").innerText = 'Now';
-      doc.querySelector("header.masthead").style.backgroundImage = 'url(assets/img/default.jpg)';
-      editor.clear();
-    }
-
-    const iframe = document.getElementById("preview");
-
-    iframe.addEventListener("load", function (ev) {
-      document.getElementById("publish").classList.add("disabled");
-      document.getElementById("properties").classList.add("disabled");
-
-      const win = document.getElementById('preview').contentWindow;
-      const previewDocument = document.getElementById('preview').contentDocument;
-
-      const href = win.location.href;
-      const filename = href.split('#')[0].split('?')[0].split('/').pop();
-      if (filename === 'post.html') {
-        const intervalId = setInterval(function () {
-          const doc = document.getElementById('preview').contentDocument;
-          const el = doc.getElementById('editor');
-          if (el) {
-            const editor = el.editor;
-            if (editor) {
-              doc.getElementById('title').setAttribute('contenteditable', true);
-              doc.getElementById('subtitle').setAttribute('contenteditable', true);
-              doc.getElementById('author').setAttribute('contenteditable', true);
-
-              editor.readOnly.toggle(false);
-              clearInterval(intervalId);
-
-              win.addEventListener('hashchange', function (ev) {
-                if (new URL(ev.newURL).hash === "#new") {
-                  newPost(doc, editor);
-                }
-              });
-
-              if (win.location.hash === "#new") {
-                newPost(doc, editor);
-              }
-
-              document.getElementById("publish").classList.remove("disabled");
-              document.getElementById("properties").classList.remove("disabled");
-            }
-          }
-        }, 100);
-      }
+      iframe.src = "editor/" + "?t=" + new Date().getTime();
     });
   </script>
-  <script type='text/javascript'>
-    window.addEventListener('beforeunload', async function (e) {
-      // e.preventDefault();
-      // e.returnValue = '';
-    });
-
-    window.addEventListener('unload', async function (e) {
-      // await fetch("blog/close");
-    });
-</script>
 </body>
 
 </html>

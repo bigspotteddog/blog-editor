@@ -1,11 +1,11 @@
 package com.example.blogeditor;
 
 import java.io.ByteArrayInputStream;
+import java.net.URI;
 import java.util.List;
 
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.InputStreamResource;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.MultiValueMapAdapter;
@@ -28,13 +28,16 @@ public class HttpRequestController {
     @GetMapping
     @ResponseBody
     public ResponseEntity<InputStreamResource> get(HttpServletRequest req) throws Exception {
-        if (req.getServletPath().equals("/editor.html")) {
-            ClassPathResource resource = new ClassPathResource("static/editor.html");
+        if (req.getServletPath().equals("/index.html") || req.getServletPath().equals("/")) {
+            ClassPathResource resource = new ClassPathResource("static/index.html");
             return ResponseEntity.ok()
                 .contentType(MediaType.TEXT_HTML)
                 .body(new InputStreamResource(resource.getInputStream()));
         }
-        System.out.println(req.getServletPath());
+        String servletPath = req.getServletPath();
+        System.out.println(servletPath);
+        String referer = req.getHeader("referer");
+        System.out.println(referer);
 
         String proxy = null;
         String editor = null;
@@ -58,53 +61,68 @@ public class HttpRequestController {
             System.out.println("No cookies present in request");
         }
 
-        String base = "/";
-        if (proxy != null) {
-            base = proxy;
+        String refererPath = URI.create(referer).getPath();
+        System.out.println(refererPath);
+
+        String targetPath = servletPath.substring(8);
+        System.out.println(targetPath);
+
+        String targetHost = URI.create(proxy).toString();
+        System.out.println(targetHost);
+
+        String refererPathPrefix = "";
+        if (referer.startsWith("http://localhost:8888/editor") && !referer.equals("http://localhost:8888/index.html")) {
+            if (referer.length() > 28) {
+                refererPathPrefix = referer.substring(29);
+                if (refererPathPrefix.contains("?")) {
+                    refererPathPrefix = refererPathPrefix.substring(0, refererPathPrefix.indexOf("?"));
+                }
+                System.out.println(refererPathPrefix);
+                if (refererPathPrefix.length() > 0 && !refererPathPrefix.contains(".")) {
+                    if (refererPathPrefix.endsWith("/")) {
+                        targetPath = refererPathPrefix + targetPath;    
+                    } else {
+                        targetPath = refererPathPrefix + "/" + targetPath;
+                    }
+                }
+            }
         }
-        if (editor != null) {
-            base = editor;
+
+        String path = targetHost;
+        if (!targetPath.isEmpty()) {
+            path = path + "/" + targetPath;
         }
-        if (base.endsWith("/")) {
-            base = base.substring(0, base.length() - 1);
-        }
-        String end = req.getRequestURI().replace(base, "");
-        if (end.equals("/")) {
-            end = "";
-        }
-        if (end.startsWith("/")) {
-            end = end.substring(1);
-        }
-        if (end.startsWith("editor")) {
-            end = end.substring(6);
-        }
-        if (end.startsWith("/")) {
-            end = end.substring(1);
-        }
-        String path = base + "/" + end;
+        System.out.print(path);
 
         HttpResponseModel response = new HttpRequestCommand(path).execute();
         MultiValueMapAdapter<String, String> map = new MultiValueMapAdapter<>(response.getHeaders());
         int status = response.getStatus();
         System.out.println(status);
 
-        // Handle redirect
-        if (status == 302 || status == 301) {
-            String redirectLocation = map.getFirst("Location");
-            if (redirectLocation == null) {
-                redirectLocation = map.getFirst("location");
-            }
-            // Either follow the redirect or pass it back to the client
-            return ResponseEntity.status(status)
-                .header(HttpHeaders.LOCATION, redirectLocation.replace(base, ""))
-                .build();
+        if (status != 200) {
+            System.out.println("not 200");
         }
+        // Handle redirect
+        // if (status == 302 || status == 301) {
+        //     String redirectLocation = map.getFirst("Location");
+        //     if (redirectLocation == null) {
+        //         redirectLocation = map.getFirst("location");
+        //     }
+        //     // Either follow the redirect or pass it back to the client
+        //     return ResponseEntity.status(status)
+        //         .header(HttpHeaders.LOCATION, redirectLocation.replace(base, ""))
+        //         .build();
+        // }
+
+        String contentType = "text/html;charset=utf-8";
 
         List<String> contentTypeList = map.get("Content-Type");
         if (contentTypeList == null) {
             contentTypeList = map.get("content-type");
         }
-        String contentType = contentTypeList.getFirst();
+        if (contentTypeList != null) {
+            contentType = contentTypeList.getFirst();
+        }
         ByteArrayInputStream in = new ByteArrayInputStream(response.getBytes());
 
         ResponseEntity.BodyBuilder builder = ResponseEntity.ok()
