@@ -2,7 +2,10 @@ package com.example.blogeditor;
 
 import java.io.ByteArrayInputStream;
 import java.net.URI;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.InputStreamResource;
@@ -34,13 +37,26 @@ public class HttpRequestController {
                 .contentType(MediaType.TEXT_HTML)
                 .body(new InputStreamResource(resource.getInputStream()));
         }
-        String servletPath = req.getServletPath().replace("/editor/", "");
-        System.out.println(servletPath);
+
+        Map<String, String> query = new HashMap<>();
+        String queryString = req.getQueryString();
+        String[] split = queryString.split("&");
+        for (String param : split) {
+            String[] entry = param.split("=");
+            String key = entry[0];
+            String value = entry[1];
+            query.put(key, value);
+        }
+
         String referer = req.getHeader("referer");
         System.out.println(referer);
 
+        String origin = req.getHeader("origin");
+        System.out.println(origin);
+
         String proxy = null;
         String editor = null;
+        
         Cookie[] cookies = req.getCookies();
         if (cookies != null) {
             System.out.println("=== Cookies ===");
@@ -61,10 +77,18 @@ public class HttpRequestController {
             System.out.println("No cookies present in request");
         }
 
-        String path = URI.create(proxy).resolve(servletPath).toString();
+        String path = proxy;
+        String url = query.get("url");
+        if (url != null) {
+            path = url;
+        }
         System.out.print(path);
 
-        HttpResponseModel response = new HttpRequestCommand(path).execute();
+        Map<String, List<String>> headers = HttpRequestCommand.getHeaders(req);
+        headers.put("origin", Arrays.asList(proxy));
+        headers.put("referer", Arrays.asList(proxy));
+        HttpRequestCommand request = new HttpRequestCommand(path, HttpRequestCommand.Method.valueOf(req.getMethod().toUpperCase()), headers);
+        HttpResponseModel response = request.execute();
         MultiValueMapAdapter<String, String> map = new MultiValueMapAdapter<>(response.getHeaders());
         int status = response.getStatus();
         System.out.println(status);
@@ -93,7 +117,14 @@ public class HttpRequestController {
         if (contentTypeList != null) {
             contentType = contentTypeList.getFirst();
         }
-        ByteArrayInputStream in = new ByteArrayInputStream(response.getBytes());
+
+        byte[] bytes = response.getBytes();
+        if (contentType.startsWith("text/html")) {
+            String html = new String(bytes);
+            String html2 = UrlReplacer.replaceUrls(html, "http://localhost:8888/editor/?url=", proxy);
+            bytes = html2.getBytes();
+        }        
+        ByteArrayInputStream in = new ByteArrayInputStream(bytes);
 
         ResponseEntity.BodyBuilder builder = ResponseEntity.ok()
         .contentType(MediaType.valueOf(contentType));
