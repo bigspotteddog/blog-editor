@@ -34,7 +34,7 @@ public class HttpRequestController {
                 .contentType(MediaType.TEXT_HTML)
                 .body(new InputStreamResource(resource.getInputStream()));
         }
-        String servletPath = req.getServletPath();
+        String servletPath = req.getServletPath().replace("/editor/", "");
         System.out.println(servletPath);
         String referer = req.getHeader("referer");
         System.out.println(referer);
@@ -61,37 +61,7 @@ public class HttpRequestController {
             System.out.println("No cookies present in request");
         }
 
-        String refererPath = URI.create(referer).getPath();
-        System.out.println(refererPath);
-
-        String targetPath = servletPath.substring(8);
-        System.out.println(targetPath);
-
-        String targetHost = URI.create(proxy).toString();
-        System.out.println(targetHost);
-
-        String refererPathPrefix = "";
-        if (referer.startsWith("http://localhost:8888/editor") && !referer.equals("http://localhost:8888/index.html")) {
-            if (referer.length() > 28) {
-                refererPathPrefix = referer.substring(29);
-                if (refererPathPrefix.contains("?")) {
-                    refererPathPrefix = refererPathPrefix.substring(0, refererPathPrefix.indexOf("?"));
-                }
-                System.out.println(refererPathPrefix);
-                if (refererPathPrefix.length() > 0 && !refererPathPrefix.contains(".")) {
-                    if (refererPathPrefix.endsWith("/")) {
-                        targetPath = refererPathPrefix + targetPath;    
-                    } else {
-                        targetPath = refererPathPrefix + "/" + targetPath;
-                    }
-                }
-            }
-        }
-
-        String path = targetHost;
-        if (!targetPath.isEmpty()) {
-            path = path + "/" + targetPath;
-        }
+        String path = URI.create(proxy).resolve(servletPath).toString();
         System.out.print(path);
 
         HttpResponseModel response = new HttpRequestCommand(path).execute();
