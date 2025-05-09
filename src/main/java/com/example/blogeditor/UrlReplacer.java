@@ -34,6 +34,9 @@ public class UrlReplacer {
         // Process any JavaScript content within the HTML
         result = replaceJsUrls(result, urlPrefix, baseUrl);
         
+        // Process JSON content within script tags
+        result = replaceJsonUrls(result, urlPrefix, baseUrl);
+        
         return result;
     }
     
@@ -160,7 +163,100 @@ public class UrlReplacer {
             result = buffer.toString();
         }
         
+        // Process URLs in JavaScript string literals
+        result = processJsStringUrls(result, urlPrefix, baseUrl);
+        
         return result;
+    }
+    
+    /**
+     * Processes URLs found in JavaScript string literals.
+     */
+    private static String processJsStringUrls(String content, String urlPrefix, String baseUrl) {
+        // Pattern to find URLs in JS string literals
+        // This looks for http:// or https:// URLs in single or double quotes
+        String urlPattern = "(['\"])(https?://[^'\"\\s]+?)(['\"])";
+        Pattern pattern = Pattern.compile(urlPattern);
+        Matcher matcher = pattern.matcher(content);
+        
+        StringBuffer result = new StringBuffer();
+        
+        while (matcher.find()) {
+            String quote = matcher.group(1);
+            String url = matcher.group(2);
+            String endQuote = matcher.group(3);
+            
+            // Skip if not a valid URL or is a special URL
+            if (url.isEmpty() || shouldSkipUrl(url)) {
+                continue;
+            }
+            
+            String replacement = quote + urlPrefix + url + endQuote;
+            matcher.appendReplacement(result, Matcher.quoteReplacement(replacement));
+        }
+        
+        matcher.appendTail(result);
+        return result.toString();
+    }
+    
+    /**
+     * Replaces URLs in JSON content found within script tags.
+     */
+    private static String replaceJsonUrls(String content, String urlPrefix, String baseUrl) {
+        // Find script tags with application/json type
+        String scriptPattern = "(<script[^>]*type\\s*=\\s*['\"]application/json['\"][^>]*>)(.*?)(</script>)";
+        Pattern pattern = Pattern.compile(scriptPattern, Pattern.DOTALL);
+        Matcher matcher = pattern.matcher(content);
+        
+        StringBuffer result = new StringBuffer();
+        
+        while (matcher.find()) {
+            String scriptOpen = matcher.group(1);
+            String jsonContent = matcher.group(2);
+            String scriptClose = matcher.group(3);
+            
+            // Process the JSON content to find and replace URLs
+            String processedJson = processJsonStringUrls(jsonContent, urlPrefix, baseUrl);
+            
+            String replacement = scriptOpen + processedJson + scriptClose;
+            matcher.appendReplacement(result, Matcher.quoteReplacement(replacement));
+        }
+        
+        matcher.appendTail(result);
+        
+        // Also process inline JSON strings outside of script tags
+        // This handles JSON embedded in data attributes or JavaScript variables
+        return result.toString();
+    }
+    
+    /**
+     * Processes URLs found in JSON string values.
+     */
+    private static String processJsonStringUrls(String jsonContent, String urlPrefix, String baseUrl) {
+        // Pattern to find JSON key-value pairs with URLs
+        // Looks for "key":"http://..." or "key": "http://..."
+        String urlPattern = "(\"\\s*[^\"]+\\s*\"\\s*:\\s*\")(https?://[^\"]+)(\"\\s*)";
+        Pattern pattern = Pattern.compile(urlPattern);
+        Matcher matcher = pattern.matcher(jsonContent);
+        
+        StringBuffer result = new StringBuffer();
+        
+        while (matcher.find()) {
+            String keyPrefix = matcher.group(1);
+            String url = matcher.group(2);
+            String suffix = matcher.group(3);
+            
+            // Skip if not a valid URL or is a special URL
+            if (url.isEmpty() || shouldSkipUrl(url)) {
+                continue;
+            }
+            
+            String replacement = keyPrefix + urlPrefix + url + suffix;
+            matcher.appendReplacement(result, Matcher.quoteReplacement(replacement));
+        }
+        
+        matcher.appendTail(result);
+        return result.toString();
     }
     
     /**
@@ -183,6 +279,18 @@ public class UrlReplacer {
                path.startsWith("data:") ||         // Data URIs
                path.startsWith("blob:") ||         // Blob URIs
                path.startsWith("javascript:");     // JavaScript URIs
+    }
+    
+    /**
+     * Checks if a URL should be skipped from replacement.
+     */
+    private static boolean shouldSkipUrl(String url) {
+        return url.startsWith("data:") ||         // Data URIs
+               url.startsWith("blob:") ||         // Blob URIs
+               url.startsWith("javascript:") ||   // JavaScript URIs
+               url.equals("#") ||                 // Anchor links
+               url.contains("localhost") ||       // Already localhost URLs
+               url.contains("127.0.0.1");         // Local IP addresses
     }
     
     /**
@@ -243,6 +351,13 @@ public class UrlReplacer {
                     import('./dynamic-module.js').then(module => {
                         console.log(module);
                     });
+                    
+                    // String with URL
+                    const apiEndpoint = "https://api.example.com/v1/data";
+                    fetch(apiEndpoint);
+                </script>
+                <script type="application/json" id="AnalyticsConfigurationJSON">
+                    {"GTM_ID":"GTM-WK8882T","GTM_FRAME_URL":"https://b.stripecdn.com/stripethirdparty-srv/assets/","environment":"production"}
                 </script>
             </body>
             </html>
@@ -276,5 +391,14 @@ public class UrlReplacer {
         System.out.println("\n==== PROCESSED JS (Minified Format) ====");
         String processedJs2 = replaceJsUrls(jsContent2, urlPrefix, baseUrl);
         System.out.println(processedJs2);
+        
+        // Example with just the JSON script tag
+        String jsonScriptExample = """
+            <script type="application/json" id="AnalyticsConfigurationJSON">{"GTM_ID":"GTM-WK8882T","GTM_FRAME_URL":"https://b.stripecdn.com/stripethirdparty-srv/assets/","environment":"production"}</script>
+            """;
+        
+        System.out.println("\n==== PROCESSED JSON SCRIPT ====");
+        String processedJsonScript = replaceUrls(jsonScriptExample, urlPrefix, baseUrl);
+        System.out.println(processedJsonScript);
     }
 }
