@@ -214,7 +214,7 @@ public class DependencyManager {
      */
     public static void main(String[] args) {
         String baseUrl = "https://stripe.com";
-        String urlPrefix = "http://localhost:8888/editor/?url=";
+        String urlPrefix = "https://sheep-warm-cicada.ngrok-free.app/editor/?url=";
         
         // Example HTML content with dynamic imports
         String htmlContent = """

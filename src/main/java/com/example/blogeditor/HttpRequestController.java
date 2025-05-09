@@ -125,21 +125,27 @@ public class HttpRequestController {
 
         byte[] bytes = response.getBytes();
         if (contentType.startsWith("text/html")) {
-            DependencyManager deps = new DependencyManager(proxy, "http://localhost:8888/editor/?url=");
+            DependencyManager deps = new DependencyManager(proxy, "https://sheep-warm-cicada.ngrok-free.app/editor/?url=");
             String html = new String(bytes);
             String html2 = deps.processHtml(html);
-            // String html2 = UrlReplacer.replaceUrls(html, "http://localhost:8888/editor/?url=", proxy);
+            // String html2 = UrlReplacer.replaceUrls(html, "https://sheep-warm-cicada.ngrok-free.app/editor/?url=", proxy);
             bytes = html2.getBytes();
         } else if (contentType.startsWith("text/javascript") || contentType.startsWith("application/javascript")) {
-            DependencyManager deps = new DependencyManager(path, "http://localhost:8888/editor/?url=");
+            DependencyManager deps = new DependencyManager(path, "https://sheep-warm-cicada.ngrok-free.app/editor/?url=");
             String js = new String(bytes);
             String js2 = deps.processJsModule(path, js);
-            // String js2 = UrlReplacer.replaceJsUrls(js, "http://localhost:8888/editor/?url=", path);
+            // String js2 = UrlReplacer.replaceJsUrls(js, "https://sheep-warm-cicada.ngrok-free.app/editor/?url=", path);
             bytes = js2.getBytes();
 
-            builder.header("Access-Control-Allow-Origin", "http://localhost:8888");
-            builder.header("Cross-Origin-Resource-Policy", "cross-origin");
-            builder.header("Cache-Control", "public, max-age=31536000, immutable");
+            builder.header("access-control-allow-origin", "*");
+            builder.header("cache-control", "no-cache");
+            builder.header("content-security-policy", "script-src 'self'; object-src 'self'");
+            builder.header("cross-origin-resource-policy", "cross-origin");
+
+
+            // builder.header("Access-Control-Allow-Origin", "https://sheep-warm-cicada.ngrok-free.app");
+            // builder.header("Cross-Origin-Resource-Policy", "cross-origin");
+            // builder.header("Cache-Control", "public, max-age=31536000, immutable");
             contentType = "application/javascript";
         }
         ByteArrayInputStream in = new ByteArrayInputStream(bytes);
