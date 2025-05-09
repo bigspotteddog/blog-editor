@@ -10,11 +10,13 @@ import java.net.URI;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Scanner;
+import java.util.Set;
 import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
 
@@ -22,6 +24,22 @@ import jakarta.servlet.http.HttpServletRequest;
 
 public class HttpRequestCommand extends AbstractCommand<HttpResponseModel> {
     private static final Logger log = Logger.getLogger(HttpRequestCommand.class.getName());
+
+    private static final Set<String> HEADERS_TO_REMOVE =
+        new HashSet<>(Arrays.asList(
+        "access-control-allow-origin",
+        "access-control-allow-methods",
+        "access-control-allow-headers",
+        "access-control-allow-credentials",
+        "access-control-expose-headers",
+        "access-control-max-age",
+        "strict-transport-security",
+        "x-frame-options",
+        "x-content-type-options",
+        "x-xss-protection",
+        "content-security-policy",
+        "referrer-policy"
+    ));
 
     public enum Method {
         GET, POST, PUT, DELETE, HEAD
@@ -149,6 +167,9 @@ public class HttpRequestCommand extends AbstractCommand<HttpResponseModel> {
 
             for (java.util.Map.Entry<String, List<String>> e : responseHeaders.entrySet()) {
                 String key = e.getKey();
+                if (HEADERS_TO_REMOVE.contains(key)) {
+                    continue;
+                }
                 if (key != null) {
                     List<String> value = e.getValue();
                     if (!value.isEmpty()) {

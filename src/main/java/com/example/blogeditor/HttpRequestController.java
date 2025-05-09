@@ -123,7 +123,11 @@ public class HttpRequestController {
             String html = new String(bytes);
             String html2 = UrlReplacer.replaceUrls(html, "http://localhost:8888/editor/?url=", proxy);
             bytes = html2.getBytes();
-        }        
+        } else if (contentType.startsWith("text/javascript")) {
+            String js = new String(bytes);
+            String js2 = UrlReplacer.replaceJsUrls(js, "http://localhost:8888/editor/?url=", path);
+            bytes = js2.getBytes();
+        }
         ByteArrayInputStream in = new ByteArrayInputStream(bytes);
 
         ResponseEntity.BodyBuilder builder = ResponseEntity.ok()
