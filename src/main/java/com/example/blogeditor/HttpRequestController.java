@@ -38,24 +38,11 @@ public class HttpRequestController {
                 .body(new InputStreamResource(resource.getInputStream()));
         }
 
-        Map<String, String> query = new HashMap<>();
-        String queryString = req.getQueryString();
-        String[] split = queryString.split("&");
-        for (String param : split) {
-            String[] entry = param.split("=");
-            String key = entry[0];
-            String value = entry[1];
-            query.put(key, value);
-        }
-
-        String referer = req.getHeader("referer");
-        System.out.println(referer);
-
-        String origin = req.getHeader("origin");
-        System.out.println(origin);
+        String servletPath = req.getServletPath();
+        System.out.println(servletPath);
+        String path = servletPath;
 
         String proxy = null;
-        String editor = null;
         
         Cookie[] cookies = req.getCookies();
         if (cookies != null) {
@@ -69,24 +56,46 @@ public class HttpRequestController {
                 if (cookie.getName().equals("proxy")) {
                     proxy = cookie.getValue();
                 }
-                if (cookie.getName().equals("editor")) {
-                    editor = cookie.getValue();
-                }
+            }
+            if (proxy != null) {
+                path = proxy;
             }
         } else {
             System.out.println("No cookies present in request");
         }
 
-        String path = proxy;
-        String url = query.get("url");
-        if (url != null) {
-            path = url;
+        Map<String, String> query = new HashMap<>();
+        String queryString = req.getQueryString();
+        if (queryString != null) {
+            String[] split = queryString.split("&");
+            for (String param : split) {
+                try {
+                    String[] entry = param.split("=");
+                    String key = entry[0];
+                    if (entry.length > 1) {
+                        String value = entry[1];
+                        query.put(key, value);
+                    }
+                } catch (Exception e) {
+                    System.out.println(servletPath);
+                    e.printStackTrace();
+                }
+            }
+
+            String url = query.get("url");
+            if (url != null) {
+                path = url;
+            }    
         }
+
         System.out.print(path);
 
-        if (path.equals("https://b.stripecdn.com/mkt-statics-srv/assets/v1-Bootstrapper-Y5WGUHUI.js")) {
-            System.out.println(path);
-        }
+        String referer = req.getHeader("referer");
+        System.out.println(referer);
+
+        String origin = req.getHeader("origin");
+        System.out.println(origin);
+
         Map<String, List<String>> headers = HttpRequestCommand.getHeaders(req);
         headers.put("origin", Arrays.asList(proxy));
         headers.put("referer", Arrays.asList(proxy));
@@ -125,16 +134,16 @@ public class HttpRequestController {
 
         byte[] bytes = response.getBytes();
         if (contentType.startsWith("text/html")) {
-            DependencyManager deps = new DependencyManager(proxy, "https://sheep-warm-cicada.ngrok-free.app/editor/?url=");
+            DependencyManager deps = new DependencyManager(proxy, "http://editor.local:8888/editor/?url=");
             String html = new String(bytes);
             String html2 = deps.processHtml(html);
-            // String html2 = UrlReplacer.replaceUrls(html, "https://sheep-warm-cicada.ngrok-free.app/editor/?url=", proxy);
+            // String html2 = UrlReplacer.replaceUrls(html, "http://editor.local:8888/editor/?url=", proxy);
             bytes = html2.getBytes();
         } else if (contentType.startsWith("text/javascript") || contentType.startsWith("application/javascript")) {
-            DependencyManager deps = new DependencyManager(path, "https://sheep-warm-cicada.ngrok-free.app/editor/?url=");
+            DependencyManager deps = new DependencyManager(path, "http://editor.local:8888/editor/?url=");
             String js = new String(bytes);
             String js2 = deps.processJsModule(path, js);
-            // String js2 = UrlReplacer.replaceJsUrls(js, "https://sheep-warm-cicada.ngrok-free.app/editor/?url=", path);
+            // String js2 = UrlReplacer.replaceJsUrls(js, "http://editor.local:8888/editor/?url=", path);
             bytes = js2.getBytes();
 
             builder.header("access-control-allow-origin", "*");
@@ -143,7 +152,7 @@ public class HttpRequestController {
             builder.header("cross-origin-resource-policy", "cross-origin");
 
 
-            // builder.header("Access-Control-Allow-Origin", "https://sheep-warm-cicada.ngrok-free.app");
+            // builder.header("Access-Control-Allow-Origin", "http://editor.local:8888");
             // builder.header("Cross-Origin-Resource-Policy", "cross-origin");
             // builder.header("Cache-Control", "public, max-age=31536000, immutable");
             contentType = "application/javascript";

@@ -163,7 +163,7 @@ public class HttpRequestCommand extends AbstractCommand<HttpResponseModel> {
             log.info("Response Code: " + responseCode);
 
             Map<String, List<String>> responseHeaders = connection.getHeaderFields();
-            log.info(responseHeaders.toString());
+            // log.info(responseHeaders.toString());
 
             for (java.util.Map.Entry<String, List<String>> e : responseHeaders.entrySet()) {
                 String key = e.getKey();
