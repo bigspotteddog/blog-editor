@@ -29,7 +29,11 @@ public class DependencyManager {
      * @param urlPrefix The prefix to add to URLs
      */
     public DependencyManager(String baseUrl, String urlPrefix) {
-        this.baseUrl = baseUrl.endsWith("/") ? baseUrl.substring(0, baseUrl.length() - 1) : baseUrl;
+        if (baseUrl == null) {
+            System.out.println("hello");
+        }
+        // this.baseUrl = baseUrl.endsWith("/") ? baseUrl.substring(0, baseUrl.length() - 1) : baseUrl;
+        this.baseUrl = baseUrl;
         this.urlPrefix = urlPrefix;
     }
     

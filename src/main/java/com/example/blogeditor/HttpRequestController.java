@@ -31,15 +31,20 @@ public class HttpRequestController {
     @GetMapping
     @ResponseBody
     public ResponseEntity<InputStreamResource> get(HttpServletRequest req) throws Exception {
-        if (req.getServletPath().equals("/index.html") || req.getServletPath().equals("/")) {
-            ClassPathResource resource = new ClassPathResource("static/index.html");
-            return ResponseEntity.ok()
-                .contentType(MediaType.TEXT_HTML)
-                .body(new InputStreamResource(resource.getInputStream()));
-        }
-
+        String urlPrefix = "http://localhost:8888/editor/?url=";
         String servletPath = req.getServletPath();
         System.out.println(servletPath);
+        String queryString = req.getQueryString();
+        System.out.println(queryString);
+
+        if (servletPath.equals("/index.html") ||
+            servletPath.equals("/")) {
+                ClassPathResource resource = new ClassPathResource("static/index.html");
+                return ResponseEntity.ok()
+                    .contentType(MediaType.TEXT_HTML)
+                    .body(new InputStreamResource(resource.getInputStream()));
+        }
+
         String path = servletPath;
 
         String proxy = null;
@@ -65,7 +70,6 @@ public class HttpRequestController {
         }
 
         Map<String, String> query = new HashMap<>();
-        String queryString = req.getQueryString();
         if (queryString != null) {
             String[] split = queryString.split("&");
             for (String param : split) {
@@ -134,16 +138,16 @@ public class HttpRequestController {
 
         byte[] bytes = response.getBytes();
         if (contentType.startsWith("text/html")) {
-            DependencyManager deps = new DependencyManager(proxy, "http://editor.local:8888/editor/?url=");
+            DependencyManager deps = new DependencyManager(proxy, urlPrefix);
             String html = new String(bytes);
             String html2 = deps.processHtml(html);
-            // String html2 = UrlReplacer.replaceUrls(html, "http://editor.local:8888/editor/?url=", proxy);
+            // String html2 = UrlReplacer.replaceUrls(html, urlPrefix, proxy);
             bytes = html2.getBytes();
         } else if (contentType.startsWith("text/javascript") || contentType.startsWith("application/javascript")) {
-            DependencyManager deps = new DependencyManager(path, "http://editor.local:8888/editor/?url=");
+            DependencyManager deps = new DependencyManager(path, urlPrefix);
             String js = new String(bytes);
             String js2 = deps.processJsModule(path, js);
-            // String js2 = UrlReplacer.replaceJsUrls(js, "http://editor.local:8888/editor/?url=", path);
+            // String js2 = UrlReplacer.replaceJsUrls(js, urlPrefix, path);
             bytes = js2.getBytes();
 
             builder.header("access-control-allow-origin", "*");

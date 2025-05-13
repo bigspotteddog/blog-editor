@@ -25,7 +25,7 @@ public class UrlReplacer {
         
         // Trim trailing slash from base URL if present
         if (baseUrl.endsWith("/")) {
-            baseUrl = baseUrl.substring(0, baseUrl.length() - 1);
+            // baseUrl = baseUrl.substring(0, baseUrl.length() - 1);
         }
         
         // Process HTML content
@@ -314,6 +314,9 @@ public class UrlReplacer {
                 return base.getProtocol() + ":" + relativeUrl;
             }
             
+            if (relativeUrl.startsWith("http://localhost:8888")) {
+                System.out.println("hello");
+            }
             // Create a new URL by resolving against the base
             // This properly handles cases like "../images/logo.png"
             URL resolvedURL = new URL(base, relativeUrl);
