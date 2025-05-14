@@ -37,6 +37,10 @@ public class HttpRequestController {
         String queryString = req.getQueryString();
         System.out.println(queryString);
 
+        if (servletPath.contains("bootstrap-icons.css") || (queryString != null && queryString.contains("bootstrap-icons.css"))) {
+            System.out.println("hello");
+        }
+
         if (servletPath.equals("/index.html") ||
             servletPath.equals("/")) {
                 ClassPathResource resource = new ClassPathResource("static/index.html");
