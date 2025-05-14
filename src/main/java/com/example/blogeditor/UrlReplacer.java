@@ -108,6 +108,40 @@ public class UrlReplacer {
         return finalResult.toString();
     }
     
+    public static String replaceCssUrls(String cssContent, String urlPrefix, String baseUrl) {
+        // Handle inline CSS with url() references
+        String cssUrlPattern = "(url\\s*\\(\\s*['\"]?)([^'\")]+)(['\"]?\\s*\\))";
+        Pattern cssPattern = Pattern.compile(cssUrlPattern);
+        Matcher cssMatcher = cssPattern.matcher(cssContent);
+        
+        StringBuffer finalResult = new StringBuffer();
+        
+        while (cssMatcher.find()) {
+            String urlOpen = cssMatcher.group(1);
+            String urlValue = cssMatcher.group(2);
+            String urlClose = cssMatcher.group(3);
+            
+            // Skip data: URLs and empty URLs
+            if (urlValue.isEmpty() || 
+                urlValue.startsWith("data:") || 
+                urlValue.startsWith("javascript:") || 
+                urlValue.equals("#")) {
+                continue;
+            }
+            
+            // Resolve relative URLs against the base URL
+            String resolvedUrl = resolveUrl(baseUrl, urlValue);
+            
+            // Replace the URL with the prefixed version
+            String replacement = urlOpen + urlPrefix + resolvedUrl + urlClose;
+            cssMatcher.appendReplacement(finalResult, Matcher.quoteReplacement(replacement));
+        }
+        
+        cssMatcher.appendTail(finalResult);
+        
+        return finalResult.toString();    
+    }
+
     /**
      * Replaces all URLs in JavaScript content with a prefixed version.
      * 

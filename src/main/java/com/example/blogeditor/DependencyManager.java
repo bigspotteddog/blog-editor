@@ -54,6 +54,11 @@ public class DependencyManager {
         return processedHtml;
     }
     
+    public String processCss(String cssContent) {        
+        String processedCss = UrlReplacer.replaceCssUrls(cssContent, urlPrefix, baseUrl);
+        return processedCss;
+    }
+
     /**
      * Adds the import proxy helper script to the HTML head section.
      */

@@ -147,6 +147,11 @@ public class HttpRequestController {
             String html2 = deps.processHtml(html);
             // String html2 = UrlReplacer.replaceUrls(html, urlPrefix, proxy);
             bytes = html2.getBytes();
+        } else if (contentType.startsWith("text/css")) {
+            DependencyManager deps = new DependencyManager(path, urlPrefix);
+            String css = new String(bytes);
+            String css2 = deps.processCss(css);
+            bytes = css2.getBytes();
         } else if (contentType.startsWith("text/javascript") || contentType.startsWith("application/javascript")) {
             DependencyManager deps = new DependencyManager(path, urlPrefix);
             String js = new String(bytes);
