@@ -98,6 +98,10 @@ public class HttpRequestController {
 
         System.out.print(path);
 
+        if (path.startsWith("https://fonts.googleapis.com/css2")) {
+            System.out.println("hello");
+        }
+
         String referer = req.getHeader("referer");
         System.out.println(referer);
 

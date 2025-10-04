@@ -1151,6 +1151,38 @@
     function updateStylesDialog(element) {
       const stylesDialogElement = document.querySelector(".styles-dialog-element");
       stylesDialogElement.innerHTML = getElementDisplayName(element);
+      
+      // Add class list section
+      const classHeaderRow = document.createElement('tr');
+      classHeaderRow.innerHTML = `
+        <td style="background: #f8f9fa; font-weight: 600; color: #1D202B;">Class List</td>
+        <td style="background: #f8f9fa;"></td>
+      `;
+      stylesTable.appendChild(classHeaderRow);
+      
+      // Add a row for the class list editor
+      const classRow = document.createElement('tr');
+      classRow.innerHTML = `
+        <td contenteditable="false" style="font-weight: 600;">class</td>
+        <td contenteditable="true" id="class-list-editor">${element.className || ''}</td>
+      `;
+      stylesTable.appendChild(classRow);
+      
+      // Add event listener to update class list when changed
+      const classListEditor = classRow.querySelector('#class-list-editor');
+      classListEditor.addEventListener('blur', function() {
+        if (activeContainer) {
+          activeContainer.className = this.textContent.trim();
+        }
+      });
+      
+      classListEditor.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          this.blur();
+        }
+      });
+
       // Add inline styles section
       const inlineHeaderRow = document.createElement('tr');
       inlineHeaderRow.innerHTML = `
