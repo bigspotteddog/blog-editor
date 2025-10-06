@@ -971,6 +971,29 @@
         }
       }
     }
+    
+    // Utility function to preserve element attributes
+    function preserveElementAttributes(element) {
+      const attributes = {};
+      for (let i = 0; i < element.attributes.length; i++) {
+        const attr = element.attributes[i];
+        attributes[attr.name] = attr.value;
+      }
+      return attributes;
+    }
+    
+    // Utility function to restore element attributes
+    function restoreElementAttributes(element, attributes) {
+      // Clear existing attributes
+      while (element.attributes.length > 0) {
+        element.removeAttribute(element.attributes[0].name);
+      }
+      
+      // Restore preserved attributes
+      for (const [name, value] of Object.entries(attributes)) {
+        element.setAttribute(name, value);
+      }
+    }
   </script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs/loader.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs/editor/editor.main.nls.js"></script>
@@ -1482,6 +1505,10 @@
                   // Format the editor content first
                   await formatEditorContent(window.styleEditor);
                   const editorValue = window.styleEditor.getValue();
+                  
+                  // Preserve element attributes before updating
+                  const preservedAttributes = preserveElementAttributes(activeContainer);
+                  
                   if (inHead) {
                     // For head style elements, save content as is
                     activeContainer.textContent = editorValue;
@@ -1496,6 +1523,9 @@
                       activeContainer.textContent = editorValue;
                     }
                   }
+                  
+                  // Restore element attributes after updating
+                  restoreElementAttributes(activeContainer, preservedAttributes);
                 }
               }, 500); // Debounce updates to avoid too frequent DOM updates
             });
@@ -1534,6 +1564,10 @@
                       // Format the editor content first
                       await formatEditorContent(window.styleEditor);
                       const editorValue = window.styleEditor.getValue();
+                      
+                      // Preserve element attributes before updating
+                      const preservedAttributes = preserveElementAttributes(activeContainer);
+                      
                       if (inHead) {
                         // For head style elements, save content as is
                         activeContainer.textContent = editorValue;
@@ -1548,6 +1582,9 @@
                           activeContainer.textContent = editorValue;
                         }
                       }
+                      
+                      // Restore element attributes after updating
+                      restoreElementAttributes(activeContainer, preservedAttributes);
                     }
                   }, 500); // Debounce updates to avoid too frequent DOM updates
                 });
@@ -1563,6 +1600,10 @@
                   textarea.addEventListener('blur', function() {
                     if (activeContainer) {
                       // This would be a simplified update for the fallback
+                      
+                      // Preserve element attributes before updating
+                      const preservedAttributes = preserveElementAttributes(activeContainer);
+                      
                       const value = this.value;
                       if (inHead) {
                         activeContainer.textContent = value;
@@ -1574,6 +1615,9 @@
                           activeContainer.textContent = value;
                         }
                       }
+                      
+                      // Restore element attributes after updating
+                      restoreElementAttributes(activeContainer, preservedAttributes);
                     }
                   });
                 }
@@ -2010,7 +2054,14 @@
                   // Format the editor content first
                   await formatEditorContent(window.scriptEditor);
                   // Save the content as is to the script element
+                  
+                  // Preserve element attributes before updating
+                  const preservedAttributes = preserveElementAttributes(activeContainer);
+                  
                   activeContainer.textContent = window.scriptEditor.getValue();
+                  
+                  // Restore element attributes after updating
+                  restoreElementAttributes(activeContainer, preservedAttributes);
                 }
               }, 500); // Debounce updates to avoid too frequent DOM updates
             });
@@ -2049,7 +2100,14 @@
                       // Format the editor content first
                       await formatEditorContent(window.scriptEditor);
                       // Save the content as is to the script element
+                      
+                      // Preserve element attributes before updating
+                      const preservedAttributes = preserveElementAttributes(activeContainer);
+                      
                       activeContainer.textContent = window.scriptEditor.getValue();
+                      
+                      // Restore element attributes after updating
+                      restoreElementAttributes(activeContainer, preservedAttributes);
                     }
                   }, 500); // Debounce updates to avoid too frequent DOM updates
                 });
@@ -2065,7 +2123,14 @@
                   textarea.addEventListener('blur', function() {
                     if (activeContainer) {
                       // This would be a simplified update for the fallback
+                      
+                      // Preserve element attributes before updating
+                      const preservedAttributes = preserveElementAttributes(activeContainer);
+                      
                       activeContainer.textContent = this.value;
+                      
+                      // Restore element attributes after updating
+                      restoreElementAttributes(activeContainer, preservedAttributes);
                     }
                   });
                 }
