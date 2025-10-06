@@ -958,7 +958,6 @@
     
     // Format editor content using Monaco's built-in formatter
     async function formatEditorContent(editor) {
-      return;
       if (editor && typeof editor.getAction === 'function') {
         try {
           // Use Monaco's built-in format action
@@ -1454,29 +1453,32 @@
         const styleRow = document.createElement('tr');
         styleRow.innerHTML = `
           <td colspan="2">
-            <div id="style-editor-container" style="width: 100%; height: 300px; border: 1px solid #ddd; border-radius: 4px;"></div>
+            <div id="editor-container" style="width: 100%; height: 300px; border: 1px solid #ddd; border-radius: 4px;"></div>
+            <div style="margin-top: 10px; text-align: right;">
+              <button id="save-button" class="btn btn-primary btn-sm">Save Changes</button>
+            </div>
           </td>
         `;
         stylesTable.appendChild(styleRow);
         
         // Initialize Monaco editor after a brief delay to ensure DOM is ready
         // Clear any existing editor if present to avoid duplication
-        if (window.styleEditor) {
-          window.styleEditor.dispose();
-          window.styleEditor = null;
+        if (window.editor) {
+          window.editor.dispose();
+          window.editor = null;
         }
         // Ensure the container is clean
-        const styleContainer = document.getElementById('style-editor-container');
-        if (styleContainer) {
-          styleContainer.innerHTML = '';
+        const editorContainer = document.getElementById('editor-container');
+        if (editorContainer) {
+          editorContainer.innerHTML = '';
         }
         
         setTimeout(() => {
           if (typeof monaco !== 'undefined' && monaco.editor) {
             // Create the editor instance
             if (!window.styleEditor) {
-              window.styleEditor = monaco.editor.create(document.getElementById('style-editor-container'), {
-                language: 'css',
+              window.editor = monaco.editor.create(document.getElementById('editor-container'), {
+                language: 'html',
                 theme: 'vs-light',
                 automaticLayout: true,
                 minimap: { enabled: false },
@@ -1492,50 +1494,50 @@
 
             // Format content on initialization
             setTimeout(() => {
-              window.styleEditor.setValue(displayContent);
-              formatEditorContent(window.styleEditor);
+              window.editor.setValue(displayContent);
+              formatEditorContent(window.editor);
             }, 100);
             
-            // Update the style element when editor content changes (with debounce)
-            let updateTimeout;
-            window.styleEditor.onDidChangeModelContent(() => {
-              clearTimeout(updateTimeout);
-              updateTimeout = setTimeout(async () => {
-                if (activeContainer) {
-                  // Format the editor content first
-                  await formatEditorContent(window.styleEditor);
-                  const editorValue = window.styleEditor.getValue();
-                  
-                  // Preserve element attributes before updating
-                  const preservedAttributes = preserveElementAttributes(activeContainer);
-                  
-                  if (inHead) {
-                    // For head style elements, save content as is
-                    activeContainer.textContent = editorValue;
+            // Attach click event listener to the save button
+            document.getElementById('save-button').addEventListener('click', async () => {
+              if (activeContainer && window.editor) {
+                // Format the editor content first
+                await formatEditorContent(window.editor);
+                const editorValue = window.editor.getValue();
+                
+                // Preserve element attributes before updating
+                const preservedAttributes = preserveElementAttributes(activeContainer);
+                
+                if (inHead) {
+                  // For head style elements, save content as is
+                  activeContainer.textContent = editorValue;
+                } else {
+                  // For non-head style elements, wrap in :where() with parent selector
+                  if (parentSelector) {
+                    // Wrap the edited content in :where() selector
+                    let wrappedContent = `:where(${parentSelector}) {\n  ${editorValue.replace(/\n/g, '\n  ')}\n}`;
+                    activeContainer.textContent = wrappedContent;
                   } else {
-                    // For non-head style elements, wrap in :where() with parent selector
-                    if (parentSelector) {
-                      // Wrap the edited content in :where() selector
-                      let wrappedContent = `:where(${parentSelector}) {\n  ${editorValue.replace(/\n/g, '\n  ')}\n}`;
-                      activeContainer.textContent = wrappedContent;
-                    } else {
-                      // If no parent selector, just save the content as is
-                      activeContainer.textContent = editorValue;
-                    }
+                    // If no parent selector, just save the content as is
+                    activeContainer.textContent = editorValue;
                   }
-                  
-                  // Restore element attributes after updating
-                  restoreElementAttributes(activeContainer, preservedAttributes);
                 }
-              }, 500); // Debounce updates to avoid too frequent DOM updates
+                
+                // Restore element attributes after updating
+                restoreElementAttributes(activeContainer, preservedAttributes);
+                
+                // Show success message
+                alert('Style changes saved successfully!');
+              }
             });
           } else {
             // If Monaco is not yet available, try again after a longer delay
             setTimeout(() => {
               if (typeof monaco !== 'undefined' && monaco.editor) {
-                if (!window.styleEditor) {
-                  window.styleEditor = monaco.editor.create(document.getElementById('style-editor-container'), {
-                    language: 'css',
+                if (!window.editor) {
+                  window.editor = monaco.editor.create(document.getElementById('editor-container'), {
+                    value: displayContent,
+                    language: 'html',
                     theme: 'vs-light',
                     automaticLayout: true,
                     minimap: { enabled: false },
@@ -1551,75 +1553,74 @@
                 
                 // Format content on initialization
                 setTimeout(() => {
-                  window.styleEditor.setValue(displayContent);
-                  formatEditorContent(window.styleEditor);
+                  window.editor.setValue(displayContent);
+                  formatEditorContent(window.editor);
                 }, 100);
 
-                // Update the style element when editor content changes (with debounce)
-                let updateTimeout;
-                window.styleEditor.onDidChangeModelContent(() => {
-                  clearTimeout(updateTimeout);
-                  updateTimeout = setTimeout(async () => {
-                    if (activeContainer) {
-                      // Format the editor content first
-                      await formatEditorContent(window.styleEditor);
-                      const editorValue = window.styleEditor.getValue();
-                      
-                      // Preserve element attributes before updating
-                      const preservedAttributes = preserveElementAttributes(activeContainer);
-                      
-                      if (inHead) {
-                        // For head style elements, save content as is
-                        activeContainer.textContent = editorValue;
+                // Attach click event listener to the save button
+                document.getElementById('save-button').addEventListener('click', async () => {
+                  if (activeContainer && window.editor) {
+                    // Format the editor content first
+                    await formatEditorContent(window.editor);
+                    const editorValue = window.editor.getValue();
+                    
+                    // Preserve element attributes before updating
+                    const preservedAttributes = preserveElementAttributes(activeContainer);
+                    
+                    if (inHead) {
+                      // For head style elements, save content as is
+                      activeContainer.textContent = editorValue;
+                    } else {
+                      // For non-head style elements, wrap in :where() with parent selector
+                      if (parentSelector) {
+                        // Wrap the edited content in :where() selector
+                        let wrappedContent = `:where(${parentSelector}) {\n  ${editorValue.replace(/\n/g, '\n  ')}\n}`;
+                        activeContainer.textContent = wrappedContent;
                       } else {
-                        // For non-head style elements, wrap in :where() with parent selector
-                        if (parentSelector) {
-                          // Wrap the edited content in :where() selector
-                          let wrappedContent = `:where(${parentSelector}) {\n  ${editorValue.replace(/\n/g, '\n  ')}\n}`;
-                          activeContainer.textContent = wrappedContent;
-                        } else {
-                          // If no parent selector, just save the content as is
-                          activeContainer.textContent = editorValue;
-                        }
+                        // If no parent selector, just save the content as is
+                        activeContainer.textContent = editorValue;
                       }
-                      
-                      // Restore element attributes after updating
-                      restoreElementAttributes(activeContainer, preservedAttributes);
                     }
-                  }, 500); // Debounce updates to avoid too frequent DOM updates
+                    
+                    // Restore element attributes after updating
+                    restoreElementAttributes(activeContainer, preservedAttributes);
+                    
+                    // Show success message
+                    alert('Style changes saved successfully!');
+                  }
                 });
               } else {
                 console.error('Monaco editor is not available for style element');
                 // Fallback: display content in a regular textarea
-                const container = document.getElementById('style-editor-container');
+                const container = document.getElementById('editor-container');
                 if (container) {
-                  container.innerHTML = `
-                    <textarea style="width: 100%; height: 300px; font-family: monospace; padding: 10px;">${displayContent}</textarea>
-                  `;
-                  const textarea = container.querySelector('textarea');
-                  textarea.addEventListener('blur', function() {
-                    if (activeContainer) {
-                      // This would be a simplified update for the fallback
-                      
-                      // Preserve element attributes before updating
-                      const preservedAttributes = preserveElementAttributes(activeContainer);
-                      
-                      const value = this.value;
-                      if (inHead) {
-                        activeContainer.textContent = value;
+                container.innerHTML = `
+                  <textarea style="width: 100%; height: 300px; font-family: monospace; padding: 10px;">${displayContent}</textarea>
+                `;
+                const textarea = container.querySelector('textarea');
+                textarea.addEventListener('blur', function() {
+                  if (activeContainer) {
+                    // This would be a simplified update for the fallback
+                    
+                    // Preserve element attributes before updating
+                    const preservedAttributes = preserveElementAttributes(activeContainer);
+                    
+                    const value = this.value;
+                    if (inHead) {
+                      activeContainer.textContent = value;
+                    } else {
+                      if (parentSelector) {
+                        let wrappedContent = `:where(${parentSelector}) {\n  ${value.replace(/\n/g, '\n  ')}\n}`;
+                        activeContainer.textContent = wrappedContent;
                       } else {
-                        if (parentSelector) {
-                          let wrappedContent = `:where(${parentSelector}) {\n  ${value.replace(/\n/g, '\n  ')}\n}`;
-                          activeContainer.textContent = wrappedContent;
-                        } else {
-                          activeContainer.textContent = value;
-                        }
-                      }
-                      
-                      // Restore element attributes after updating
-                      restoreElementAttributes(activeContainer, preservedAttributes);
+                        activeContainer.textContent = value;
+                     }
                     }
-                  });
+                    
+                    // Restore element attributes after updating
+                    restoreElementAttributes(activeContainer, preservedAttributes);
+                  }
+                });
                 }
               }
             }, 500);
@@ -1693,28 +1694,31 @@
         const htmlRow = document.createElement('tr');
         htmlRow.innerHTML = `
           <td colspan="2">
-            <div id="html-editor-container" style="width: 100%; height: 300px; border: 1px solid #ddd; border-radius: 4px;"></div>
+            <div id="editor-container" style="width: 100%; height: 300px; border: 1px solid #ddd; border-radius: 4px;"></div>
+            <div style="margin-top: 10px; text-align: right;">
+              <button id="save-button" class="btn btn-primary btn-sm">Save Changes</button>
+            </div>
           </td>
         `;
         stylesTable.appendChild(htmlRow);
         
         // Initialize Monaco editor after a brief delay to ensure DOM is ready
         // Clear any existing editor if present to avoid duplication
-        if (window.htmlEditor) {
-          window.htmlEditor.dispose();
-          window.htmlEditor = null;
+        if (window.editor) {
+          window.editor.dispose();
+          window.editor = null;
         }
         // Ensure the container is clean
-        const htmlContainer = document.getElementById('html-editor-container');
-        if (htmlContainer) {
-          htmlContainer.innerHTML = '';
+        const editorContainer = document.getElementById('editor-container');
+        if (editorContainer) {
+          editorContainer.innerHTML = '';
         }
         
         setTimeout(() => {
           if (typeof monaco !== 'undefined' && monaco.editor) {
             // Create the editor instance
-            if (!window.htmlEditor) {
-              window.htmlEditor = monaco.editor.create(document.getElementById('html-editor-container'), {
+            if (!window.editor) {
+              window.editor = monaco.editor.create(document.getElementById('editor-container'), {
                 language: 'html',
                 theme: 'vs-light',
                 automaticLayout: true,
@@ -1733,67 +1737,67 @@
             
             // Format content on initialization
             setTimeout(() => {
-              window.htmlEditor.setValue(htmlContent);
-              formatEditorContent(window.htmlEditor);
+              window.editor.setValue(htmlContent);
+              formatEditorContent(window.editor);
             }, 100);
 
-            // Update the HTML element when editor content changes (with debounce)
-            let htmlUpdateTimeout;
-            window.htmlEditor.onDidChangeModelContent(() => {
-              clearTimeout(htmlUpdateTimeout);
-              htmlUpdateTimeout = setTimeout(async () => {
-                if (activeContainer) {
-                  // Format the editor content first
-                  await formatEditorContent(window.htmlEditor);
-                  // Update the entire HTML document
-                  try {
-                    const newHtmlContent = window.htmlEditor.getValue();
-                    // Parse the new HTML content and update the document
-                    const parser = new DOMParser();
-                    const newDoc = parser.parseFromString(newHtmlContent, 'text/html');
-                    
-                    // Update the html element's content
-                    const newHtmlElement = newDoc.documentElement;
-                    const currentHtmlElement = activeContainer;
-                    
-                    // Update attributes
-                    for (let i = currentHtmlElement.attributes.length - 1; i >= 0; i--) {
-                      currentHtmlElement.removeAttribute(currentHtmlElement.attributes[i].name);
-                    }
-                    for (let i = 0; i < newHtmlElement.attributes.length; i++) {
-                      const attr = newHtmlElement.attributes[i];
-                      currentHtmlElement.setAttribute(attr.name, attr.value);
-                    }
-                    
-                    // Update child nodes
-                    const oldHead = currentHtmlElement.querySelector('head');
-                    const oldBody = currentHtmlElement.querySelector('body');
-                    const newHead = newHtmlElement.querySelector('head');
-                    const newBody = newHtmlElement.querySelector('body');
-                    
-                    if (oldHead && newHead) {
-                      oldHead.innerHTML = newHead.innerHTML;
-                    }
-                    
-                    if (oldBody && newBody) {
-                      oldBody.innerHTML = newBody.innerHTML;
-                    }
-                    
-                    // Refresh the selector to reflect the changes
-                    refreshSelector(currentHtmlElement);
-                  } catch (e) {
-                    console.error('Error updating HTML:', e);
+            // Attach click event listener to the save button
+            document.getElementById('save-button').addEventListener('click', async () => {
+              if (activeContainer && window.editor) {
+                // Format the editor content first
+                await formatEditorContent(window.editor);
+                // Update the entire HTML document
+                try {
+                  const newHtmlContent = window.editor.getValue();
+                  // Parse the new HTML content and update the document
+                  const parser = new DOMParser();
+                  const newDoc = parser.parseFromString(newHtmlContent, 'text/html');
+                  
+                  // Update the html element's content
+                  const newHtmlElement = newDoc.documentElement.getElementsByTagName('body')[0].children[0];
+                  const currentHtmlElement = activeContainer;
+                  
+                  // Update attributes
+                  for (let i = currentHtmlElement.attributes.length - 1; i >= 0; i--) {
+                    currentHtmlElement.removeAttribute(currentHtmlElement.attributes[i].name);
                   }
+                  for (let i = 0; i < newHtmlElement.attributes.length; i++) {
+                    const attr = newHtmlElement.attributes[i];
+                    currentHtmlElement.setAttribute(attr.name, attr.value);
+                  }
+                  
+                  // Update child nodes
+                  const oldHead = currentHtmlElement.querySelector('head');
+                  const oldBody = currentHtmlElement.querySelector('body');
+                  const newHead = newHtmlElement.querySelector('head');
+                  const newBody = newHtmlElement.querySelector('body');
+                  
+                  if (oldHead && newHead) {
+                    oldHead.innerHTML = newHead.innerHTML;
+                  }
+                  
+                  if (oldBody && newBody) {
+                    oldBody.innerHTML = newBody.innerHTML;
+                  }
+                  
+                  // Refresh the selector to reflect the changes
+                  refreshSelector(currentHtmlElement);
+                  
+                  // Show success message
+                  alert('HTML changes saved successfully!');
+                } catch (e) {
+                  console.error('Error updating HTML:', e);
                 }
-              }, 1000); // Debounce updates to avoid too frequent DOM updates
+              }
             });
           } else {
-            // If Monaco is not yet available, try again after a longer delay
+          // If Monaco is not yet available, try again after a longer delay
             setTimeout(() => {
               if (typeof monaco !== 'undefined' && monaco.editor) {
                 // Create the editor instance
-                if (!window.htmlEditor) {
-                  window.htmlEditor = monaco.editor.create(document.getElementById('html-editor-container'), {
+                if (!window.editor) {                
+                  window.editor = monaco.editor.create(document.getElementById('editor-container'), {
+                    value: htmlContent,
                     language: 'html',
                     theme: 'vs-light',
                     automaticLayout: true,
@@ -1806,65 +1810,64 @@
                     padding: { top: 10, bottom: 10 },
                     fontFamily: 'monospace',
                     formatOnType: true,
-                    formatOnPaste: true
-                  });                  
-                }
-                
-                // Format content on initialization
-                setTimeout(() => {
-                  window.htmlEditor.setValue(htmlContent);
-                  formatEditorContent(window.htmlEditor);
-                }, 100);
+                  formatOnPaste: true
+                });                  
+          }
+          
+          // Format content on initialization
+          setTimeout(() => {
+          window.editor.setValue(htmlContent);
+          formatEditorContent(window.editor);
+          }, 100);
 
-                // Update the HTML element when editor content changes (with debounce)
-                let htmlUpdateTimeout;
-                window.htmlEditor.onDidChangeModelContent(() => {
-                  clearTimeout(htmlUpdateTimeout);
-                  htmlUpdateTimeout = setTimeout(async () => {
-                    if (activeContainer) {
-                      // Format the editor content first
-                      await formatEditorContent(window.htmlEditor);
-                      // Update the entire HTML document
-                      try {
-                        const newHtmlContent = window.htmlEditor.getValue();
-                        // Parse the new HTML content and update the document
-                        const parser = new DOMParser();
-                        const newDoc = parser.parseFromString(newHtmlContent, 'text/html');
-                        
-                        // Update the html element's content
-                        const newHtmlElement = newDoc.documentElement;
-                        const currentHtmlElement = activeContainer;
-                        
-                        // Update attributes
-                        for (let i = currentHtmlElement.attributes.length - 1; i >= 0; i--) {
-                          currentHtmlElement.removeAttribute(currentHtmlElement.attributes[i].name);
-                        }
-                        for (let i = 0; i < newHtmlElement.attributes.length; i++) {
-                          const attr = newHtmlElement.attributes[i];
-                          currentHtmlElement.setAttribute(attr.name, attr.value);
-                        }
-                        
-                        // Update child nodes
-                        const oldHead = currentHtmlElement.querySelector('head');
-                        const oldBody = currentHtmlElement.querySelector('body');
-                        const newHead = newHtmlElement.querySelector('head');
-                        const newBody = newHtmlElement.querySelector('body');
-                        
-                        if (oldHead && newHead) {
-                          oldHead.innerHTML = newHead.innerHTML;
-                        }
-                        
-                        if (oldBody && newBody) {
-                          oldBody.innerHTML = newBody.innerHTML;
-                        }
-                        
-                        // Refresh the selector to reflect the changes
-                        refreshSelector(currentHtmlElement);
-                      } catch (e) {
-                        console.error('Error updating HTML:', e);
+                // Attach click event listener to the save button
+                document.getElementById('save-html-button').addEventListener('click', async () => {
+                  if (activeContainer && window.htmlEditor) {
+                    // Format the editor content first
+                    await formatEditorContent(window.htmlEditor);
+                    // Update the entire HTML document
+                    try {
+                      const newHtmlContent = window.htmlEditor.getValue();
+                      // Parse the new HTML content and update the document
+                      const parser = new DOMParser();
+                      const newDoc = parser.parseFromString(newHtmlContent, 'text/html');
+                      
+                      // Update the html element's content
+                      const newHtmlElement = newDoc.documentElement.getElementsByTagName('body')[0].children[0];
+                      const currentHtmlElement = activeContainer;
+                      
+                      // Update attributes
+                      for (let i = currentHtmlElement.attributes.length - 1; i >= 0; i--) {
+                        currentHtmlElement.removeAttribute(currentHtmlElement.attributes[i].name);
                       }
+                      for (let i = 0; i < newHtmlElement.attributes.length; i++) {
+                        const attr = newHtmlElement.attributes[i];
+                        currentHtmlElement.setAttribute(attr.name, attr.value);
+                      }
+                      
+                      // Update child nodes
+                      const oldHead = currentHtmlElement.querySelector('head');
+                      const oldBody = currentHtmlElement.querySelector('body');
+                      const newHead = newHtmlElement.querySelector('head');
+                      const newBody = newHtmlElement.querySelector('body');
+                      
+                      if (oldHead && newHead) {
+                        oldHead.innerHTML = newHead.innerHTML;
+                      }
+                      
+                      if (oldBody && newBody) {
+                        oldBody.innerHTML = newBody.innerHTML;
+                      }
+                      
+                      // Refresh the selector to reflect the changes
+                      refreshSelector(currentHtmlElement);
+                      
+                      // Show success message
+                      alert('HTML changes saved successfully!');
+                    } catch (e) {
+                      console.error('Error updating HTML:', e);
                     }
-                  }, 1000); // Debounce updates to avoid too frequent DOM updates
+                  }
                 });
               } else {
                 console.error('Monaco editor is not available for HTML element');
@@ -2002,29 +2005,32 @@
         const scriptRow = document.createElement('tr');
         scriptRow.innerHTML = `
           <td colspan="2">
-            <div id="script-editor-container" style="width: 100%; height: 300px; border: 1px solid #ddd; border-radius: 4px;"></div>
+            <div id="editor-container" style="width: 100%; height: 300px; border: 1px solid #ddd; border-radius: 4px;"></div>
+            <div style="margin-top: 10px; text-align: right;">
+              <button id="save-button" class="btn btn-primary btn-sm">Save Changes</button>
+            </div>
           </td>
         `;
         stylesTable.appendChild(scriptRow);
         
         // Initialize Monaco editor after a brief delay to ensure DOM is ready
         // Clear any existing editor if present to avoid duplication
-        if (window.scriptEditor) {
-          window.scriptEditor.dispose();
-          window.scriptEditor = null;
+        if (window.editor) {
+          window.editor.dispose();
+          window.editor = null;
         }
         // Ensure the container is clean
-        const scriptContainer = document.getElementById('script-editor-container');
-        if (scriptContainer) {
-          scriptContainer.innerHTML = '';
+        const editorContainer = document.getElementById('editor-container');
+        if (editorContainer) {
+          editorContainer.innerHTML = '';
         }
         
         setTimeout(() => {
           if (typeof monaco !== 'undefined' && monaco.editor) {
             // Create the editor instance
-            if (!window.scriptEditor) {
-              window.scriptEditor = monaco.editor.create(document.getElementById('script-editor-container'), {
-                language: 'javascript',
+            if (!window.editor) {
+              window.editor = monaco.editor.create(document.getElementById('editor-container'), {
+                language: 'html',
                 theme: 'vs-light',
                 automaticLayout: true,
                 minimap: { enabled: false },
@@ -2040,38 +2046,38 @@
 
             // Format content on initialization
             setTimeout(() => {
-              window.scriptEditor.setValue(scriptContent);
-              formatEditorContent(window.scriptEditor);
+              window.editor.setValue(scriptContent);
+              formatEditorContent(window.editor);
             }, 100);
 
             
-            // Update the script element when editor content changes (with debounce)
-            let scriptUpdateTimeout;
-            window.scriptEditor.onDidChangeModelContent(() => {
-              clearTimeout(scriptUpdateTimeout);
-              scriptUpdateTimeout = setTimeout(async () => {
-                if (activeContainer) {
-                  // Format the editor content first
-                  await formatEditorContent(window.scriptEditor);
-                  // Save the content as is to the script element
-                  
-                  // Preserve element attributes before updating
-                  const preservedAttributes = preserveElementAttributes(activeContainer);
-                  
-                  activeContainer.textContent = window.scriptEditor.getValue();
-                  
-                  // Restore element attributes after updating
-                  restoreElementAttributes(activeContainer, preservedAttributes);
-                }
-              }, 500); // Debounce updates to avoid too frequent DOM updates
+            // Attach click event listener to the save button
+            document.getElementById('save-button').addEventListener('click', async () => {
+              if (activeContainer && window.editor) {
+                // Format the editor content first
+                await formatEditorContent(window.editor);
+                // Save the content as is to the script element
+                
+                // Preserve element attributes before updating
+                const preservedAttributes = preserveElementAttributes(activeContainer);
+                
+                activeContainer.textContent = window.editor.getValue();
+                
+                // Restore element attributes after updating
+                restoreElementAttributes(activeContainer, preservedAttributes);
+                
+                // Show success message
+                alert('Script changes saved successfully!');
+              }
             });
           } else {
             // If Monaco is not yet available, try again after a longer delay
             setTimeout(() => {
               if (typeof monaco !== 'undefined' && monaco.editor) {
-                if (!window.scriptEditor) {                
-                  window.scriptEditor = monaco.editor.create(document.getElementById('script-editor-container'), {
-                    language: 'javascript',
+                if (!window.editor) {                
+                  window.editor = monaco.editor.create(document.getElementById('editor-container'), {
+                    value: scriptContent,
+                    language: 'html',
                     theme: 'vs-light',
                     automaticLayout: true,
                     minimap: { enabled: false },
@@ -2087,34 +2093,33 @@
 
                 // Format content on initialization
                 setTimeout(() => {
-                  window.scriptEditor.setValue(scriptContent);
-                  formatEditorContent(window.scriptEditor);
+                window.editor.setValue(scriptContent);
+                formatEditorContent(window.editor);
                 }, 100);
-                
-                // Update the script element when editor content changes (with debounce)
-                let scriptUpdateTimeout;
-                window.scriptEditor.onDidChangeModelContent(() => {
-                  clearTimeout(scriptUpdateTimeout);
-                  scriptUpdateTimeout = setTimeout(async () => {
-                    if (activeContainer) {
-                      // Format the editor content first
-                      await formatEditorContent(window.scriptEditor);
-                      // Save the content as is to the script element
-                      
-                      // Preserve element attributes before updating
-                      const preservedAttributes = preserveElementAttributes(activeContainer);
-                      
-                      activeContainer.textContent = window.scriptEditor.getValue();
-                      
-                      // Restore element attributes after updating
-                      restoreElementAttributes(activeContainer, preservedAttributes);
-                    }
-                  }, 500); // Debounce updates to avoid too frequent DOM updates
+
+                // Attach click event listener to the save button
+                document.getElementById('save-button').addEventListener('click', async () => {
+                  if (activeContainer && window.editor) {
+                    // Format the editor content first
+                    await formatEditorContent(window.editor);
+                    // Save the content as is to the script element
+                    
+                    // Preserve element attributes before updating
+                    const preservedAttributes = preserveElementAttributes(activeContainer);
+                    
+                    activeContainer.textContent = window.editor.getValue();
+                    
+                    // Restore element attributes after updating
+                    restoreElementAttributes(activeContainer, preservedAttributes);
+                    
+                    // Show success message
+                    alert('Script changes saved successfully!');
+                  }
                 });
               } else {
                 console.error('Monaco editor is not available for script element');
                 // Fallback: display content in a regular textarea
-                const container = document.getElementById('script-editor-container');
+                const container = document.getElementById('editor-container');
                 if (container) {
                   container.innerHTML = `
                     <textarea style="width: 100%; height: 300px; font-family: monospace; padding: 10px;">${scriptContent}</textarea>
