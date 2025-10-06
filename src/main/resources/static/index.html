@@ -2213,13 +2213,105 @@
       componentSelector.innerHTML = "";
       const chain = buildHierarchyChain(element);
 
-      // Add main first
-      const main = editorDocument.body;
-      const mainHtml = `<div class="selector-item${main === element ? ' selected' : ''}" data-element="div" draggable="true">body</div>`;
-      const mainDiv = document.createElement('div');
-      mainDiv.innerHTML = mainHtml;
-      mainDiv.firstChild.el = main;
-      componentSelector.appendChild(mainDiv.firstChild);
+      // Add html element first
+      const htmlElement = editorDocument.documentElement;
+      const htmlHtml = `<div class="selector-item${htmlElement === element ? ' selected' : ''}" data-element="html" draggable="true">html</div>`;
+      const htmlDiv = document.createElement('div');
+      htmlDiv.innerHTML = htmlHtml;
+      htmlDiv.firstChild.el = htmlElement;
+      componentSelector.appendChild(htmlDiv.firstChild);
+
+      // Add head element under html
+      const headElement = editorDocument.head;
+      const headHtml = `<div class="selector-item child${headElement === element ? ' selected-child' : ''}" data-element="head" draggable="true">head</div>`;
+      const headDiv = document.createElement('div');
+      headDiv.innerHTML = headHtml;
+      headDiv.firstChild.el = headElement;
+      componentSelector.appendChild(headDiv.firstChild);
+
+      // Build head children tree
+      if (headElement.children.length > 0) {
+        const headTreeContainer = document.createElement('div');
+        headTreeContainer.className = 'selector-tree-item';
+        // Expand if head or one of its descendants is in the chain
+        if (chain.includes(headElement) || chain.some(el => el.parentElement === headElement)) {
+          headTreeContainer.classList.add('expanded');
+        }
+
+        Array.from(headElement.children).forEach(child => {
+          const isInChain = chain.includes(child);
+          const isSelected = child === element;
+
+          const childTagName = child.tagName.toLowerCase();
+          const childClasses = Array.from(child.classList)
+            .filter(cls => cls !== 'editable')
+            .join(' ');
+          const childId = child.id ? `#${child.id}` : '';
+
+          let childClassName = 'selector-item child';
+          if (isSelected) childClassName += ' selected-child';
+          else if (isInChain) childClassName += ' selected-path';
+
+          const hasChildren = child.children.length > 0;
+          const prefix = hasChildren ? '▸' : '•';
+          const childDivHtml = `<div class="${childClassName}" data-element="${childTagName}" style="padding-left: 40px" draggable="true">
+            <span class="selector-item-prefix">${prefix}</span>${childTagName}${childId}${childClasses ? ` .${childClasses}` : ''}
+          </div>`;
+          
+          const childDiv = document.createElement('div');
+          childDiv.innerHTML = childDivHtml;
+          childDiv.firstChild.el = child;
+          headTreeContainer.appendChild(childDiv.firstChild);
+
+          // Recursively build head children if they exist
+          if (child.children.length > 0) {
+            const childTreeContainer = document.createElement('div');
+            childTreeContainer.className = 'selector-tree-item';
+            if (chain.includes(child) || chain.some(el => el.parentElement === child)) {
+              childTreeContainer.classList.add('expanded');
+            }
+
+            Array.from(child.children).forEach(grandchild => {
+              const isGrandchildInChain = chain.includes(grandchild);
+              const isGrandchildSelected = grandchild === element;
+
+              const grandchildTagName = grandchild.tagName.toLowerCase();
+              const grandchildClasses = Array.from(grandchild.classList)
+                .filter(cls => cls !== 'editable')
+                .join(' ');
+              const grandchildId = grandchild.id ? `#${grandchild.id}` : '';
+
+              let grandchildClassName = 'selector-item child';
+              if (isGrandchildSelected) grandchildClassName += ' selected-child';
+              else if (isGrandchildInChain) grandchildClassName += ' selected-path';
+
+              const grandchildHasChildren = grandchild.children.length > 0;
+              const grandchildPrefix = grandchildHasChildren ? '▸' : '•';
+              
+              const grandchildDivHtml = `<div class="${grandchildClassName}" data-element="${grandchildTagName}" style="padding-left: 60px" draggable="true">
+                <span class="selector-item-prefix">${grandchildPrefix}</span>${grandchildTagName}${grandchildId}${grandchildClasses ? ` .${grandchildClasses}` : ''}
+              </div>`;
+              
+              const grandchildDiv = document.createElement('div');
+              grandchildDiv.innerHTML = grandchildDivHtml;
+              grandchildDiv.firstChild.el = grandchild;
+              childTreeContainer.appendChild(grandchildDiv.firstChild);
+            });
+
+            headTreeContainer.appendChild(childTreeContainer);
+          }
+        });
+
+        componentSelector.appendChild(headTreeContainer);
+      }
+
+      // Add body element under html
+      const bodyElement = editorDocument.body;
+      const bodyHtml = `<div class="selector-item child${bodyElement === element ? ' selected-child' : ''}" data-element="body" draggable="true">body</div>`;
+      const bodyDiv = document.createElement('div');
+      bodyDiv.innerHTML = bodyHtml;
+      bodyDiv.firstChild.el = bodyElement;
+      componentSelector.appendChild(bodyDiv.firstChild);
 
       // Function to create element HTML with proper indentation and prefix
       function createElementHtml(el, level, isInChain, isSelected) {
@@ -2236,7 +2328,7 @@
 
         const hasChildren = el.children.length > 0;
         const prefix = hasChildren ? '▸' : '•';
-        const padding = level * 20;
+        const padding = 20 + (level * 20); // Start from 40px to align with body
 
         return `<div class="${className}" data-element="${tagName}" style="padding-left: ${padding}px" draggable="true">
           <span class="selector-item-prefix">${prefix}</span>${tagName}${id}${classes ? ` .${classes}` : ''}
@@ -2256,6 +2348,9 @@
         }
 
         for (const child of children) {
+          // Skip if child is already a head child (don't duplicate)
+          if (child.parentElement === headElement) continue;
+
           const isInChain = chain.includes(child);
           const isSelected = child === element;
 
@@ -2272,7 +2367,7 @@
         container.appendChild(treeContainer);
       }
 
-      // Build the entire tree
+      // Build the body tree
       buildTree(editorDocument.body, 1, componentSelector);
 
       // Find and scroll to selected element
