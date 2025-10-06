@@ -2215,7 +2215,11 @@
 
       // Add html element first
       const htmlElement = editorDocument.documentElement;
-      const htmlHtml = `<div class="selector-item${htmlElement === element ? ' selected' : ''}" data-element="html" draggable="true">html</div>`;
+      const hasHtmlChildren = htmlElement.children.length > 0;
+      const htmlPrefix = hasHtmlChildren ? '▸' : '•'; // Use ▸ for collapsed state, • for no children
+      const htmlHtml = `<div class="selector-item${htmlElement === element ? ' selected' : ''}" data-element="html" draggable="true" style="position: relative;">
+        <span class="selector-item-prefix">${htmlPrefix}</span>html
+      </div>`;
       const htmlDiv = document.createElement('div');
       htmlDiv.innerHTML = htmlHtml;
       htmlDiv.firstChild.el = htmlElement;
@@ -2223,8 +2227,10 @@
 
       // Add head element under html
       const headElement = editorDocument.head;
+      const hasHeadChildren = headElement.children.length > 0;
+      const headPrefix = hasHeadChildren ? '▸' : '•'; // Use ▸ for collapsed state, • for no children
       const headHtml = `<div class="selector-item child${headElement === element ? ' selected-child' : ''}" data-element="head" draggable="true" style="position: relative;">
-        <span class="selector-item-prefix">▾</span>head
+        <span class="selector-item-prefix">${headPrefix}</span>head
       </div>`;
       const headDiv = document.createElement('div');
       headDiv.innerHTML = headHtml;
@@ -2234,7 +2240,7 @@
       // Build head children tree
       if (headElement.children.length > 0) {
         const headTreeContainer = document.createElement('div');
-        headTreeContainer.className = 'selector-tree-item expanded'; // Always expanded to show head children
+        headTreeContainer.className = 'selector-tree-item'; // Default to not expanded
 
         Array.from(headElement.children).forEach(child => {
           const isInChain = chain.includes(child);
@@ -2305,7 +2311,11 @@
 
       // Add body element under html
       const bodyElement = editorDocument.body;
-      const bodyHtml = `<div class="selector-item child${bodyElement === element ? ' selected-child' : ''}" data-element="body" draggable="true">body</div>`;
+      const hasBodyChildren = bodyElement.children.length > 0;
+      const bodyPrefix = hasBodyChildren ? '▸' : '•'; // Use ▸ for collapsed state, • for no children
+      const bodyHtml = `<div class="selector-item child${bodyElement === element ? ' selected-child' : ''}" data-element="body" draggable="true" style="position: relative;">
+        <span class="selector-item-prefix">${bodyPrefix}</span>body
+      </div>`;
       const bodyDiv = document.createElement('div');
       bodyDiv.innerHTML = bodyHtml;
       bodyDiv.firstChild.el = bodyElement;
@@ -2328,7 +2338,7 @@
         const prefix = hasChildren ? '▸' : '•';
         const padding = 20 + (level * 20); // Start from 40px to align with body
 
-        return `<div class="${className}" data-element="${tagName}" style="padding-left: ${padding}px" draggable="true">
+        return `<div class="${className}" data-element="${tagName}" style="padding-left: ${padding}px" draggable="true" style="position: relative;">
           <span class="selector-item-prefix">${prefix}</span>${tagName}${id}${classes ? ` .${classes}` : ''}
         </div>`;
       }
@@ -2753,46 +2763,50 @@
           if (treeContainer && treeContainer.classList.contains('selector-tree-item')) {
             const isExpanded = treeContainer.classList.contains('expanded');
             treeContainer.classList.toggle('expanded');
+            // Toggle the prefix character - if it's ▾ (expanded), change to ▸ (collapsed), and vice versa
             prefix.textContent = isExpanded ? '▸' : '▾';
+            e.preventDefault();
             e.stopPropagation();
             return;
           }
         }
 
-        // Handle selection
-        e.preventDefault();
-        e.stopPropagation();
+        // Handle selection only if not clicking the prefix (to avoid conflicts)
+        if (!e.target.classList.contains('selector-item-prefix')) {
+          e.preventDefault();
+          e.stopPropagation();
 
-        // Clear previous selection
-        const prevSelected = componentSelector.querySelector('.selected-child');
-        if (prevSelected) {
-          prevSelected.classList.remove('selected-child');
-        }
-        selectorItem.classList.add('selected-child');
+          // Clear previous selection
+          const prevSelected = componentSelector.querySelector('.selected-child');
+          if (prevSelected) {
+            prevSelected.classList.remove('selected-child');
+          }
+          selectorItem.classList.add('selected-child');
 
-        // Hide highlight while scrolling
-        if (highlightOverlay && highlightOverlay.style) {
-          highlightOverlay.style.display = 'none';
-        }
+          // Hide highlight while scrolling
+          if (highlightOverlay && highlightOverlay.style) {
+            highlightOverlay.style.display = 'none';
+          }
 
-        // First scroll, then highlight
-        if (!isInViewport(selectorItem.el)) {
-          // selectorItem.el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
-        
-        activeContainer = selectorItem.el;
+          // First scroll, then highlight
+          if (!isInViewport(selectorItem.el)) {
+            // selectorItem.el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
+          
+          activeContainer = selectorItem.el;
 
-        // Update styles dialog to show properties of the selected element
-        const stylesTable = document.querySelector('.styles-dialog table tbody');
-        if (stylesTable) {
-          stylesTable.innerHTML = '';
-          updateStylesDialog(selectorItem.el);
+          // Update styles dialog to show properties of the selected element
+          const stylesTable = document.querySelector('.styles-dialog table tbody');
+          if (stylesTable) {
+            stylesTable.innerHTML = '';
+            updateStylesDialog(selectorItem.el);
+          }
+          
+          // Wait for scroll to complete before showing highlight (smooth scroll typically takes ~800ms)
+          setTimeout(() => {
+            showHighlight(selectorItem.el);
+          }, 800);
         }
-        
-        // Wait for scroll to complete before showing highlight (smooth scroll typically takes ~800ms)
-        setTimeout(() => {
-          showHighlight(selectorItem.el);
-        }, 800);
       });
 
       editorDocument.addEventListener('mousedown', (e) => {
