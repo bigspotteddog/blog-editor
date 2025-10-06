@@ -1289,7 +1289,7 @@
       const stylesDialogElement = document.querySelector(".styles-dialog-element");
       stylesDialogElement.innerHTML = getElementDisplayName(element);
       
-      // Check if the selected element is a style element
+      // Check if the selected element is a style or script element
       if (element.tagName.toLowerCase() === 'style') {
         // Determine if the style element is in the head
         const inHead = element.parentElement && element.parentElement.tagName.toLowerCase() === 'head';
@@ -1386,6 +1386,70 @@
         }, 100);
         
         return; // Return early for style elements to avoid other editors
+      }
+      
+      // Check if the selected element is a script element
+      if (element.tagName.toLowerCase() === 'script') {
+        // Determine if the script element is in the head
+        const inHead = element.parentElement && element.parentElement.tagName.toLowerCase() === 'head';
+        
+        // Add script content editor section
+        const scriptHeaderRow = document.createElement('tr');
+        if (inHead) {
+          scriptHeaderRow.innerHTML = `
+            <td style="background: #f8f9fa; font-weight: 600; color: #1D202B;" colspan="2">Global Script Editor</td>
+          `;
+        } else {
+          scriptHeaderRow.innerHTML = `
+            <td style="background: #f8f9fa; font-weight: 600; color: #1D202B;" colspan="2">Script Editor</td>
+          `;
+        }
+        stylesTable.appendChild(scriptHeaderRow);
+        
+        // Get the script content
+        let scriptContent = element.textContent || '';
+        
+        // Create a container for the Monaco editor
+        const scriptRow = document.createElement('tr');
+        scriptRow.innerHTML = `
+          <td colspan="2">
+            <div id="script-editor-container" style="width: 100%; height: 300px; border: 1px solid #ddd; border-radius: 4px;"></div>
+          </td>
+        `;
+        stylesTable.appendChild(scriptRow);
+        
+        // Initialize Monaco editor after a brief delay to ensure DOM is ready
+        setTimeout(() => {
+          require(['vs/editor/editor.main'], function() {
+            // Create the editor instance
+            window.scriptEditor = monaco.editor.create(document.getElementById('script-editor-container'), {
+              value: scriptContent,
+              language: 'javascript',
+              theme: 'vs-light',
+              automaticLayout: true,
+              minimap: { enabled: false },
+              fontSize: 14,
+              scrollBeyondLastLine: false,
+              roundedSelection: false,
+              padding: { top: 10, bottom: 10 },
+              fontFamily: 'monospace'
+            });
+            
+            // Update the script element when editor content changes (with debounce)
+            let scriptUpdateTimeout;
+            window.scriptEditor.onDidChangeModelContent(() => {
+              clearTimeout(scriptUpdateTimeout);
+              scriptUpdateTimeout = setTimeout(() => {
+                if (activeContainer) {
+                  // Save the content as is to the script element
+                  activeContainer.textContent = window.scriptEditor.getValue();
+                }
+              }, 500); // Debounce updates to avoid too frequent DOM updates
+            });
+          });
+        }, 100);
+        
+        return; // Return early for script elements to avoid other editors
       }
       
       // Add attributes section
