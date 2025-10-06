@@ -537,7 +537,7 @@
       <div class="col-sm p-0">
         <iframe id="editor-frame" allow="fullscreen *; keyboard-map *"></iframe>
       </div>
-      <div class="col-sm-3">
+      <div class="col-sm-3 p-1 pt-0">
         <!-- Component selector element -->
         <div class="styles-dialog-header">
           <div class="styles-dialog-title">Elements</div>
@@ -1452,7 +1452,7 @@
         // Create a container for the Monaco editor
         const styleRow = document.createElement('tr');
         styleRow.innerHTML = `
-          <td colspan="2">
+          <td colspan="2" class="p-0">
             <div id="editor-container" style="width: 100%; height: 300px; border: 1px solid #ddd; border-radius: 4px;"></div>
             <div style="margin-top: 10px; text-align: right;">
               <button id="save-button" class="btn btn-primary btn-sm">Save Changes</button>
@@ -1693,7 +1693,7 @@
         // Create a container for the Monaco editor
         const htmlRow = document.createElement('tr');
         htmlRow.innerHTML = `
-          <td colspan="2">
+          <td colspan="2" class="p-0">
             <div id="editor-container" style="width: 100%; height: 300px; border: 1px solid #ddd; border-radius: 4px;"></div>
             <div style="margin-top: 10px; text-align: right;">
               <button id="save-button" class="btn btn-primary btn-sm">Save Changes</button>
@@ -2004,7 +2004,7 @@
         // Create a container for the Monaco editor
         const scriptRow = document.createElement('tr');
         scriptRow.innerHTML = `
-          <td colspan="2">
+          <td colspan="2" class="p-0">
             <div id="editor-container" style="width: 100%; height: 300px; border: 1px solid #ddd; border-radius: 4px;"></div>
             <div style="margin-top: 10px; text-align: right;">
               <button id="save-button" class="btn btn-primary btn-sm">Save Changes</button>
