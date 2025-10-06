@@ -1353,6 +1353,17 @@
         stylesTable.appendChild(styleRow);
         
         // Initialize Monaco editor after a brief delay to ensure DOM is ready
+        // Clear any existing editor if present to avoid duplication
+        if (window.styleEditor) {
+          window.styleEditor.dispose();
+          window.styleEditor = null;
+        }
+        // Ensure the container is clean
+        const styleContainer = document.getElementById('style-editor-container');
+        if (styleContainer) {
+          styleContainer.innerHTML = '';
+        }
+        
         setTimeout(() => {
           if (typeof monaco !== 'undefined' && monaco.editor) {
             // Create the editor instance
@@ -1397,7 +1408,11 @@
             // If Monaco is not yet available, try again after a longer delay
             setTimeout(() => {
               if (typeof monaco !== 'undefined' && monaco.editor) {
-                // Create the editor instance
+                // Create the editor instance (first dispose any existing editor)
+                if (window.styleEditor) {
+                  window.styleEditor.dispose();
+                }
+                
                 window.styleEditor = monaco.editor.create(document.getElementById('style-editor-container'), {
                   value: displayContent,
                   language: 'css',
@@ -1469,7 +1484,7 @@
       }
       
       // Check if the selected element is the html element
-      if (element.tagName && element.tagName.toLowerCase() === 'html') {
+      if (element.tagName) {
         // Add attributes section for html element
         const attributesHeaderRow = document.createElement('tr');
         attributesHeaderRow.innerHTML = `
@@ -1538,23 +1553,36 @@
         stylesTable.appendChild(htmlRow);
         
         // Initialize Monaco editor after a brief delay to ensure DOM is ready
+        // Clear any existing editor if present to avoid duplication
+        if (window.htmlEditor) {
+          window.htmlEditor.dispose();
+          window.htmlEditor = null;
+        }
+        // Ensure the container is clean
+        const htmlContainer = document.getElementById('html-editor-container');
+        if (htmlContainer) {
+          htmlContainer.innerHTML = '';
+        }
+        
         setTimeout(() => {
-          require(['vs/editor/editor.main'], function() {
+          if (typeof monaco !== 'undefined' && monaco.editor) {
             // Create the editor instance
-            window.htmlEditor = monaco.editor.create(document.getElementById('html-editor-container'), {
-              value: htmlContent,
-              language: 'html',
-              theme: 'vs-light',
-              automaticLayout: true,
-              minimap: { enabled: false },
-              fontSize: 14,
-              scrollBeyondLastLine: false,
-              roundedSelection: false,
-              padding: { top: 10, bottom: 10 },
-              fontFamily: 'monospace',
-              formatOnType: true,
-              formatOnPaste: true
-            });
+            if (!window.htmlEditor) {
+              window.htmlEditor = monaco.editor.create(document.getElementById('html-editor-container'), {
+                value: htmlContent,
+                language: 'html',
+                theme: 'vs-light',
+                automaticLayout: true,
+                minimap: { enabled: false },
+                fontSize: 14,
+                scrollBeyondLastLine: false,
+                roundedSelection: false,
+                padding: { top: 10, bottom: 10 },
+                fontFamily: 'monospace',
+                formatOnType: true,
+                formatOnPaste: true
+              });
+            }
             
             // Update the HTML element when editor content changes (with debounce)
             let htmlUpdateTimeout;
@@ -1604,7 +1632,97 @@
                 }
               }, 1000); // Debounce updates to avoid too frequent DOM updates
             });
-          });
+          } else {
+            // If Monaco is not yet available, try again after a longer delay
+            setTimeout(() => {
+              if (typeof monaco !== 'undefined' && monaco.editor) {
+                // Create the editor instance (first dispose any existing editor)
+                if (window.htmlEditor) {
+                  window.htmlEditor.dispose();
+                }
+                
+                window.htmlEditor = monaco.editor.create(document.getElementById('html-editor-container'), {
+                  value: htmlContent,
+                  language: 'html',
+                  theme: 'vs-light',
+                  automaticLayout: true,
+                  minimap: { enabled: false },
+                  fontSize: 14,
+                  scrollBeyondLastLine: false,
+                  roundedSelection: false,
+                  padding: { top: 10, bottom: 10 },
+                  fontFamily: 'monospace',
+                  formatOnType: true,
+                  formatOnPaste: true
+                });
+                
+                // Update the HTML element when editor content changes (with debounce)
+                let htmlUpdateTimeout;
+                window.htmlEditor.onDidChangeModelContent(() => {
+                  clearTimeout(htmlUpdateTimeout);
+                  htmlUpdateTimeout = setTimeout(() => {
+                    if (activeContainer) {
+                      // Update the entire HTML document
+                      try {
+                        const newHtmlContent = window.htmlEditor.getValue();
+                        // Parse the new HTML content and update the document
+                        const parser = new DOMParser();
+                        const newDoc = parser.parseFromString(newHtmlContent, 'text/html');
+                        
+                        // Update the html element's content
+                        const newHtmlElement = newDoc.documentElement;
+                        const currentHtmlElement = activeContainer;
+                        
+                        // Update attributes
+                        for (let i = currentHtmlElement.attributes.length - 1; i >= 0; i--) {
+                          currentHtmlElement.removeAttribute(currentHtmlElement.attributes[i].name);
+                        }
+                        for (let i = 0; i < newHtmlElement.attributes.length; i++) {
+                          const attr = newHtmlElement.attributes[i];
+                          currentHtmlElement.setAttribute(attr.name, attr.value);
+                        }
+                        
+                        // Update child nodes
+                        const oldHead = currentHtmlElement.querySelector('head');
+                        const oldBody = currentHtmlElement.querySelector('body');
+                        const newHead = newHtmlElement.querySelector('head');
+                        const newBody = newHtmlElement.querySelector('body');
+                        
+                        if (oldHead && newHead) {
+                          oldHead.innerHTML = newHead.innerHTML;
+                        }
+                        
+                        if (oldBody && newBody) {
+                          oldBody.innerHTML = newBody.innerHTML;
+                        }
+                        
+                        // Refresh the selector to reflect the changes
+                        refreshSelector(currentHtmlElement);
+                      } catch (e) {
+                        console.error('Error updating HTML:', e);
+                      }
+                    }
+                  }, 1000); // Debounce updates to avoid too frequent DOM updates
+                });
+              } else {
+                console.error('Monaco editor is not available for HTML element');
+                // Fallback: display content in a regular textarea
+                const container = document.getElementById('html-editor-container');
+                if (container) {
+                  container.innerHTML = `
+                    <textarea style="width: 100%; height: 300px; font-family: monospace; padding: 10px;">${htmlContent}</textarea>
+                  `;
+                  const textarea = container.querySelector('textarea');
+                  textarea.addEventListener('blur', function() {
+                    if (activeContainer) {
+                      // This would be a simplified update for the fallback
+                      console.log('HTML content updated (fallback for HTML element)');
+                    }
+                  });
+                }
+              }
+            }, 500);
+          }
         }, 100);
         
         return; // Return early for html element to avoid other editors
@@ -1689,6 +1807,17 @@
         stylesTable.appendChild(scriptRow);
         
         // Initialize Monaco editor after a brief delay to ensure DOM is ready
+        // Clear any existing editor if present to avoid duplication
+        if (window.scriptEditor) {
+          window.scriptEditor.dispose();
+          window.scriptEditor = null;
+        }
+        // Ensure the container is clean
+        const scriptContainer = document.getElementById('script-editor-container');
+        if (scriptContainer) {
+          scriptContainer.innerHTML = '';
+        }
+        
         setTimeout(() => {
           if (typeof monaco !== 'undefined' && monaco.editor) {
             // Create the editor instance
@@ -1720,7 +1849,11 @@
             // If Monaco is not yet available, try again after a longer delay
             setTimeout(() => {
               if (typeof monaco !== 'undefined' && monaco.editor) {
-                // Create the editor instance
+                // Create the editor instance (first dispose any existing editor)
+                if (window.scriptEditor) {
+                  window.scriptEditor.dispose();
+                }
+                
                 window.scriptEditor = monaco.editor.create(document.getElementById('script-editor-container'), {
                   value: scriptContent,
                   language: 'javascript',
@@ -1853,164 +1986,7 @@
         });
       }
       
-      // Add HTML content editor section for elements that have children
-      if (element.children.length > 0 || element.textContent.trim() !== '') {
-        const hasChildren = element.children.length > 0;
-        const htmlHeaderRow = document.createElement('tr');
-        htmlHeaderRow.innerHTML = `
-          <td style="background: #f8f9fa; font-weight: 600; color: #1D202B;" colspan="2">${element.tagName.toLowerCase()} Editor</td>
-        `;
-        stylesTable.appendChild(htmlHeaderRow);
-        
-        // Get the outer HTML content of the element (includes the element itself)
-        let elementHtmlContent = element.outerHTML || '';
-        
-        // Create a container for the Monaco editor
-        const htmlEditorRow = document.createElement('tr');
-        htmlEditorRow.innerHTML = `
-          <td colspan="2">
-            <div id="element-html-editor-container" style="width: 100%; height: 200px; border: 1px solid #ddd; border-radius: 4px;"></div>
-          </td>
-        `;
-        stylesTable.appendChild(htmlEditorRow);
-        
-        // Initialize Monaco editor after a brief delay to ensure DOM is ready
-        setTimeout(() => {
-          if (typeof monaco !== 'undefined' && monaco.editor) {
-            // Create the editor instance
-            window.elementHtmlEditor = monaco.editor.create(document.getElementById('element-html-editor-container'), {
-              value: elementHtmlContent,
-              language: 'html',
-              theme: 'vs-light',
-              automaticLayout: true,
-              minimap: { enabled: false },
-              fontSize: 14,
-              scrollBeyondLastLine: false,
-              roundedSelection: false,
-              padding: { top: 10, bottom: 10 },
-              fontFamily: 'monospace',
-              formatOnType: true,
-              formatOnPaste: true
-            });
-            
-            // Update the element when editor content changes (with debounce)
-            let elementHtmlUpdateTimeout;
-            window.elementHtmlEditor.onDidChangeModelContent(() => {
-              clearTimeout(elementHtmlUpdateTimeout);
-              elementHtmlUpdateTimeout = setTimeout(() => {
-                if (activeContainer) {
-                  // Update the element by replacing it with the new outerHTML
-                  try {
-                    const newHtmlContent = window.elementHtmlEditor.getValue();
-                    // Create a temporary element to parse the new content
-                    const tempDiv = document.createElement('div');
-                    tempDiv.innerHTML = newHtmlContent;
-                    
-                    // Get the first child element (which should be our replacement element)
-                    const newElement = tempDiv.firstElementChild;
-                    
-                    if (newElement) {
-                      // Replace the current element with the new one
-                      activeContainer.parentNode.replaceChild(newElement, activeContainer);
-                      // Update the activeContainer reference
-                      activeContainer = newElement;
-                      // Refresh the selector to reflect the changes
-                      refreshSelector(newElement);
-                    }
-                  } catch (e) {
-                    console.error('Error updating element HTML:', e);
-                  }
-                }
-              }, 800); // Debounce updates to avoid too frequent DOM updates
-            });
-          } else {
-            // If Monaco is not yet available, try again after a longer delay
-            setTimeout(() => {
-              if (typeof monaco !== 'undefined' && monaco.editor) {
-                // Create the editor instance
-                window.elementHtmlEditor = monaco.editor.create(document.getElementById('element-html-editor-container'), {
-                  value: elementHtmlContent,
-                  language: 'html',
-                  theme: 'vs-light',
-                  automaticLayout: true,
-                  minimap: { enabled: false },
-                  fontSize: 14,
-                  scrollBeyondLastLine: false,
-                  roundedSelection: false,
-                  padding: { top: 10, bottom: 10 },
-                  fontFamily: 'monospace',
-                  formatOnType: true,
-                  formatOnPaste: true
-                });
-                
-                // Update the element when editor content changes (with debounce)
-                let elementHtmlUpdateTimeout;
-                window.elementHtmlEditor.onDidChangeModelContent(() => {
-                  clearTimeout(elementHtmlUpdateTimeout);
-                  elementHtmlUpdateTimeout = setTimeout(() => {
-                    if (activeContainer) {
-                      // Update the element by replacing it with the new outerHTML
-                      try {
-                        const newHtmlContent = window.elementHtmlEditor.getValue();
-                        // Create a temporary element to parse the new content
-                        const tempDiv = document.createElement('div');
-                        tempDiv.innerHTML = newHtmlContent;
-                        
-                        // Get the first child element (which should be our replacement element)
-                        const newElement = tempDiv.firstElementChild;
-                        
-                        if (newElement) {
-                          // Replace the current element with the new one
-                          activeContainer.parentNode.replaceChild(newElement, activeContainer);
-                          // Update the activeContainer reference
-                          activeContainer = newElement;
-                          // Refresh the selector to reflect the changes
-                          refreshSelector(newElement);
-                        }
-                      } catch (e) {
-                        console.error('Error updating element HTML:', e);
-                      }
-                    }
-                  }, 800); // Debounce updates to avoid too frequent DOM updates
-                });
-              } else {
-                console.error('Monaco editor is not available for element HTML editor');
-                // Fallback: display content in a regular textarea
-                const container = document.getElementById('element-html-editor-container');
-                if (container) {
-                  container.innerHTML = `
-                    <textarea style="width: 100%; height: 200px; font-family: monospace; padding: 10px;">${elementHtmlContent}</textarea>
-                  `;
-                  const textarea = container.querySelector('textarea');
-                  textarea.addEventListener('blur', function() {
-                    if (activeContainer) {
-                      // Update the element by replacing it with the new outerHTML
-                      try {
-                        const newHtmlContent = this.value;
-                        // Create a temporary element to parse the new content
-                        const tempDiv = document.createElement('div');
-                        tempDiv.innerHTML = newHtmlContent;
-                        
-                        // Get the first child element (which should be our replacement element)
-                        const newElement = tempDiv.firstElementChild;
-                        
-                        if (newElement) {
-                          // Replace the current element with the new one
-                          activeContainer.parentNode.replaceChild(newElement, activeContainer);
-                          // Update the activeContainer reference and refresh selector
-                          refreshSelector(newElement);
-                        }
-                      } catch (e) {
-                        console.error('Error updating element HTML (fallback):', e);
-                      }
-                    }
-                  });
-                }
-              }
-            }, 500);
-          }
-        }, 100);
-      }
+
       
       // Add inline styles section
       const inlineHeaderRow = document.createElement('tr');
