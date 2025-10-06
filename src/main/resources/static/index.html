@@ -2223,7 +2223,9 @@
 
       // Add head element under html
       const headElement = editorDocument.head;
-      const headHtml = `<div class="selector-item child${headElement === element ? ' selected-child' : ''}" data-element="head" draggable="true">head</div>`;
+      const headHtml = `<div class="selector-item child${headElement === element ? ' selected-child' : ''}" data-element="head" draggable="true" style="position: relative;">
+        <span class="selector-item-prefix">▾</span>head
+      </div>`;
       const headDiv = document.createElement('div');
       headDiv.innerHTML = headHtml;
       headDiv.firstChild.el = headElement;
@@ -2232,11 +2234,7 @@
       // Build head children tree
       if (headElement.children.length > 0) {
         const headTreeContainer = document.createElement('div');
-        headTreeContainer.className = 'selector-tree-item';
-        // Expand if head or one of its descendants is in the chain
-        if (chain.includes(headElement) || chain.some(el => el.parentElement === headElement)) {
-          headTreeContainer.classList.add('expanded');
-        }
+        headTreeContainer.className = 'selector-tree-item expanded'; // Always expanded to show head children
 
         Array.from(headElement.children).forEach(child => {
           const isInChain = chain.includes(child);
@@ -2712,14 +2710,44 @@
         toolbarElement.style.display = 'none';
       });
 
-      refreshSelector(editorDocument.body);
+      // Load the element tree with the html element when the page loads
+      refreshSelector(editorDocument.documentElement);
+      
+      // Add a click event listener to the iframe document to update the selector when elements are clicked
+      iframeDocument.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        const clickedElement = e.target;
+        refreshSelector(clickedElement);
+        
+        // Store the clicked element as the active container
+        activeContainer = clickedElement;
+        
+        // Update styles dialog to show properties of the clicked element
+        const stylesTable = document.querySelector('.styles-dialog table tbody');
+        if (stylesTable) {
+          stylesTable.innerHTML = '';
+          updateStylesDialog(clickedElement);
+        }
+        
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+        
+        // Show mini selector above mouse
+        if (e.detail !== 2) {
+          showMiniSelector(clickedElement, e.clientX, e.clientY, e.detail);
+        }
+        
+        return false;
+      }, true);
 
       componentSelector.addEventListener('click', (e) => {
         const selectorItem = e.target.closest('.selector-item');
         if (!selectorItem || !selectorItem.el) return;
 
         // Handle expansion if clicking the prefix
-        if (e.target.classList.contains('selector-item-prefix') && selectorItem.el.children.length > 0) {
+        if (e.target.classList.contains('selector-item-prefix')) {
           const prefix = e.target;
           const treeContainer = selectorItem.nextElementSibling;
           if (treeContainer && treeContainer.classList.contains('selector-tree-item')) {
