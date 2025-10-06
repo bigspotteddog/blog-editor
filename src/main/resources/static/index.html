@@ -831,6 +831,17 @@
             </div>
             <div class="ce-popover__item-label">Form</div>
           </div>
+          <div class="ce-popover__item" data-type="script">
+            <div class="ce-popover__item-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                <path stroke="currentColor" stroke-width="2" d="M4 19.5V4.5C4 3.4 4.9 2.5 6 2.5H18C19.1 2.5 20 3.4 20 4.5V19.5C20 20.6 19.1 21.5 18 21.5H6C4.9 21.5 4 20.6 20 19.5Z" />
+                <path stroke="currentColor" stroke-width="2" d="M8 7.5H16" />
+                <path stroke="currentColor" stroke-width="2" d="M8 12.5H16" />
+                <path stroke="currentColor" stroke-width="2" d="M8 17.5H12" />
+              </svg>
+            </div>
+            <div class="ce-popover__item-label">Script</div>
+          </div>
         </div>
       </div>
       <span class="ce-toolbar__settings-btn">
@@ -2104,6 +2115,26 @@
 
         // Close the toolbox
         toolbox.classList.remove('active');
+      }
+    });
+
+    // Add script creation functionality
+    const scriptOption = document.querySelector('[data-type="script"]');
+    scriptOption.addEventListener('click', () => {
+      if (activeContainer) {
+        // Create script element
+        const script = document.createElement('script');
+        script.type = 'text/javascript';
+        script.textContent = '// Add your JavaScript here\n';
+
+        // Add script to active container
+        activeContainer.appendChild(script);
+        refreshSelector(script);
+        showMiniSelector(activeContainer, mouseX, mouseY, 1);
+
+        // Close the toolbox
+        toolbox.classList.remove('active');
+        toolbarElement.style.display = 'none';
       }
     });
 
