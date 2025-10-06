@@ -1367,18 +1367,20 @@
         setTimeout(() => {
           if (typeof monaco !== 'undefined' && monaco.editor) {
             // Create the editor instance
-            window.styleEditor = monaco.editor.create(document.getElementById('style-editor-container'), {
-              value: displayContent,
-              language: 'css',
-              theme: 'vs-light',
-              automaticLayout: true,
-              minimap: { enabled: false },
-              fontSize: 14,
-              scrollBeyondLastLine: false,
-              roundedSelection: false,
-              padding: { top: 10, bottom: 10 },
-              fontFamily: 'monospace'
-            });
+            if (!window.styleEditor) {
+              window.styleEditor = monaco.editor.create(document.getElementById('style-editor-container'), {
+                value: displayContent,
+                language: 'css',
+                theme: 'vs-light',
+                automaticLayout: true,
+                minimap: { enabled: false },
+                fontSize: 14,
+                scrollBeyondLastLine: false,
+                roundedSelection: false,
+                padding: { top: 10, bottom: 10 },
+                fontFamily: 'monospace'
+              });
+            }
             
             // Update the style element when editor content changes (with debounce)
             let updateTimeout;
@@ -1408,23 +1410,20 @@
             // If Monaco is not yet available, try again after a longer delay
             setTimeout(() => {
               if (typeof monaco !== 'undefined' && monaco.editor) {
-                // Create the editor instance (first dispose any existing editor)
-                if (window.styleEditor) {
-                  window.styleEditor.dispose();
+                if (!window.styleEditor) {
+                  window.styleEditor = monaco.editor.create(document.getElementById('style-editor-container'), {
+                    value: displayContent,
+                    language: 'css',
+                    theme: 'vs-light',
+                    automaticLayout: true,
+                    minimap: { enabled: false },
+                    fontSize: 14,
+                    scrollBeyondLastLine: false,
+                    roundedSelection: false,
+                    padding: { top: 10, bottom: 10 },
+                    fontFamily: 'monospace'
+                  });
                 }
-                
-                window.styleEditor = monaco.editor.create(document.getElementById('style-editor-container'), {
-                  value: displayContent,
-                  language: 'css',
-                  theme: 'vs-light',
-                  automaticLayout: true,
-                  minimap: { enabled: false },
-                  fontSize: 14,
-                  scrollBeyondLastLine: false,
-                  roundedSelection: false,
-                  padding: { top: 10, bottom: 10 },
-                  fontFamily: 'monospace'
-                });
                 
                 // Update the style element when editor content changes (with debounce)
                 let updateTimeout;
@@ -1636,25 +1635,23 @@
             // If Monaco is not yet available, try again after a longer delay
             setTimeout(() => {
               if (typeof monaco !== 'undefined' && monaco.editor) {
-                // Create the editor instance (first dispose any existing editor)
-                if (window.htmlEditor) {
-                  window.htmlEditor.dispose();
+                // Create the editor instance
+                if (!window.htmlEditor) {
+                  window.htmlEditor = monaco.editor.create(document.getElementById('html-editor-container'), {
+                    value: htmlContent,
+                    language: 'html',
+                    theme: 'vs-light',
+                    automaticLayout: true,
+                    minimap: { enabled: false },
+                    fontSize: 14,
+                    scrollBeyondLastLine: false,
+                    roundedSelection: false,
+                    padding: { top: 10, bottom: 10 },
+                    fontFamily: 'monospace',
+                    formatOnType: true,
+                    formatOnPaste: true
+                  });
                 }
-                
-                window.htmlEditor = monaco.editor.create(document.getElementById('html-editor-container'), {
-                  value: htmlContent,
-                  language: 'html',
-                  theme: 'vs-light',
-                  automaticLayout: true,
-                  minimap: { enabled: false },
-                  fontSize: 14,
-                  scrollBeyondLastLine: false,
-                  roundedSelection: false,
-                  padding: { top: 10, bottom: 10 },
-                  fontFamily: 'monospace',
-                  formatOnType: true,
-                  formatOnPaste: true
-                });
                 
                 // Update the HTML element when editor content changes (with debounce)
                 let htmlUpdateTimeout;
@@ -1821,18 +1818,20 @@
         setTimeout(() => {
           if (typeof monaco !== 'undefined' && monaco.editor) {
             // Create the editor instance
-            window.scriptEditor = monaco.editor.create(document.getElementById('script-editor-container'), {
-              value: scriptContent,
-              language: 'javascript',
-              theme: 'vs-light',
-              automaticLayout: true,
-              minimap: { enabled: false },
-              fontSize: 14,
-              scrollBeyondLastLine: false,
-              roundedSelection: false,
-              padding: { top: 10, bottom: 10 },
-              fontFamily: 'monospace'
-            });
+            if (!window.scriptEditor) {
+              window.scriptEditor = monaco.editor.create(document.getElementById('script-editor-container'), {
+                value: scriptContent,
+                language: 'javascript',
+                theme: 'vs-light',
+                automaticLayout: true,
+                minimap: { enabled: false },
+                fontSize: 14,
+                scrollBeyondLastLine: false,
+                roundedSelection: false,
+                padding: { top: 10, bottom: 10 },
+                fontFamily: 'monospace'
+              });
+            }
             
             // Update the script element when editor content changes (with debounce)
             let scriptUpdateTimeout;
@@ -1849,23 +1848,20 @@
             // If Monaco is not yet available, try again after a longer delay
             setTimeout(() => {
               if (typeof monaco !== 'undefined' && monaco.editor) {
-                // Create the editor instance (first dispose any existing editor)
-                if (window.scriptEditor) {
-                  window.scriptEditor.dispose();
+                if (!window.scriptEditor) {                
+                  window.scriptEditor = monaco.editor.create(document.getElementById('script-editor-container'), {
+                    value: scriptContent,
+                    language: 'javascript',
+                    theme: 'vs-light',
+                    automaticLayout: true,
+                    minimap: { enabled: false },
+                    fontSize: 14,
+                    scrollBeyondLastLine: false,
+                    roundedSelection: false,
+                    padding: { top: 10, bottom: 10 },
+                    fontFamily: 'monospace'
+                  });
                 }
-                
-                window.scriptEditor = monaco.editor.create(document.getElementById('script-editor-container'), {
-                  value: scriptContent,
-                  language: 'javascript',
-                  theme: 'vs-light',
-                  automaticLayout: true,
-                  minimap: { enabled: false },
-                  fontSize: 14,
-                  scrollBeyondLastLine: false,
-                  roundedSelection: false,
-                  padding: { top: 10, bottom: 10 },
-                  fontFamily: 'monospace'
-                });
                 
                 // Update the script element when editor content changes (with debounce)
                 let scriptUpdateTimeout;
