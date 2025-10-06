@@ -1032,6 +1032,111 @@
       selection.addRange(range);
     }
 
+    // Function to add a new attribute row
+    function addAttributeRow() {
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td contenteditable="true" class="attr-name" placeholder="attribute">attribute</td>
+        <td contenteditable="true" class="attr-value" placeholder="value">value</td>
+      `;
+      
+      // Add event listeners to update attributes when changed
+      const nameCell = row.querySelector('.attr-name');
+      const valueCell = row.querySelector('.attr-value');
+      
+      nameCell.addEventListener('blur', updateAttribute);
+      valueCell.addEventListener('blur', updateAttribute);
+      
+      nameCell.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          this.blur();
+        }
+      });
+      
+      valueCell.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          this.blur();
+        } else if (e.key === 'Tab' && !(e.ctrlKey || e.altKey || e.shiftKey || e.metaKey)) {
+          e.preventDefault();
+          this.blur();
+          setTimeout(() => {
+            addAttributeRow();
+          }, 100);
+        }
+      });
+      
+      nameCell.addEventListener('focus', function() {
+        if (this.textContent === 'attribute') {
+          this.textContent = '';
+        }
+      });
+      
+      valueCell.addEventListener('focus', function() {
+        if (this.textContent === 'value') {
+          this.textContent = '';
+        }
+      });
+
+      // Insert after the attributes header row
+      const attributesHeaderRow = Array.from(stylesTable.querySelectorAll('tr')).find(row => {
+        const firstCell = row.querySelector('td');
+        return firstCell && firstCell.textContent.includes('Attributes');
+      });
+      if (attributesHeaderRow) {
+        attributesHeaderRow.after(row);
+      } else {
+        // Fallback - insert at beginning of table body
+        const firstRow = stylesTable.querySelector('tr');
+        if (firstRow) {
+          firstRow.before(row);
+        } else {
+          stylesTable.appendChild(row);
+        }
+      }
+      
+      // Focus the name cell
+      nameCell.focus();
+    }
+
+    // Function to update an attribute when name or value changes
+    function updateAttribute(e) {
+      const row = e.target.closest('tr');
+      const nameCell = row.querySelector('.attr-name');
+      const valueCell = row.querySelector('.attr-value');
+      const attrName = nameCell.textContent.trim();
+      const attrValue = valueCell.textContent.trim();
+      
+      if (activeContainer) {
+        // If the attribute name is empty, remove the attribute and the row
+        if (!attrName || attrName === 'attribute') {
+          // If both name and value are empty, remove the row
+          if ((!attrValue || attrValue === 'value') && (nameCell.textContent.trim() === '' || nameCell.textContent.trim() === 'attribute')) {
+            row.remove();
+          } else {
+            // If only name is empty but value exists, set the value to an empty string
+            activeContainer.setAttribute(attrName, attrValue);
+          }
+          return;
+        }
+        
+        // Store the old attribute name before it's changed
+        const oldAttrName = nameCell.dataset.oldName || attrName;
+        
+        // If the attribute name has changed, remove the old attribute first
+        if (oldAttrName && oldAttrName !== attrName && oldAttrName !== attrName) {
+          activeContainer.removeAttribute(oldAttrName);
+        }
+        
+        // Set the new attribute value
+        activeContainer.setAttribute(attrName, attrValue);
+        
+        // Update the old name data attribute to track changes
+        nameCell.dataset.oldName = attrName;
+      }
+    }
+
     // Function to add a new inline style row
     function addInlineStyle() {
       const row = document.createElement('tr');
@@ -1148,41 +1253,209 @@
       return matchedRules;
     }
 
+    function getCssSelector(element) {
+      if (!element || !element.tagName) return '';
+      
+      let selector = element.tagName.toLowerCase();
+      
+      if (element.id) {
+        selector += `#${element.id}`;
+      } else if (element.className) {
+        // Include all classes (not just the first one), escaping dots in class names
+        const classes = element.className.trim().split(/\s+/).filter(c => c).join('.');
+        if (classes) {
+          selector += `.${classes}`;
+        }
+      }
+      
+      return selector;
+    }
+
     function updateStylesDialog(element) {
       const stylesDialogElement = document.querySelector(".styles-dialog-element");
       stylesDialogElement.innerHTML = getElementDisplayName(element);
       
-      // Add class list section
-      const classHeaderRow = document.createElement('tr');
-      classHeaderRow.innerHTML = `
-        <td style="background: #f8f9fa; font-weight: 600; color: #1D202B;">Class List</td>
-        <td style="background: #f8f9fa;"></td>
-      `;
-      stylesTable.appendChild(classHeaderRow);
-      
-      // Add a row for the class list editor
-      const classRow = document.createElement('tr');
-      classRow.innerHTML = `
-        <td contenteditable="false" style="font-weight: 600;">class</td>
-        <td contenteditable="true" id="class-list-editor">${element.className || ''}</td>
-      `;
-      stylesTable.appendChild(classRow);
-      
-      // Add event listener to update class list when changed
-      const classListEditor = classRow.querySelector('#class-list-editor');
-      classListEditor.addEventListener('blur', function() {
-        if (activeContainer) {
-          activeContainer.className = this.textContent.trim();
+      // Check if the selected element is a style element
+      if (element.tagName.toLowerCase() === 'style') {
+        // Determine if the style element is in the head
+        const inHead = element.parentElement && element.parentElement.tagName.toLowerCase() === 'head';
+        let parentSelector = getCssSelector(element.parentElement);
+        
+        // Add style content editor section
+        const styleHeaderRow = document.createElement('tr');
+        if (inHead) {
+          styleHeaderRow.innerHTML = `
+            <td style="background: #f8f9fa; font-weight: 600; color: #1D202B;" colspan="2">Global Style Editor</td>
+          `;
+        } else {
+          styleHeaderRow.innerHTML = `
+            <td style="background: #f8f9fa; font-weight: 600; color: #1D202B;" colspan="2">Style Editor (context: :where(${parentSelector}))</td>
+          `;
         }
-      });
-      
-      classListEditor.addEventListener('keydown', function(e) {
-        if (e.key === 'Enter') {
-          e.preventDefault();
-          this.blur();
+        stylesTable.appendChild(styleHeaderRow);
+        
+        // Prepare CSS content based on location
+        let originalContent = element.textContent || '';
+        let displayContent = originalContent;
+        
+        if (inHead) {
+          // For head style elements, display raw content without :where() processing
+          displayContent = originalContent;
+        } else {
+          // For non-head style elements, handle :where() wrapper as before
+          const existingMatch = originalContent.match(/^:where\([^)]+\)\s*\{([\s\S]*)\}$/s);
+          if (existingMatch) {
+            // Content is already wrapped, extract inner content for editing
+            let innerContent = existingMatch[1].trim();
+            displayContent = innerContent
+              .split('\n')
+              .map(line => line.replace(/^ {2}/, '')) // Remove leading 2 spaces
+              .join('\n')
+              .trim();
+          } else {
+            // Not wrapped, show the content as is
+            displayContent = originalContent;
+          }
         }
-      });
-
+        
+        // Create a textarea-like editable area for CSS content
+        const styleRow = document.createElement('tr');
+        styleRow.innerHTML = `
+          <td colspan="2">
+            <div contenteditable="true" id="style-content-editor" style="font-family: monospace; min-height: 200px; padding: 10px; border: 1px solid #ddd; border-radius: 4px; background: #f8f9fa; white-space: pre; overflow-x: auto;">${displayContent}</div>
+          </td>
+        `;
+        stylesTable.appendChild(styleRow);
+        
+        // Add event listener to update style content when changed
+        const styleContentEditor = styleRow.querySelector('#style-content-editor');
+        styleContentEditor.addEventListener('blur', function() {
+          if (activeContainer) {
+            if (inHead) {
+              // For head style elements, save content as is
+              activeContainer.textContent = this.textContent;
+            } else {
+              // For non-head style elements, wrap in :where() with parent selector
+              if (parentSelector) {
+                let editedContent = this.textContent;
+                // Wrap the edited content in :where() selector
+                let wrappedContent = `:where(${parentSelector}) {\n  ${editedContent.replace(/\n/g, '\n  ')}\n}`;
+                activeContainer.textContent = wrappedContent;
+              } else {
+                // If no parent selector, just save the content as is
+                activeContainer.textContent = this.textContent;
+              }
+            }
+          }
+        });
+        
+        styleContentEditor.addEventListener('keydown', function(e) {
+          if (e.key === 'Tab') {
+            e.preventDefault();
+            // Insert 2 spaces at cursor position
+            const start = this.selectionStart;
+            const end = this.selectionEnd;
+            const text = this.textContent;
+            this.textContent = text.substring(0, start) + '  ' + text.substring(end);
+            
+            // Move cursor to after the inserted spaces
+            const newCursorPosition = start + 2;
+            this.focus();
+            const range = document.createRange();
+            const sel = window.getSelection();
+            range.setStart(this.childNodes[0], newCursorPosition);
+            range.collapse(true);
+            sel.removeAllRanges();
+            sel.addRange(range);
+          }
+        });
+        return; // Return early for style elements to avoid other editors
+      }
+      
+      // Add attributes section
+      const attributesHeaderRow = document.createElement('tr');
+      attributesHeaderRow.innerHTML = `
+        <td style="background: #f8f9fa; font-weight: 600; color: #1D202B;">Attributes</td>
+        <td style="background: #f8f9fa;"><button class="btn btn-sm btn-outline-primary" onclick="addAttributeRow()">+</button></td>
+      `;
+      stylesTable.appendChild(attributesHeaderRow);
+      
+      // Add existing attributes
+      const attributes = element.attributes;
+      for (let i = 0; i < attributes.length; i++) {
+        const attr = attributes[i];
+        // Skip the class attribute since we handle it separately
+        if (attr.name === 'class') continue;
+        
+        const attrRow = document.createElement('tr');
+        attrRow.innerHTML = `
+          <td contenteditable="true" class="attr-name">${attr.name}</td>
+          <td contenteditable="true" class="attr-value">${attr.value}</td>
+        `;
+        stylesTable.appendChild(attrRow);
+        
+        // Add event listeners to update attributes when changed
+        const nameCell = attrRow.querySelector('.attr-name');
+        const valueCell = attrRow.querySelector('.attr-value');
+        
+        nameCell.addEventListener('blur', updateAttribute);
+        valueCell.addEventListener('blur', updateAttribute);
+        
+        nameCell.addEventListener('keydown', function(e) {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            this.blur();
+          }
+        });
+        
+        valueCell.addEventListener('keydown', function(e) {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            this.blur();
+          } else if (e.key === 'Tab' && !(e.ctrlKey || e.altKey || e.shiftKey || e.metaKey)) {
+            e.preventDefault();
+            this.blur();
+            setTimeout(() => {
+              addAttributeRow();
+            }, 100);
+          }
+        });
+      }
+      
+      // If the element has a parent (not a style element), add class list and inline styles
+      if (element.parentElement && element.tagName.toLowerCase() !== 'style') {
+        // Add class list section
+        const classHeaderRow = document.createElement('tr');
+        classHeaderRow.innerHTML = `
+          <td style="background: #f8f9fa; font-weight: 600; color: #1D202B;">Class List</td>
+          <td style="background: #f8f9fa;"></td>
+        `;
+        stylesTable.appendChild(classHeaderRow);
+        
+        // Add a row for the class list editor
+        const classRow = document.createElement('tr');
+        classRow.innerHTML = `
+          <td contenteditable="false" style="font-weight: 600;">class</td>
+          <td contenteditable="true" id="class-list-editor">${element.className || ''}</td>
+        `;
+        stylesTable.appendChild(classRow);
+        
+        // Add event listener to update class list when changed
+        const classListEditor = classRow.querySelector('#class-list-editor');
+        classListEditor.addEventListener('blur', function() {
+          if (activeContainer) {
+            activeContainer.className = this.textContent.trim();
+          }
+        });
+        
+        classListEditor.addEventListener('keydown', function(e) {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            this.blur();
+          }
+        });
+      }
+      
       // Add inline styles section
       const inlineHeaderRow = document.createElement('tr');
       inlineHeaderRow.innerHTML = `
