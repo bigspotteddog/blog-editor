@@ -1392,11 +1392,13 @@
         const styleHeaderRow = document.createElement('tr');
         if (inHead) {
           styleHeaderRow.innerHTML = `
-            <td style="background: #f8f9fa; font-weight: 600; color: #1D202B;" colspan="2">Global Style Editor</td>
+            <td style="background: #f8f9fa; font-weight: 600; color: #1D202B;" colspan="1">Global Style Editor</td>
+            <td style="background: #f8f9fa; text-align: right;"><button id="save-button" class="btn btn-primary btn-sm">Save Changes</button></td>
           `;
         } else {
           styleHeaderRow.innerHTML = `
-            <td style="background: #f8f9fa; font-weight: 600; color: #1D202B;" colspan="2">Style Editor (context: :where(${parentSelector}))</td>
+            <td style="background: #f8f9fa; font-weight: 600; color: #1D202B;" colspan="1">Style Editor (context: :where(${parentSelector}))</td>
+            <td style="background: #f8f9fa; text-align: right;"><button id="save-button" class="btn btn-primary btn-sm">Save Changes</button></td>
           `;
         }
         stylesTable.appendChild(styleHeaderRow);
@@ -1454,9 +1456,6 @@
         styleRow.innerHTML = `
           <td colspan="2" class="p-0">
             <div id="editor-container" style="width: 100%; height: 300px; border: 1px solid #ddd; border-radius: 4px;"></div>
-            <div style="margin-top: 10px; text-align: right;">
-              <button id="save-button" class="btn btn-primary btn-sm">Save Changes</button>
-            </div>
           </td>
         `;
         stylesTable.appendChild(styleRow);
@@ -1683,7 +1682,8 @@
         // Add HTML content editor section
         const htmlHeaderRow = document.createElement('tr');
         htmlHeaderRow.innerHTML = `
-          <td style="background: #f8f9fa; font-weight: 600; color: #1D202B;" colspan="2">HTML Editor</td>
+          <td style="background: #f8f9fa; font-weight: 600; color: #1D202B;" colspan="1">HTML Editor</td>
+          <td style="background: #f8f9fa; text-align: right;"><button id="save-button" class="btn btn-primary btn-sm">Save Changes</button></td>
         `;
         stylesTable.appendChild(htmlHeaderRow);
         
@@ -1695,9 +1695,6 @@
         htmlRow.innerHTML = `
           <td colspan="2" class="p-0">
             <div id="editor-container" style="width: 100%; height: 300px; border: 1px solid #ddd; border-radius: 4px;"></div>
-            <div style="margin-top: 10px; text-align: right;">
-              <button id="save-button" class="btn btn-primary btn-sm">Save Changes</button>
-            </div>
           </td>
         `;
         stylesTable.appendChild(htmlRow);
@@ -1989,11 +1986,13 @@
         const scriptHeaderRow = document.createElement('tr');
         if (inHead) {
           scriptHeaderRow.innerHTML = `
-            <td style="background: #f8f9fa; font-weight: 600; color: #1D202B;" colspan="2">Global Script Editor</td>
+            <td style="background: #f8f9fa; font-weight: 600; color: #1D202B;" colspan="1">Global Script Editor</td>
+            <td style="background: #f8f9fa; text-align: right;"><button id="save-button" class="btn btn-primary btn-sm">Save Changes</button></td>
           `;
         } else {
           scriptHeaderRow.innerHTML = `
-            <td style="background: #f8f9fa; font-weight: 600; color: #1D202B;" colspan="2">Script Editor</td>
+            <td style="background: #f8f9fa; font-weight: 600; color: #1D202B;" colspan="1">Script Editor</td>
+            <td style="background: #f8f9fa; text-align: right;"><button id="save-button" class="btn btn-primary btn-sm">Save Changes</button></td>
           `;
         }
         stylesTable.appendChild(scriptHeaderRow);
@@ -2006,9 +2005,6 @@
         scriptRow.innerHTML = `
           <td colspan="2" class="p-0">
             <div id="editor-container" style="width: 100%; height: 300px; border: 1px solid #ddd; border-radius: 4px;"></div>
-            <div style="margin-top: 10px; text-align: right;">
-              <button id="save-button" class="btn btn-primary btn-sm">Save Changes</button>
-            </div>
           </td>
         `;
         stylesTable.appendChild(scriptRow);
