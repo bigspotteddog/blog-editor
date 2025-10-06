@@ -955,6 +955,21 @@
         'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs'
       }
     };
+    
+    // Format editor content using Monaco's built-in formatter
+    async function formatEditorContent(editor) {
+      if (editor && typeof editor.getAction === 'function') {
+        try {
+          // Use Monaco's built-in format action
+          const formatAction = editor.getAction('editor.action.formatDocument');
+          if (formatAction) {
+            await formatAction.run();
+          }
+        } catch (error) {
+          console.warn('Could not format content:', error);
+        }
+      }
+    }
   </script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs/loader.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs/editor/editor.main.nls.js"></script>
@@ -1296,6 +1311,50 @@
       return selector;
     }
 
+    function processStyleElementUpdate(activeContainer, editorValue, inHead, parentSelector) {
+      // Extract content between style tags if the editor shows full tags
+      const styleTagMatch = editorValue.match(/<style[^>]*>([\s\S]*?)<\/style>/i);
+      if (styleTagMatch) {
+        // Content includes style tags, extract the CSS content
+        let content = styleTagMatch[1].trim();
+        
+        if (inHead) {
+          // For head style elements, save just the CSS content
+          activeContainer.textContent = content;
+        } else {
+          // For non-head style elements, wrap in :where() with parent selector
+          if (parentSelector) {
+            // Wrap the edited content in :where() selector
+            let wrappedContent = `:where(${parentSelector}) {
+  ${content.replace(/\n/g, '\n  ')}
+}`;
+            activeContainer.textContent = wrappedContent;
+          } else {
+            // If no parent selector, just save the CSS content as is
+            activeContainer.textContent = content;
+          }
+        }
+      } else {
+        // If editor doesn't show style tags, handle as before
+        if (inHead) {
+          // For head style elements, save content as is
+          activeContainer.textContent = editorValue;
+        } else {
+          // For non-head style elements, wrap in :where() with parent selector
+          if (parentSelector) {
+            // Wrap the edited content in :where() selector
+            let wrappedContent = `:where(${parentSelector}) {
+  ${editorValue.replace(/\n/g, '\n  ')}
+}`;
+            activeContainer.textContent = wrappedContent;
+          } else {
+            // If no parent selector, just save the content as is
+            activeContainer.textContent = editorValue;
+          }
+        }
+      }
+    }
+
     function updateStylesDialog(element) {
       const stylesDialogElement = document.querySelector(".styles-dialog-element");
       stylesDialogElement.innerHTML = getElementDisplayName(element);
@@ -1319,8 +1378,8 @@
         }
         stylesTable.appendChild(styleHeaderRow);
         
-        // Prepare CSS content based on location
-        let originalContent = element.textContent || '';
+        // Prepare CSS content including the full style tag with attributes
+        let originalContent = element.outerHTML || '';
         let displayContent = originalContent;
         
         if (inHead) {
@@ -1328,18 +1387,42 @@
           displayContent = originalContent;
         } else {
           // For non-head style elements, handle :where() wrapper as before
-          const existingMatch = originalContent.match(/^:where\([^)]+\)\s*\{([\s\S]*)\}$/s);
+          // Extract the content inside the style tag while preserving the style tag itself
+          const existingMatch = originalContent.match(/<style[^>]*>([\s\S]*)<\/style>/i);
           if (existingMatch) {
-            // Content is already wrapped, extract inner content for editing
+            // Content is in a style tag, extract it for editing
             let innerContent = existingMatch[1].trim();
-            displayContent = innerContent
-              .split('\n')
-              .map(line => line.replace(/^ {2}/, '')) // Remove leading 2 spaces
-              .join('\n')
-              .trim();
+            const styleTagMatch = originalContent.match(/(<style[^>]*>)([\s\S]*)(<\/style>)/i);
+            if (styleTagMatch) {
+              // Preserve the style tag opening and closing with attributes
+              let styleOpenTag = styleTagMatch[1];
+              let styleCloseTag = styleTagMatch[3];
+              let innerContent = styleTagMatch[2];
+              
+              // Check if content is already wrapped in :where() selector for non-head elements
+              const wrappedMatch = innerContent.match(/^:where\([^)]+\)\s*\{([\s\S]*)\}$/s);
+              if (wrappedMatch) {
+                // Content is already wrapped, extract inner content for editing
+                let extractedContent = wrappedMatch[1].trim();
+                extractedContent = extractedContent
+                  .split('\n')
+                  .map(line => line.replace(/^ {2}/, '')) // Remove leading 2 spaces
+                  .join('\n')
+                  .trim();
+                
+                // Create display content with just the CSS content between style tags
+                displayContent = `${styleOpenTag}\n${extractedContent}\n${styleCloseTag}`;
+              } else {
+                // Not wrapped, show the content as is with style tags
+                displayContent = originalContent;
+              }
+            } else {
+              // Fallback: show original content as is
+              displayContent = originalContent;
+            }
           } else {
-            // Not wrapped, show the content as is
-            displayContent = originalContent;
+            // Not in style tag format, but include the style tag for editing
+            displayContent = `<style>\n${originalContent}\n</style>`;
           }
         }
         
@@ -1380,14 +1463,21 @@
                 padding: { top: 10, bottom: 10 },
                 fontFamily: 'monospace'
               });
+              
+              // Format content on initialization
+              setTimeout(() => {
+                formatEditorContent(window.styleEditor);
+              }, 100);
             }
             
             // Update the style element when editor content changes (with debounce)
             let updateTimeout;
             window.styleEditor.onDidChangeModelContent(() => {
               clearTimeout(updateTimeout);
-              updateTimeout = setTimeout(() => {
+              updateTimeout = setTimeout(async () => {
                 if (activeContainer) {
+                  // Format the editor content first
+                  await formatEditorContent(window.styleEditor);
                   const editorValue = window.styleEditor.getValue();
                   if (inHead) {
                     // For head style elements, save content as is
@@ -1423,14 +1513,21 @@
                     padding: { top: 10, bottom: 10 },
                     fontFamily: 'monospace'
                   });
+                  
+                  // Format content on initialization
+                  setTimeout(() => {
+                    formatEditorContent(window.styleEditor);
+                  }, 100);
                 }
                 
                 // Update the style element when editor content changes (with debounce)
                 let updateTimeout;
                 window.styleEditor.onDidChangeModelContent(() => {
                   clearTimeout(updateTimeout);
-                  updateTimeout = setTimeout(() => {
+                  updateTimeout = setTimeout(async () => {
                     if (activeContainer) {
+                      // Format the editor content first
+                      await formatEditorContent(window.styleEditor);
                       const editorValue = window.styleEditor.getValue();
                       if (inHead) {
                         // For head style elements, save content as is
@@ -1461,14 +1558,15 @@
                   textarea.addEventListener('blur', function() {
                     if (activeContainer) {
                       // This would be a simplified update for the fallback
+                      const value = this.value;
                       if (inHead) {
-                        activeContainer.textContent = this.value;
+                        activeContainer.textContent = value;
                       } else {
                         if (parentSelector) {
-                          let wrappedContent = `:where(${parentSelector}) {\n  ${this.value.replace(/\n/g, '\n  ')}\n}`;
+                          let wrappedContent = `:where(${parentSelector}) {\n  ${value.replace(/\n/g, '\n  ')}\n}`;
                           activeContainer.textContent = wrappedContent;
                         } else {
-                          activeContainer.textContent = this.value;
+                          activeContainer.textContent = value;
                         }
                       }
                     }
@@ -1581,14 +1679,21 @@
                 formatOnType: true,
                 formatOnPaste: true
               });
+              
+              // Format content on initialization
+              setTimeout(() => {
+                formatEditorContent(window.htmlEditor);
+              }, 100);
             }
             
             // Update the HTML element when editor content changes (with debounce)
             let htmlUpdateTimeout;
             window.htmlEditor.onDidChangeModelContent(() => {
               clearTimeout(htmlUpdateTimeout);
-              htmlUpdateTimeout = setTimeout(() => {
+              htmlUpdateTimeout = setTimeout(async () => {
                 if (activeContainer) {
+                  // Format the editor content first
+                  await formatEditorContent(window.htmlEditor);
                   // Update the entire HTML document
                   try {
                     const newHtmlContent = window.htmlEditor.getValue();
@@ -1651,14 +1756,21 @@
                     formatOnType: true,
                     formatOnPaste: true
                   });
+                  
+                  // Format content on initialization
+                  setTimeout(() => {
+                    formatEditorContent(window.htmlEditor);
+                  }, 100);
                 }
                 
                 // Update the HTML element when editor content changes (with debounce)
                 let htmlUpdateTimeout;
                 window.htmlEditor.onDidChangeModelContent(() => {
                   clearTimeout(htmlUpdateTimeout);
-                  htmlUpdateTimeout = setTimeout(() => {
+                  htmlUpdateTimeout = setTimeout(async () => {
                     if (activeContainer) {
+                      // Format the editor content first
+                      await formatEditorContent(window.htmlEditor);
                       // Update the entire HTML document
                       try {
                         const newHtmlContent = window.htmlEditor.getValue();
@@ -1713,7 +1825,46 @@
                   textarea.addEventListener('blur', function() {
                     if (activeContainer) {
                       // This would be a simplified update for the fallback
-                      console.log('HTML content updated (fallback for HTML element)');
+                      const value = this.value;
+                      
+                      // Update the entire HTML document
+                      try {
+                        // Parse the new HTML content and update the document
+                        const parser = new DOMParser();
+                        const newDoc = parser.parseFromString(value, 'text/html');
+                        
+                        // Update the html element's content
+                        const newHtmlElement = newDoc.documentElement;
+                        const currentHtmlElement = activeContainer;
+                        
+                        // Update attributes
+                        for (let i = currentHtmlElement.attributes.length - 1; i >= 0; i--) {
+                          currentHtmlElement.removeAttribute(currentHtmlElement.attributes[i].name);
+                        }
+                        for (let i = 0; i < newHtmlElement.attributes.length; i++) {
+                          const attr = newHtmlElement.attributes[i];
+                          currentHtmlElement.setAttribute(attr.name, attr.value);
+                        }
+                        
+                        // Update child nodes
+                        const oldHead = currentHtmlElement.querySelector('head');
+                        const oldBody = currentHtmlElement.querySelector('body');
+                        const newHead = newHtmlElement.querySelector('head');
+                        const newBody = newHtmlElement.querySelector('body');
+                        
+                        if (oldHead && newHead) {
+                          oldHead.innerHTML = newHead.innerHTML;
+                        }
+                        
+                        if (oldBody && newBody) {
+                          oldBody.innerHTML = newBody.innerHTML;
+                        }
+                        
+                        // Refresh the selector to reflect the changes
+                        refreshSelector(currentHtmlElement);
+                      } catch (e) {
+                        console.error('Error updating HTML:', e);
+                      }
                     }
                   });
                 }
@@ -1831,14 +1982,21 @@
                 padding: { top: 10, bottom: 10 },
                 fontFamily: 'monospace'
               });
+              
+              // Format content on initialization
+              setTimeout(() => {
+                formatEditorContent(window.scriptEditor);
+              }, 100);
             }
             
             // Update the script element when editor content changes (with debounce)
             let scriptUpdateTimeout;
             window.scriptEditor.onDidChangeModelContent(() => {
               clearTimeout(scriptUpdateTimeout);
-              scriptUpdateTimeout = setTimeout(() => {
+              scriptUpdateTimeout = setTimeout(async () => {
                 if (activeContainer) {
+                  // Format the editor content first
+                  await formatEditorContent(window.scriptEditor);
                   // Save the content as is to the script element
                   activeContainer.textContent = window.scriptEditor.getValue();
                 }
@@ -1861,14 +2019,21 @@
                     padding: { top: 10, bottom: 10 },
                     fontFamily: 'monospace'
                   });
+                  
+                  // Format content on initialization
+                  setTimeout(() => {
+                    formatEditorContent(window.scriptEditor);
+                  }, 100);
                 }
                 
                 // Update the script element when editor content changes (with debounce)
                 let scriptUpdateTimeout;
                 window.scriptEditor.onDidChangeModelContent(() => {
                   clearTimeout(scriptUpdateTimeout);
-                  scriptUpdateTimeout = setTimeout(() => {
+                  scriptUpdateTimeout = setTimeout(async () => {
                     if (activeContainer) {
+                      // Format the editor content first
+                      await formatEditorContent(window.scriptEditor);
                       // Save the content as is to the script element
                       activeContainer.textContent = window.scriptEditor.getValue();
                     }
