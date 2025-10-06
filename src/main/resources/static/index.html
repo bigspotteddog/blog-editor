@@ -2782,6 +2782,13 @@
         
         activeContainer = selectorItem.el;
 
+        // Update styles dialog to show properties of the selected element
+        const stylesTable = document.querySelector('.styles-dialog table tbody');
+        if (stylesTable) {
+          stylesTable.innerHTML = '';
+          updateStylesDialog(selectorItem.el);
+        }
+        
         // Wait for scroll to complete before showing highlight (smooth scroll typically takes ~800ms)
         setTimeout(() => {
           showHighlight(selectorItem.el);
