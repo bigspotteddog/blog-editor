@@ -1401,6 +1401,54 @@
       
       // Check if the selected element is a script element
       if (element.tagName.toLowerCase() === 'script') {
+        // Add attributes section for script elements
+        const attributesHeaderRow = document.createElement('tr');
+        attributesHeaderRow.innerHTML = `
+          <td style="background: #f8f9fa; font-weight: 600; color: #1D202B;">Attributes</td>
+          <td style="background: #f8f9fa;"><button class="btn btn-sm btn-outline-primary" onclick="addAttributeRow()">+</button></td>
+        `;
+        stylesTable.appendChild(attributesHeaderRow);
+        
+        // Add existing attributes for the script element
+        const attributes = element.attributes;
+        for (let i = 0; i < attributes.length; i++) {
+          const attr = attributes[i];
+          
+          const attrRow = document.createElement('tr');
+          attrRow.innerHTML = `
+            <td contenteditable="true" class="attr-name">${attr.name}</td>
+            <td contenteditable="true" class="attr-value">${attr.value}</td>
+          `;
+          stylesTable.appendChild(attrRow);
+          
+          // Add event listeners to update attributes when changed
+          const nameCell = attrRow.querySelector('.attr-name');
+          const valueCell = attrRow.querySelector('.attr-value');
+          
+          nameCell.addEventListener('blur', updateAttribute);
+          valueCell.addEventListener('blur', updateAttribute);
+          
+          nameCell.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+              e.preventDefault();
+              this.blur();
+            }
+          });
+          
+          valueCell.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+              e.preventDefault();
+              this.blur();
+            } else if (e.key === 'Tab' && !(e.ctrlKey || e.altKey || e.shiftKey || e.metaKey)) {
+              e.preventDefault();
+              this.blur();
+              setTimeout(() => {
+                addAttributeRow();
+              }, 100);
+            }
+          });
+        }
+        
         // Determine if the script element is in the head
         const inHead = element.parentElement && element.parentElement.tagName.toLowerCase() === 'head';
         
