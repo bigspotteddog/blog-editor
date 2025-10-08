@@ -10,6 +10,7 @@
     integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
   <link rel="stylesheet" data-name="vs/editor/editor.main" href="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs/editor/editor.main.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/downloadjs/1.4.8/download.min.js"></script>
   <style>
     .editable {
       position: relative;
@@ -517,6 +518,7 @@
             <ul class="dropdown-menu">
               <li><a id="new" class="dropdown-item" href="#">New</a></li>
               <li><a id="publish" class="dropdown-item" href="#">Publish</a></li>
+              <li><a id="save" class="dropdown-item" href="#">Save</a></li>
               <li>
                 <hr class="dropdown-divider">
               </li>
@@ -968,6 +970,90 @@
         } catch (error) {
           console.warn('Could not format content:', error);
         }
+      }
+    }
+    
+    // Unified save editor changes function
+    async function saveEditorChanges(element, editor, inHead, parentSelector) {
+      if (!element || !editor) return;
+      
+      try {
+        // Format the editor content first
+        await formatEditorContent(editor);
+        const editorValue = editor.getValue();
+        
+        // Preserve element attributes before updating
+        const preservedAttributes = preserveElementAttributes(element);
+        
+        // Handle different element types
+        if (element.tagName.toLowerCase() === 'style') {
+          if (inHead) {
+            // For head style elements, save content as is
+            element.textContent = editorValue;
+          } else {
+            // For non-head style elements, wrap in :where() with parent selector
+            if (parentSelector) {
+              // Wrap the edited content in :where() selector
+              let wrappedContent = `:where(${parentSelector}) {\n  ${editorValue.replace(/\n/g, '\n  ')}\n}`;
+              element.textContent = wrappedContent;
+            } else {
+              // If no parent selector, just save the content as is
+              element.textContent = editorValue;
+            }
+          }
+        } else if (element.tagName.toLowerCase() === 'script') {
+          // For script elements, save content as is
+          element.textContent = editorValue;
+        } else {
+          // For HTML elements, parse and update the document
+          try {
+            const newHtmlContent = editorValue;
+            // Parse the new HTML content and update the document
+            const parser = new DOMParser();
+            const newDoc = parser.parseFromString(newHtmlContent, 'text/html');
+            
+            // Update the html element's content
+            const newHtmlElement = newDoc.documentElement;
+            const currentHtmlElement = element;
+            
+            // Update attributes
+            for (let i = currentHtmlElement.attributes.length - 1; i >= 0; i--) {
+              currentHtmlElement.removeAttribute(currentHtmlElement.attributes[i].name);
+            }
+            for (let i = 0; i < newHtmlElement.attributes.length; i++) {
+              const attr = newHtmlElement.attributes[i];
+              currentHtmlElement.setAttribute(attr.name, attr.value);
+            }
+            
+            // Update child nodes
+            const oldHead = currentHtmlElement.querySelector('head');
+            const oldBody = currentHtmlElement.querySelector('body');
+            const newHead = newHtmlElement.querySelector('head');
+            const newBody = newHtmlElement.querySelector('body');
+            
+            if (oldHead && newHead) {
+              oldHead.innerHTML = newHead.innerHTML;
+            }
+            
+            if (oldBody && newBody) {
+              oldBody.innerHTML = newBody.innerHTML;
+            }
+            
+            // Refresh the selector to reflect the changes
+            refreshSelector(currentHtmlElement);
+          } catch (e) {
+            console.error('Error updating HTML:', e);
+          }
+        }
+        
+        // Restore element attributes after updating
+        restoreElementAttributes(element, preservedAttributes);
+        
+        // Show success message
+        alert('Changes saved successfully!');
+      } catch (e) {
+        console.error('Error saving changes:', e);
+        alert('Error saving changes. Please check the console for details.');
       }
     }
     
@@ -3331,8 +3417,14 @@
       const iframeDocument = this.contentDocument || this.contentWindow.document;  
       // Create a style element
       const styleElement = iframeDocument.createElement('style');
+      styleElement.id = "edit-styles";
       styleElement.textContent = `
-        div:empty, section:empty, form:empty, ul:empty, ol:empty, li:empty {
+        body.edit div:empty,
+        body.edit section:empty,
+        body.edit form:empty,
+        body.edit ul:empty,
+        body.edit ol:empty,
+        body.edit li:empty {
           min-height: 40px;
           border: 1px dashed lightgray;
         }
@@ -3824,6 +3916,14 @@
       console.log(url);
       document.cookie = "proxy=" + url + "; path=/;";
       iframe.src = "editor/" + "?url=" + url + "&t=" + new Date().getTime();
+    });
+
+    document.getElementById('save').addEventListener('click', () => {
+      const iframe = document.getElementById('editor-frame');
+      const editStyles = iframe.contentDocument.getElementById("edit-styles");
+      editStyles.remove();
+      const iframeContent = iframe.contentWindow.document.documentElement.outerHTML;
+      download(iframeContent, 'index.html', 'text/html');
     });
   </script>
 </body>
