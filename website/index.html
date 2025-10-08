@@ -1,0 +1,1151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PageCraft - Create Stunning Landing Pages in Minutes</title>
+    <meta name="description" content="Build beautiful, high-converting landing pages with our intuitive drag-and-drop editor. Mix and match pre-built sections, customize everything, and launch in minutes.">
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            color: #1a1a1a;
+            overflow-x: hidden;
+        }
+
+        /* Navigation */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            padding: 1rem 0;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2rem;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #3b82f6;
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #4b5563;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: #3b82f6;
+        }
+
+        .nav-cta {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: #aaaaf6;
+            border: 2px solid #aaaaf6;
+        }
+
+        .btn-secondary:hover {
+            background: #3b82f6;
+            border: 2px solid white;
+            color: white;
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
+            padding: 8rem 0 6rem;
+            text-align: center;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+            opacity: 0.3;
+        }
+
+        .hero-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            margin-bottom: 1.5rem;
+            line-height: 1.2;
+        }
+
+        .hero-subtitle {
+            font-size: 1.25rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .hero-cta {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-bottom: 3rem;
+        }
+
+        .btn-hero {
+            padding: 1rem 2rem;
+            font-size: 1.1rem;
+            border-radius: 12px;
+        }
+
+        .btn-white {
+            background: white;
+            color: #3b82f6;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-white:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .hero-demo {
+            max-width: 800px;
+            margin: 0 auto;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            background: white;
+            padding: 1rem;
+        }
+
+        .demo-browser {
+            background: #f3f4f6;
+            border-radius: 8px;
+            padding: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .browser-bar {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .browser-dots {
+            display: flex;
+            gap: 0.25rem;
+        }
+
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .dot.red { background: #ef4444; }
+        .dot.yellow { background: #f59e0b; }
+        .dot.green { background: #10b981; }
+
+        .browser-url {
+            background: white;
+            border-radius: 4px;
+            padding: 0.25rem 0.5rem;
+            font-size: 0.8rem;
+            color: #6b7280;
+            margin-left: auto;
+            margin-right: auto;
+            width: 200px;
+            text-align: center;
+        }
+
+        .demo-content {
+            background: white;
+            border-radius: 8px;
+            height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #6b7280;
+            font-size: 1.1rem;
+        }
+
+        /* Features Section */
+        .features {
+            padding: 6rem 0;
+            background: #f8fafc;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: #1f2937;
+        }
+
+        .section-subtitle {
+            font-size: 1.1rem;
+            color: #6b7280;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .feature-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+        }
+
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+            color: white;
+            font-size: 1.5rem;
+        }
+
+        .feature-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #1f2937;
+        }
+
+        .feature-description {
+            color: #6b7280;
+            line-height: 1.6;
+        }
+
+        /* How It Works Section */
+        .how-it-works {
+            padding: 6rem 0;
+            background: white;
+        }
+
+        .steps-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 3rem;
+            margin-top: 3rem;
+        }
+
+        .step {
+            text-align: center;
+            position: relative;
+        }
+
+        .step-number {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            color: white;
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .step-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #1f2937;
+        }
+
+        .step-description {
+            color: #6b7280;
+        }
+
+        /* Pricing Section */
+        .pricing {
+            padding: 6rem 0;
+            background: white;
+        }
+
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .pricing-card {
+            background: white;
+            border: 2px solid #e5e7eb;
+            border-radius: 16px;
+            padding: 2rem;
+            text-align: center;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .pricing-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .pricing-card.featured {
+            border-color: #3b82f6;
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            color: white;
+            transform: scale(1.05);
+        }
+
+        .pricing-card.featured:hover {
+            transform: scale(1.05) translateY(-5px);
+        }
+
+        .pricing-badge {
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #10b981;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .pricing-plan {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .pricing-card.featured .pricing-plan {
+            color: white;
+        }
+
+        .pricing-price {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+        }
+
+        .pricing-card.featured .pricing-price {
+            color: white;
+        }
+
+        .pricing-period {
+            color: #6b7280;
+            margin-bottom: 2rem;
+        }
+
+        .pricing-card.featured .pricing-period {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .pricing-description {
+            margin-bottom: 2rem;
+            color: #6b7280;
+            line-height: 1.6;
+        }
+
+        .pricing-card.featured .pricing-description {
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .pricing-features {
+            list-style: none;
+            margin-bottom: 2rem;
+            text-align: left;
+        }
+
+        .pricing-features li {
+            padding: 0.5rem 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .pricing-features .check {
+            color: #10b981;
+            font-weight: bold;
+        }
+
+        .pricing-card.featured .pricing-features .check {
+            color: #a7f3d0;
+        }
+
+        .pricing-cta {
+            width: 100%;
+            padding: 1rem;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+        }
+
+        .pricing-cta.primary {
+            background: #3b82f6;
+            color: white;
+            border: 2px solid #3b82f6;
+        }
+
+        .pricing-cta.primary:hover {
+            background: #2563eb;
+            transform: translateY(-2px);
+        }
+
+        .pricing-cta.secondary {
+            background: transparent;
+            color: #3b82f6;
+            border: 2px solid #3b82f6;
+        }
+
+        .pricing-cta.secondary:hover {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .pricing-cta.featured {
+            background: white;
+            color: #3b82f6;
+            border: 2px solid white;
+        }
+
+        .pricing-cta.featured:hover {
+            background: rgba(255, 255, 255, 0.9);
+            transform: translateY(-2px);
+        }
+
+        .enterprise-highlight {
+            background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-top: 3rem;
+            text-align: center;
+        }
+
+        .enterprise-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: #1f2937;
+        }
+
+        .enterprise-description {
+            color: #6b7280;
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+
+        .tech-badges {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-bottom: 1.5rem;
+        }
+
+        .tech-badge {
+            background: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #374151;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        /* CTA Section */
+        .cta {
+            background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
+            padding: 6rem 0;
+            text-align: center;
+            color: white;
+        }
+
+        .cta-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .cta-subtitle {
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+
+        /* Contact Form */
+        .contact-form {
+            max-width: 500px;
+            margin: 2rem auto 0;
+            display: flex;
+            gap: 1rem;
+        }
+
+        .form-input {
+            flex: 1;
+            padding: 1rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            outline: none;
+        }
+
+        .form-input:focus {
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.3);
+        }
+
+        /* Footer */
+        .footer {
+            background: #1f2937;
+            color: white;
+            padding: 3rem 0 2rem;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .footer-section h3 {
+            margin-bottom: 1rem;
+            color: #f9fafb;
+        }
+
+        .footer-section a {
+            color: #d1d5db;
+            text-decoration: none;
+            display: block;
+            margin-bottom: 0.5rem;
+            transition: color 0.3s ease;
+        }
+
+        .footer-section a:hover {
+            color: #6366f1;
+        }
+
+        .footer-bottom {
+            border-top: 1px solid #374151;
+            padding-top: 2rem;
+            text-align: center;
+            color: #9ca3af;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero-cta {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .contact-form {
+                flex-direction: column;
+            }
+
+            .section-title {
+                font-size: 2rem;
+            }
+
+            .cta-title {
+                font-size: 2rem;
+            }
+
+            .pricing-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+
+            .pricing-card.featured {
+                transform: none;
+            }
+
+            .pricing-card.featured:hover {
+                transform: translateY(-5px);
+            }
+
+            .tech-badges {
+                gap: 0.5rem;
+            }
+
+            .tech-badge {
+                font-size: 0.8rem;
+                padding: 0.4rem 0.8rem;
+            }
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-on-scroll {
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        /* Floating Elements */
+        .floating-element {
+            position: absolute;
+            opacity: 0.1;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="#" class="logo">
+                <i class="fas fa-magic"></i> PageCraft
+            </a>
+            <ul class="nav-links">
+                <li><a href="#features">Features</a></li>
+                <li><a href="#how-it-works">How It Works</a></li>
+                <li><a href="#templates">Templates</a></li>
+                <li><a href="#pricing">Pricing</a></li>
+            </ul>
+            <div class="nav-cta">
+                <a href="#" class="btn btn-secondary">Sign In</a>
+                <a href="#" class="btn btn-primary">Get Started</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-container">
+            <h1>Create Stunning Landing Pages<br>in Minutes</h1>
+            <p class="hero-subtitle">
+                Build beautiful, high-converting landing pages with our intuitive drag-and-drop editor. 
+                Mix and match pre-built sections as simple as a child's flip book and customize everything to match your brand.
+            </p>
+            <div class="hero-cta">
+                <a href="#" class="btn btn-white btn-hero">
+                    <i class="fas fa-play"></i> Get Started
+                </a>
+                <a href="#" class="btn btn-secondary btn-hero">
+                    <i class="fas fa-video"></i> Watch Demo
+                </a>
+            </div>
+            
+            <!-- Demo Browser -->
+            <div class="hero-demo">
+                <div class="demo-browser">
+                    <div class="browser-bar">
+                        <div class="browser-dots">
+                            <div class="dot red"></div>
+                            <div class="dot yellow"></div>
+                            <div class="dot green"></div>
+                        </div>
+                        <div class="browser-url">pagecraft.com/editor</div>
+                    </div>
+                    <div class="demo-content">
+                        <i class="fas fa-magic" style="font-size: 3rem; color: #6366f1;"></i>
+                        <div style="margin-left: 1rem;">
+                            <div style="font-weight: 600; color: #1f2937;">Live Editor Preview</div>
+                            <div style="font-size: 0.9rem;">Drag, drop, and customize in real-time</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Floating Elements -->
+        <div class="floating-element" style="top: 20%; left: 10%; font-size: 2rem;">
+            <i class="fas fa-palette"></i>
+        </div>
+        <div class="floating-element" style="top: 60%; right: 15%; font-size: 1.5rem; animation-delay: -2s;">
+            <i class="fas fa-mobile-alt"></i>
+        </div>
+        <div class="floating-element" style="top: 40%; left: 80%; font-size: 1.8rem; animation-delay: -4s;">
+            <i class="fas fa-rocket"></i>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="features">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Everything You Need to Build Amazing Pages</h2>
+                <p class="section-subtitle">
+                    Our powerful editor combines simplicity with professional features, 
+                    giving you complete control over every aspect of your landing page.
+                </p>
+            </div>
+            
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-layer-group"></i>
+                    </div>
+                    <h3 class="feature-title">Mix & Match Sections</h3>
+                    <p class="feature-description">
+                        Choose from dozens of pre-built sections and arrange them as simple as pages in a flip book. 
+                        Headers, features, testimonials, pricing - everything you need.
+                    </p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-edit"></i>
+                    </div>
+                    <h3 class="feature-title">Direct HTML Editing</h3>
+                    <p class="feature-description">
+                        Click any element to edit text, change colors, adjust fonts, swap images, 
+                        and modify any style property. No coding knowledge required.
+                    </p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-mobile-alt"></i>
+                    </div>
+                    <h3 class="feature-title">Mobile Responsive</h3>
+                    <p class="feature-description">
+                        Every template and section is fully responsive. Your pages will look 
+                        perfect on desktop, tablet, and mobile devices automatically.
+                    </p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-envelope"></i>
+                    </div>
+                    <h3 class="feature-title">Built-in Contact Forms</h3>
+                    <p class="feature-description">
+                        Every page includes customizable contact forms. With our hosted plan, 
+                        we process submissions and let you name your own custom fields for any data you need.
+                    </p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-rocket"></i>
+                    </div>
+                    <h3 class="feature-title">Lightning Fast</h3>
+                    <p class="feature-description">
+                        Optimized code and modern web standards ensure your pages load instantly, 
+                        improving user experience and search rankings.
+                    </p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h3 class="feature-title">Analytics Ready</h3>
+                    <p class="feature-description">
+                        Built-in tracking and analytics integration helps you measure performance 
+                        and optimize your pages for better conversions.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section id="how-it-works" class="how-it-works">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">How It Works</h2>
+                <p class="section-subtitle">
+                    From idea to published page in just three simple steps. 
+                    No design experience or technical skills required.
+                </p>
+            </div>
+            
+            <div class="steps-container">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <h3 class="step-title">Choose Your Sections</h3>
+                    <p class="step-description">
+                        Browse our library of professionally designed sections. 
+                        Pick the ones that match your goals and arrange them in any order.
+                    </p>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <h3 class="step-title">Customize Everything</h3>
+                    <p class="step-description">
+                        Click any element to edit. Change text, colors, fonts, images, 
+                        and styling with our intuitive visual editor.
+                    </p>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <h3 class="step-title">Publish & Share</h3>
+                    <p class="step-description">
+                        Hit publish and your page goes live instantly. 
+                        Share your custom URL or embed it on your existing website.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section id="pricing" class="pricing">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Choose Your Perfect Plan</h2>
+                <p class="section-subtitle">
+                    From DIY creators to enterprise solutions, we have the right plan for your needs. 
+                    All plans include our powerful drag-and-drop editor and professional templates.
+                </p>
+            </div>
+            
+            <div class="pricing-grid">
+                <!-- Free Plan -->
+                <div class="pricing-card">
+                    <div class="pricing-plan">DIY Creator</div>
+                    <div class="pricing-price">Free</div>
+                    <div class="pricing-period">Forever</div>
+                    <div class="pricing-description">
+                        Perfect for individuals and small businesses who want to create and host their own landing pages.
+                    </div>
+                    <ul class="pricing-features">
+                        <li><span class="check">✓</span> Full access to page editor</li>
+                        <li><span class="check">✓</span> All template sections</li>
+                        <li><span class="check">✓</span> Unlimited pages</li>
+                        <li><span class="check">✓</span> Export HTML/CSS</li>
+                        <li><span class="check">✓</span> Self-hosting required</li>
+                        <li><span class="check">✓</span> Community support</li>
+                    </ul>
+                    <a href="#" class="pricing-cta secondary">Get Started Free</a>
+                </div>
+                
+                <!-- Hosted Plan -->
+                <div class="pricing-card featured">
+                    <div class="pricing-badge">Most Popular</div>
+                    <div class="pricing-plan">Hosted Pro</div>
+                    <div class="pricing-price">$27</div>
+                    <div class="pricing-period">per month</div>
+                    <div class="pricing-description">
+                        Same powerful editor, but we handle all the hosting so you can focus on creating amazing pages.
+                    </div>
+                    <ul class="pricing-features">
+                        <li><span class="check">✓</span> Everything in DIY Creator</li>
+                        <li><span class="check">✓</span> Professional hosting included</li>
+                        <li><span class="check">✓</span> Custom domain support</li>
+                        <li><span class="check">✓</span> SSL certificates</li>
+                        <li><span class="check">✓</span> Contact form processing</li>
+                        <li><span class="check">✓</span> Custom form fields (name your own)</li>
+                        <li><span class="check">✓</span> 99.9% uptime guarantee</li>
+                    </ul>
+                    <a href="#" class="pricing-cta featured">Get Started</a>
+                </div>
+                
+                <!-- Custom Plan -->
+                <div class="pricing-card">
+                    <div class="pricing-plan">Custom Development</div>
+                    <div class="pricing-price">Call Us</div>
+                    <div class="pricing-period">Project-based</div>
+                    <div class="pricing-description">
+                        Need something beyond a landing page? Our principal engineers build custom enterprise solutions.
+                    </div>
+                    <ul class="pricing-features">
+                        <li><span class="check">✓</span> Custom web applications</li>
+                        <li><span class="check">✓</span> Enterprise integrations</li>
+                        <li><span class="check">✓</span> Database design</li>
+                        <li><span class="check">✓</span> API development</li>
+                        <li><span class="check">✓</span> Cloud architecture</li>
+                        <li><span class="check">✓</span> DevOps & deployment</li>
+                        <li><span class="check">✓</span> Ongoing maintenance</li>
+                        <li><span class="check">✓</span> Dedicated project manager</li>
+                    </ul>
+                    <a href="#" class="pricing-cta primary">Schedule Consultation</a>
+                </div>
+            </div>
+            
+            <!-- Enterprise Highlight -->
+            <div class="enterprise-highlight">
+                <h3 class="enterprise-title">Enterprise-Grade Development Team</h3>
+                <p class="enterprise-description">
+                    Our team consists of principal engineers with decades of experience building scalable enterprise systems. 
+                    We've architected solutions running on major cloud platforms, handling millions of users and transactions.
+                </p>
+                <div class="tech-badges">
+                    <span class="tech-badge">AWS</span>
+                    <span class="tech-badge">Google Cloud</span>
+                    <span class="tech-badge">Microsoft Azure</span>
+                    <span class="tech-badge">Kubernetes</span>
+                    <span class="tech-badge">Microservices</span>
+                    <span class="tech-badge">HTML</span>
+                    <span class="tech-badge">CSS</span>
+                    <span class="tech-badge">JavaScript</span>
+                    <span class="tech-badge">Node.js</span>
+                    <span class="tech-badge">Python</span>
+                    <span class="tech-badge">Java</span>
+                    <span class="tech-badge">PostgreSQL</span>
+                    <span class="tech-badge">NoSQL</span>
+                    <span class="tech-badge">Ecommerce</span>
+                    <span class="tech-badge">Integrations</span>
+                    <span class="tech-badge">APIs</span>
+                    <span class="tech-badge">MVPs</span>
+                    <span class="tech-badge">AI</span>
+                </div>
+                <a href="#" class="btn btn-primary">
+                    <i class="fas fa-calendar"></i> Book a Strategy Call
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta">
+        <div class="container">
+            <h2 class="cta-title">Ready to Build Your First Page?</h2>
+            <p class="cta-subtitle">
+                Join thousands of businesses creating beautiful landing pages with PageCraft.<br>
+                Get started today - no credit card required for the free plan.
+            </p>
+            
+            <!-- Contact Form -->
+            <form class="contact-form" id="signupForm">
+                <input type="email" class="form-input" placeholder="Enter your email address" required>
+                <button type="submit" class="btn btn-primary btn-hero">
+                    Get Started
+                </button>
+            </form>
+            
+            <p style="margin-top: 1rem; opacity: 0.8; font-size: 0.9rem;">
+                ✓ Free plan available &nbsp;&nbsp; ✓ No credit card required &nbsp;&nbsp; ✓ Upgrade anytime
+            </p>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3><i class="fas fa-magic"></i> PageCraft</h3>
+                    <p style="color: #d1d5db; margin-bottom: 1rem;">
+                        The easiest way to create stunning landing pages that convert visitors into customers.
+                    </p>
+                    <div style="display: flex; gap: 1rem;">
+                        <a href="#" style="font-size: 1.2rem;"><i class="fab fa-twitter"></i></a>
+                        <a href="#" style="font-size: 1.2rem;"><i class="fab fa-facebook"></i></a>
+                        <a href="#" style="font-size: 1.2rem;"><i class="fab fa-linkedin"></i></a>
+                        <a href="#" style="font-size: 1.2rem;"><i class="fab fa-instagram"></i></a>
+                    </div>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Product</h3>
+                    <a href="#">Features</a>
+                    <a href="#">Templates</a>
+                    <a href="#">Pricing</a>
+                    <a href="#">Integrations</a>
+                    <a href="#">API</a>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Resources</h3>
+                    <a href="#">Help Center</a>
+                    <a href="#">Tutorials</a>
+                    <a href="#">Blog</a>
+                    <a href="#">Community</a>
+                    <a href="#">Webinars</a>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Company</h3>
+                    <a href="#">About Us</a>
+                    <a href="#">Careers</a>
+                    <a href="#">Contact</a>
+                    <a href="#">Privacy Policy</a>
+                    <a href="#">Terms of Service</a>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2024 PageCraft. All rights reserved. Built with ❤️ for creators everywhere.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Form submission
+        document.getElementById('signupForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const email = this.querySelector('input[type="email"]').value;
+            
+            // Here you would typically send the email to your backend
+            alert(`Thanks for your interest! We'll send access details to ${email} so you can start building your landing page.`);
+            
+            // Reset form
+            this.reset();
+        });
+
+        // Add scroll effect to navbar
+        window.addEventListener('scroll', function() {
+            const navbar = document.querySelector('.navbar');
+            if (window.scrollY > 100) {
+                navbar.style.background = 'rgba(255, 255, 255, 0.98)';
+                navbar.style.boxShadow = '0 2px 20px rgba(0, 0, 0, 0.1)';
+            } else {
+                navbar.style.background = 'rgba(255, 255, 255, 0.95)';
+                navbar.style.boxShadow = 'none';
+            }
+        });
+
+        // Animate elements on scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver(function(entries) {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('animate-on-scroll');
+                }
+            });
+        }, observerOptions);
+
+        // Observe all feature cards, steps, and pricing cards
+        document.querySelectorAll('.feature-card, .step, .pricing-card').forEach(el => {
+            observer.observe(el);
+        });
+    </script>
+</body>
+</html>
