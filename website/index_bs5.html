@@ -76,6 +76,7 @@
       color: white;
       position: relative;
       overflow: hidden;
+      z-index: 2;
     }
 
     .hero::before {
@@ -87,19 +88,16 @@
       bottom: 0;
       background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
       opacity: 0.3;
-      z-index: 1;
+      z-index: 0;
     }
 
-    .hero::after {
-      content: '';
+    #gradient-canvas {
       position: absolute;
       top: 0;
       left: 0;
-      right: 0;
-      bottom: 0;
-      background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
-      z-index: 0;
-      /* Behind the pattern */
+      width: 100%;
+      height: 100%;
+      z-index: -1;
     }
 
     .hero>* {
@@ -189,6 +187,8 @@
       background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
     }
   </style>
+  <style id="liquid-background">
+  </style>
 </head>
 
 <body>
@@ -231,6 +231,7 @@
 
   <section class="hero bg-primary py-5 text-white text-center position-relative overflow-hidden"
     style="padding-top: 8rem !important; padding-bottom: 6rem !important;">
+    <canvas id="gradient-canvas"></canvas>
     <div class="container">
       <h1 class="display-3 fw-bold mb-3">Create Stunning Landing Pages<br>in Minutes</h1>
       <p class="lead mb-4 mx-auto" style="max-width: 600px; opacity: 0.9;">
@@ -681,7 +682,212 @@
     });
   </script>
 
+  <script id="liquid-script">
+    class LiquidGradient {
+      constructor() {
+        this.canvas = document.getElementById('gradient-canvas');
+        this.gl = this.canvas.getContext('webgl') || this.canvas.getContext('experimental-webgl');
+        
+        if (!this.gl) {
+          alert('WebGL not supported in your browser.');
+          return;
+        }
+        
+        this.speed = 0.5;
+        this.scale = 1.0;
+        this.colorStops = [
+            [59/255, 130/255, 246/255, 1],    // #3b82f6
+            [30/255, 64/255, 175/255, 1],     // #1e40af
+            [30/255, 64/255, 175/255, 1]      // #1e40af
+        ];
 
+        this.vertexShaderSource = `
+          attribute vec2 a_position;
+          
+          void main() {
+            gl_Position = vec4(a_position, 0.0, 1.0);
+          }
+        `;
+        
+        this.fragmentShaderSource = `
+          precision mediump float;
+          
+          uniform float u_time;
+          uniform vec2 u_resolution;
+          uniform float u_scale;
+          uniform vec4 u_colors[3];
+          
+          // Simplex 2D noise function
+          vec3 permute(vec3 x) { return mod(((x*34.0)+1.0)*x, 289.0); }
+          
+          float snoise(vec2 v) {
+            const vec4 C = vec4(0.211324865405187, 0.366025403784439,
+                              -0.577350269189626, 0.024390243902439);
+            vec2 i  = floor(v + dot(v, C.yy));
+            vec2 x0 = v -   i + dot(i, C.xx);
+            vec2 i1;
+            i1 = (x0.x > x0.y) ? vec2(1.0, 0.0) : vec2(0.0, 1.0);
+            vec4 x12 = x0.xyxy + C.xxzz;
+            x12.xy -= i1;
+            i = mod(i, 289.0);
+            vec3 p = permute(permute(i.y + vec3(0.0, i1.y, 1.0))
+                  + i.x + vec3(0.0, i1.x, 1.0));
+            vec3 m = max(0.5 - vec3(dot(x0,x0), dot(x12.xy,x12.xy),
+                                  dot(x12.zw,x12.zw)), 0.0);
+            m = m*m;
+            m = m*m;
+            vec3 x = 2.0 * fract(p * C.www) - 1.0;
+            vec3 h = abs(x) - 0.5;
+            vec3 ox = floor(x + 0.5);
+            vec3 a0 = x - ox;
+            m *= 1.79284291400159 - 0.85373472095314 * (a0*a0 + h*h);
+            vec3 g;
+            g.x  = a0.x  * x0.x  + h.x  * x0.y;
+            g.yz = a0.yz * x12.xz + h.yz * x12.yw;
+            return 130.0 * dot(m, g);
+          }
+          
+          void main() {
+            vec2 st = gl_FragCoord.xy / u_resolution.xy;
+            st.x *= u_resolution.x / u_resolution.y;
+            
+            // Animated noise fields
+            float noise1 = snoise(st * u_scale + vec2(u_time * 0.2, u_time * 0.1)) * 0.5 + 0.5;
+            float noise2 = snoise(st * u_scale * 0.8 + vec2(-u_time * 0.15, u_time * 0.05)) * 0.5 + 0.5;
+            float noise3 = snoise(st * u_scale * 1.5 + vec2(u_time * 0.1, -u_time * 0.2)) * 0.5 + 0.5;
+            
+            // Combine noise fields
+            float combinedNoise = noise1 * 0.5 + noise2 * 0.3 + noise3 * 0.2;
+            
+            // Create a flowing gradient using our noise
+            vec4 color = mix(u_colors[0], u_colors[1], smoothstep(0.2, 0.8, combinedNoise));
+            color = mix(color, u_colors[2], smoothstep(0.4, 0.9, noise2));
+            
+            gl_FragColor = color;
+          }
+        `;
+        
+        this.init();
+        this.resize();
+        window.addEventListener('resize', this.resize.bind(this));
+        this.animate();
+      }
+      
+      init() {
+        // Create shader program
+        const vertexShader = this.createShader(this.gl.VERTEX_SHADER, this.vertexShaderSource);
+        const fragmentShader = this.createShader(this.gl.FRAGMENT_SHADER, this.fragmentShaderSource);
+        this.program = this.createProgram(vertexShader, fragmentShader);
+        
+        // Look up attribute and uniform locations
+        this.positionAttributeLocation = this.gl.getAttribLocation(this.program, 'a_position');
+        this.timeUniformLocation = this.gl.getUniformLocation(this.program, 'u_time');
+        this.resolutionUniformLocation = this.gl.getUniformLocation(this.program, 'u_resolution');
+        this.scaleUniformLocation = this.gl.getUniformLocation(this.program, 'u_scale');
+        this.colorsUniformLocation = this.gl.getUniformLocation(this.program, 'u_colors');
+        
+        // Create position buffer and set attributes
+        const positionBuffer = this.gl.createBuffer();
+        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, positionBuffer);
+        
+        // Two triangles that cover the entire canvas
+        const positions = [
+          -1, -1,
+          1, -1,
+          -1, 1,
+          -1, 1,
+          1, -1,
+          1, 1,
+        ];
+        this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(positions), this.gl.STATIC_DRAW);
+      }
+      
+      createShader(type, source) {
+        const shader = this.gl.createShader(type);
+        this.gl.shaderSource(shader, source);
+        this.gl.compileShader(shader);
+        
+        const success = this.gl.getShaderParameter(shader, this.gl.COMPILE_STATUS);
+        if (success) {
+          return shader;
+        }
+        
+        console.error(this.gl.getShaderInfoLog(shader));
+        this.gl.deleteShader(shader);
+      }
+      
+      createProgram(vertexShader, fragmentShader) {
+        const program = this.gl.createProgram();
+        this.gl.attachShader(program, vertexShader);
+        this.gl.attachShader(program, fragmentShader);
+        this.gl.linkProgram(program);
+        
+        const success = this.gl.getProgramParameter(program, this.gl.LINK_STATUS);
+        if (success) {
+          return program;
+        }
+        
+        console.error(this.gl.getProgramInfoLog(program));
+        this.gl.deleteProgram(program);
+      }
+      
+      resize() {
+        // Set the canvas size to match the display size
+        const displayWidth = this.canvas.clientWidth;
+        const displayHeight = this.canvas.clientHeight;
+        
+        if (this.canvas.width !== displayWidth || this.canvas.height !== displayHeight) {
+          this.canvas.width = displayWidth;
+          this.canvas.height = displayHeight;
+          this.gl.viewport(0, 0, this.gl.canvas.width, this.gl.canvas.height);
+        }
+      }
+      
+      animate() {
+        this.render();
+        requestAnimationFrame(this.animate.bind(this));
+      }
+      
+      render() {
+        // Set the time for animation
+        const currentTime = performance.now() / 1000;
+        
+        // Tell WebGL to use our program
+        this.gl.useProgram(this.program);
+        
+        // Update uniforms
+        this.gl.uniform1f(this.timeUniformLocation, currentTime * this.speed);
+        this.gl.uniform2f(this.resolutionUniformLocation, this.canvas.width, this.canvas.height);
+        this.gl.uniform1f(this.scaleUniformLocation, this.scale);
+        
+        // Set colors
+        const flattenedColors = [];
+        this.colorStops.forEach(color => {
+          flattenedColors.push(...color);
+        });
+        this.gl.uniform4fv(this.colorsUniformLocation, new Float32Array(flattenedColors));
+        
+        // Set up position attribute
+        this.gl.enableVertexAttribArray(this.positionAttributeLocation);
+        this.gl.vertexAttribPointer(
+          this.positionAttributeLocation,
+          2,          // 2 components per iteration
+          this.gl.FLOAT,  // the data is 32bit floats
+          false,      // don't normalize the data
+          0,          // 0 = move forward size * sizeof(type) each iteration to get the next position
+          0,          // start at the beginning of the buffer
+        );
+        
+        // Draw
+        this.gl.drawArrays(this.gl.TRIANGLES, 0, 6);
+      }
+    }
+    
+    // Initialize the gradient when the page loads
+    window.addEventListener('load', () => {
+      new LiquidGradient();
+    });
+  </script>
 
 </body>
 
