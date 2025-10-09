@@ -2929,14 +2929,31 @@
       return chain;
     }
 
+    // Store expanded nodes to preserve state across iframe reloads
+    let expandedNodes = new Set();
+
     function refreshSelector(element) {
+      // Before rebuilding the tree, save the currently expanded nodes
+      const expandedElements = componentSelector.querySelectorAll('.selector-tree-item.expanded');
+      expandedNodes.clear();
+      expandedElements.forEach(expandedElement => {
+        const associatedItem = expandedElement.previousElementSibling;
+        if (associatedItem && associatedItem.el) {
+          expandedNodes.add(associatedItem.el);
+        }
+      });
+
       componentSelector.innerHTML = "";
       const chain = buildHierarchyChain(element);
 
       // Add html element first
       const htmlElement = editorDocument.documentElement;
       const hasHtmlChildren = htmlElement.children.length > 0;
-      const htmlPrefix = hasHtmlChildren ? '▸' : '•'; // Use ▸ for collapsed state, • for no children
+      // Set prefix based on whether the node is expanded or not
+      let htmlPrefix = hasHtmlChildren ? '▸' : '•'; // Default to collapsed for nodes with children
+      if (hasHtmlChildren && expandedNodes.has(htmlElement)) {
+        htmlPrefix = '▾'; // Use expanded symbol if the node is currently expanded
+      }
       const htmlHtml = `<div class="selector-item${htmlElement === element ? ' selected' : ''}" data-element="html" draggable="true" style="position: relative;">
         <span class="selector-item-prefix">${htmlPrefix}</span>html
       </div>`;
@@ -2948,7 +2965,11 @@
       // Add head element under html
       const headElement = editorDocument.head;
       const hasHeadChildren = headElement.children.length > 0;
-      const headPrefix = hasHeadChildren ? '▸' : '•'; // Use ▸ for collapsed state, • for no children
+      // Set prefix based on whether the node is expanded or not
+      let headPrefix = hasHeadChildren ? '▸' : '•'; // Default to collapsed for nodes with children
+      if (hasHeadChildren && expandedNodes.has(headElement)) {
+        headPrefix = '▾'; // Use expanded symbol if the node is currently expanded
+      }
       const headHtml = `<div class="selector-item child${headElement === element ? ' selected-child' : ''}" data-element="head" draggable="true" style="position: relative;">
         <span class="selector-item-prefix">${headPrefix}</span>head
       </div>`;
@@ -2977,7 +2998,11 @@
           else if (isInChain) childClassName += ' selected-path';
 
           const hasChildren = child.children.length > 0;
-          const prefix = hasChildren ? '▸' : '•';
+          // Set prefix based on whether the node is expanded or not
+          let prefix = hasChildren ? '▸' : '•'; // Default to collapsed for nodes with children
+          if (hasChildren && expandedNodes.has(child)) {
+            prefix = '▾'; // Use expanded symbol if the node is currently expanded
+          }
           const childDivHtml = `<div class="${childClassName}" data-element="${childTagName}" style="padding-left: 40px" draggable="true">
             <span class="selector-item-prefix">${prefix}</span>${childTagName}${childId}${childClasses ? ` .${childClasses}` : ''}
           </div>`;
@@ -2991,7 +3016,8 @@
           if (child.children.length > 0) {
             const childTreeContainer = document.createElement('div');
             childTreeContainer.className = 'selector-tree-item';
-            if (chain.includes(child) || chain.some(el => el.parentElement === child)) {
+            // Check if this node should be expanded based on previous state
+            if (expandedNodes.has(child) || chain.includes(child) || chain.some(el => el.parentElement === child)) {
               childTreeContainer.classList.add('expanded');
             }
 
@@ -3010,7 +3036,11 @@
               else if (isGrandchildInChain) grandchildClassName += ' selected-path';
 
               const grandchildHasChildren = grandchild.children.length > 0;
-              const grandchildPrefix = grandchildHasChildren ? '▸' : '•';
+              // Set prefix based on whether the node is expanded or not
+              let grandchildPrefix = grandchildHasChildren ? '▸' : '•'; // Default to collapsed for nodes with children
+              if (grandchildHasChildren && expandedNodes.has(grandchild)) {
+                grandchildPrefix = '▾'; // Use expanded symbol if the node is currently expanded
+              }
               
               const grandchildDivHtml = `<div class="${grandchildClassName}" data-element="${grandchildTagName}" style="padding-left: 60px" draggable="true">
                 <span class="selector-item-prefix">${grandchildPrefix}</span>${grandchildTagName}${grandchildId}${grandchildClasses ? ` .${grandchildClasses}` : ''}
@@ -3032,7 +3062,11 @@
       // Add body element under html
       const bodyElement = editorDocument.body;
       const hasBodyChildren = bodyElement.children.length > 0;
-      const bodyPrefix = hasBodyChildren ? '▸' : '•'; // Use ▸ for collapsed state, • for no children
+      // Set prefix based on whether the node is expanded or not
+      let bodyPrefix = hasBodyChildren ? '▸' : '•'; // Default to collapsed for nodes with children
+      if (hasBodyChildren && expandedNodes.has(bodyElement)) {
+        bodyPrefix = '▾'; // Use expanded symbol if the node is currently expanded
+      }
       const bodyHtml = `<div class="selector-item child${bodyElement === element ? ' selected-child' : ''}" data-element="body" draggable="true" style="position: relative;">
         <span class="selector-item-prefix">${bodyPrefix}</span>body
       </div>`;
@@ -3055,7 +3089,11 @@
         else if (isInChain) className += ' selected-path';
 
         const hasChildren = el.children.length > 0;
-        const prefix = hasChildren ? '▸' : '•';
+        // Set prefix based on whether the node is expanded or not
+        let prefix = hasChildren ? '▸' : '•'; // Default to collapsed for nodes with children
+        if (hasChildren && expandedNodes.has(el)) {
+          prefix = '▾'; // Use expanded symbol if the node is currently expanded
+        }
         const padding = 20 + (level * 20); // Start from 40px to align with body
 
         return `<div class="${className}" data-element="${tagName}" style="padding-left: ${padding}px" draggable="true" style="position: relative;">
@@ -3070,8 +3108,9 @@
 
         const treeContainer = document.createElement('div');
         treeContainer.className = 'selector-tree-item';
-        // Expand if parent is in the chain
-        if (chain.includes(parent) || parent === editorDocument.body) {
+        
+        // Check if this node should be expanded based on previous state or if it's in the selection chain
+        if (expandedNodes.has(parent) || chain.includes(parent) || parent === editorDocument.body) {
           treeContainer.classList.add('expanded');
         }
 
@@ -3478,63 +3517,6 @@
         return false;
       }, true);
 
-      componentSelector.addEventListener('click', (e) => {
-        const selectorItem = e.target.closest('.selector-item');
-        if (!selectorItem || !selectorItem.el) return;
-
-        // Handle expansion if clicking the prefix
-        if (e.target.classList.contains('selector-item-prefix')) {
-          const prefix = e.target;
-          const treeContainer = selectorItem.nextElementSibling;
-          if (treeContainer && treeContainer.classList.contains('selector-tree-item')) {
-            const isExpanded = treeContainer.classList.contains('expanded');
-            treeContainer.classList.toggle('expanded');
-            // Toggle the prefix character - if it's ▾ (expanded), change to ▸ (collapsed), and vice versa
-            prefix.textContent = isExpanded ? '▸' : '▾';
-            e.preventDefault();
-            e.stopPropagation();
-            return;
-          }
-        }
-
-        // Handle selection only if not clicking the prefix (to avoid conflicts)
-        if (!e.target.classList.contains('selector-item-prefix')) {
-          e.preventDefault();
-          e.stopPropagation();
-
-          // Clear previous selection
-          const prevSelected = componentSelector.querySelector('.selected-child');
-          if (prevSelected) {
-            prevSelected.classList.remove('selected-child');
-          }
-          selectorItem.classList.add('selected-child');
-
-          // Hide highlight while scrolling
-          if (highlightOverlay && highlightOverlay.style) {
-            highlightOverlay.style.display = 'none';
-          }
-
-          // First scroll, then highlight
-          if (!isInViewport(selectorItem.el)) {
-            // selectorItem.el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          }
-          
-          activeContainer = selectorItem.el;
-
-          // Update styles dialog to show properties of the selected element
-          const stylesTable = document.querySelector('.styles-dialog table tbody');
-          if (stylesTable) {
-            stylesTable.innerHTML = '';
-            updateStylesDialog(selectorItem.el);
-          }
-          
-          // Wait for scroll to complete before showing highlight (smooth scroll typically takes ~800ms)
-          setTimeout(() => {
-            showHighlight(selectorItem.el);
-          }, 800);
-        }
-      });
-
       editorDocument.addEventListener('mousedown', (e) => {
         if (e.detail === 2) {
           const target = e.target;
@@ -3898,6 +3880,74 @@
       highlightOverlay.element.style.display = 'block';
     }
 
+    // Component selector click handler - add it once after iframe load function
+    componentSelector.addEventListener('click', (e) => {
+      const selectorItem = e.target.closest('.selector-item');
+      if (!selectorItem || !selectorItem.el) return;
+
+      // Handle expansion if clicking the prefix
+      if (e.target.classList.contains('selector-item-prefix')) {
+        const prefix = e.target;
+        const treeContainer = selectorItem.nextElementSibling;
+        if (treeContainer && treeContainer.classList.contains('selector-tree-item')) {
+          const isExpanded = treeContainer.classList.contains('expanded');
+          treeContainer.classList.toggle('expanded');
+          // Toggle the prefix character - if it's ▾ (expanded), change to ▸ (collapsed), and vice versa
+          prefix.textContent = isExpanded ? '▸' : '▾';
+          
+          // Update the expandedNodes set based on the new state
+          if (isExpanded) {
+            // If it was expanded and now it's collapsed, remove from the set
+            expandedNodes.delete(selectorItem.el);
+          } else {
+            // If it was collapsed and now it's expanded, add to the set
+            expandedNodes.add(selectorItem.el);
+          }
+          
+          e.preventDefault();
+          e.stopPropagation();
+          return;
+        }
+      }
+
+      // Handle selection only if not clicking the prefix (to avoid conflicts)
+      if (!e.target.classList.contains('selector-item-prefix')) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        // Clear previous selection
+        const prevSelected = componentSelector.querySelector('.selected-child');
+        if (prevSelected) {
+          prevSelected.classList.remove('selected-child');
+        }
+        selectorItem.classList.add('selected-child');
+
+        // Hide highlight while scrolling
+        if (highlightOverlay && highlightOverlay.style) {
+          highlightOverlay.style.display = 'none';
+        }
+
+        // First scroll, then highlight
+        if (!isInViewport(selectorItem.el)) {
+          // selectorItem.el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+        
+        activeContainer = selectorItem.el;
+
+        // Update styles dialog to show properties of the selected element
+        const stylesTable = document.querySelector('.styles-dialog table tbody');
+        if (stylesTable) {
+          stylesTable.innerHTML = '';
+          updateStylesDialog(selectorItem.el);
+        }
+        
+        // Wait for scroll to complete before showing highlight (smooth scroll typically takes ~800ms)
+        setTimeout(() => {
+          showHighlight(selectorItem.el);
+        }, 800);
+      }
+    });
+
     function getElementDisplayName(element) {
       let name = element.tagName.toLowerCase();
       if (element.id) {
@@ -3916,6 +3966,9 @@
       console.log(url);
       document.cookie = "proxy=" + url + "; path=/;";
       iframe.src = "editor/" + "?url=" + url + "&t=" + new Date().getTime();
+      
+      // Clear expanded nodes when loading a new page
+      expandedNodes.clear();
     });
 
     document.getElementById('save').addEventListener('click', () => {
