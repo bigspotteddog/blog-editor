@@ -1849,20 +1849,8 @@
                     currentHtmlElement.setAttribute(attr.name, attr.value);
                   }
                   
-                  // Update child nodes
-                  const oldHead = currentHtmlElement.querySelector('head');
-                  const oldBody = currentHtmlElement.querySelector('body');
-                  const newHead = newHtmlElement.querySelector('head');
-                  const newBody = newHtmlElement.querySelector('body');
-                  
-                  if (oldHead && newHead) {
-                    oldHead.innerHTML = newHead.innerHTML;
-                  }
-                  
-                  if (oldBody && newBody) {
-                    oldBody.innerHTML = newBody.innerHTML;
-                  }
-                  
+                  currentHtmlElement.innerHTML = newHtmlElement.innerHTML;
+
                   // Refresh the selector to reflect the changes
                   refreshSelector(currentHtmlElement);
                   
