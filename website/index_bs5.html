@@ -1,24 +1,91 @@
-<!doctype html>
-<html lang="en">
-  <head>
+<html lang="en"><head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>PageCraft - Create Stunning Landing Pages in Minutes</title>
     <meta name="description" content="Build beautiful, high-converting landing pages with our intuitive drag-and-drop editor. Mix and match pre-built sections, customize everything, and launch in minutes.">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-        }
-        .navbar-toggler {
-            z-index: 1001; /* Ensure it's above other elements */
-        }
-    </style>
+    <style><style>
+  <style><style><style><style><style>body {
+    font-family: 'Inter', sans-serif;
+  }
+
+  .navbar-toggler {
+    z-index: 1001;
+    /* Ensure it's above other elements */
+  }
+
+  .hero {
+    background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
+    padding: 8rem 0 6rem;
+    text-align: center;
+    color: white;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+    opacity: 0.3;
+  }
+
+  .pricing-card.featured .pricing-features .check {
+    color: #a7f3d0;
+  }
+
+  .pricing-features .check {
+    color: #10b981;
+    font-weight: bold;
+  }
+
+  .pricing-card.featured {
+    border-color: #3b82f6;
+    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+    color: white;
+    transform: scale(1.05);
+  }
+
+  .animate-on-scroll {
+    animation: fadeInUp 0.6s ease-out;
+  }
+
+  .pricing-card {
+    background: white;
+    border: 2px solid #e5e7eb;
+    border-radius: 16px;
+    padding: 2rem;
+    text-align: center;
+    position: relative;
+    transition: all 0.3s ease;
+  }
+
+  .pricing-badge {
+    position: absolute;
+    top: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #10b981;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+</style>
+
+
+
+
   </head>
   <body>
 
-    <nav class="navbar navbar-expand-lg fixed-top bg-white shadow-sm">
+    <nav class="navbar navbar-expand-lg fixed-top bg-white shadow-sm" style="background: rgba(255, 255, 255, 0.98); box-shadow: rgba(0, 0, 0, 0.1) 0px 2px 20px;">
         <div class="container-fluid">
             <a class="navbar-brand fw-bold text-primary" href="#">
                 <i class="fas fa-magic"></i> PageCraft
@@ -90,7 +157,7 @@
     <section id="features" class="py-5 bg-light">
         <div class="container">
             <div class="text-center mb-5">
-                <h2 class="display-4 fw-bold mb-3">Everything You Need to Build Amazing Pages</h2>
+                <h2 class="display-4 fw-bold mb-3" contenteditable="false" style="outline: none;">Everything You Need to Build<br>Amazing Pages</h2>
                 <p class="lead mx-auto" style="max-width: 600px;">
                     Our powerful editor combines simplicity with professional features, 
                     giving you complete control over every aspect of your landing page.
@@ -103,7 +170,7 @@
                         <div class="mb-3">
                             <i class="fas fa-layer-group fs-1 text-primary"></i>
                         </div>
-                        <h3 class="h5 fw-bold mb-2">Mix & Match Sections</h3>
+                        <h3 class="h5 fw-bold mb-2">Mix &amp; Match Sections</h3>
                         <p class="text-muted">
                             Choose from dozens of pre-built sections and arrange them as simple as pages in a flip book. 
                             Headers, features, testimonials, pricing - everything you need.
@@ -221,7 +288,7 @@
                         <div class="mx-auto mb-3 bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 60px; height: 60px; font-size: 1.5rem; font-weight: 700;">
                             3
                         </div>
-                        <h3 class="h5 fw-bold mb-2">Publish & Share</h3>
+                        <h3 class="h5 fw-bold mb-2">Publish &amp; Share</h3>
                         <p class="text-muted">
                             Hit publish and your page goes live instantly. 
                             Share your custom URL or embed it on your existing website.
@@ -245,7 +312,7 @@
             <div class="pricing-grid row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mt-5">
                 <!-- Free Plan -->
                 <div class="col">
-                    <div class="pricing-card card h-100 p-4 border-2 shadow-sm">
+                    <div class="pricing-card card h-100 p-4 border-2 shadow-sm animate-on-scroll">
                         <div class="pricing-plan h5 fw-bold mb-2">DIY Creator</div>
                         <div class="pricing-price display-4 fw-bold">Free</div>
                         <div class="pricing-period text-muted mb-4">Forever</div>
@@ -266,8 +333,8 @@
                 
                 <!-- Hosted Plan -->
                 <div class="col">
-                    <div class="pricing-card featured card h-100 p-4 border-2 shadow-lg position-relative">
-                        <div class="pricing-badge position-absolute top-0 start-50 translate-middle-x bg-success text-white px-3 py-1 rounded-pill">Most Popular</div>
+                    <div class="pricing-card featured card h-100 p-4 border-2 shadow-lg position-relative animate-on-scroll">
+                        <div class="pricing-badge position-absolute translate-middle-x text-white rounded-pill">Most Popular</div>
                         <div class="pricing-plan h5 fw-bold mb-2 mt-3">Hosted Pro</div>
                         <div class="pricing-price display-4 fw-bold">$23</div>
                         <div class="pricing-period text-white-50 mb-4">per month</div>
@@ -289,7 +356,7 @@
                 
                 <!-- Custom Plan -->
                 <div class="col">
-                    <div class="pricing-card card h-100 p-4 border-2 shadow-sm">
+                    <div class="pricing-card card h-100 p-4 border-2 shadow-sm animate-on-scroll">
                         <div class="pricing-plan h5 fw-bold mb-2">Custom Development</div>
                         <div class="pricing-price display-4 fw-bold">Call Us</div>
                         <div class="pricing-period text-muted mb-4">Project-based</div>
@@ -302,7 +369,7 @@
                             <li class="d-flex align-items-center mb-2"><span class="check me-2">✓</span> Database design</li>
                             <li class="d-flex align-items-center mb-2"><span class="check me-2">✓</span> API development</li>
                             <li class="d-flex align-items-center mb-2"><span class="check me-2">✓</span> Cloud architecture</li>
-                            <li class="d-flex align-items-center mb-2"><span class="check me-2">✓</span> DevOps & deployment</li>
+                            <li class="d-flex align-items-center mb-2"><span class="check me-2">✓</span> DevOps &amp; deployment</li>
                             <li class="d-flex align-items-center mb-2"><span class="check me-2">✓</span> Ongoing maintenance</li>
                             <li class="d-flex align-items-center mb-2"><span class="check me-2">✓</span> Dedicated project manager</li>
                         </ul>
@@ -316,13 +383,13 @@
     <section class="py-5 bg-dark text-white text-center">
         <div class="container">
             <h2 class="display-4 fw-bold mb-3">Ready to Build Your First Page?</h2>
-            <p class="lead mb-4 mx-auto" style="max-width: 600px;">
+            <p class="lead mb-4 mx-auto" style="max-width: 800px; outline: none;" contenteditable="false">
                 Join thousands of businesses creating beautiful landing pages with PageCraft.<br>
                 Get started today - no credit card required for the free plan.
             </p>
             
             <form id="signupForm" class="d-flex justify-content-center gap-2 mx-auto" style="max-width: 500px;">
-                <input type="email" class="form-control form-control-lg" placeholder="Enter your email address" required>
+                <input type="email" class="form-control form-control-lg" placeholder="Enter your email address" required="">
                 <button type="submit" class="btn btn-primary btn-lg">Get Started</button>
             </form>
             
@@ -383,7 +450,7 @@
             </div>
             
             <div class="footer-bottom text-center pt-4 border-top border-secondary">
-                <p class="text-white-50">&copy; 2024 PageCraft. All rights reserved. Built with ❤️ for creators everywhere.</p>
+                <p class="text-white-50">© 2024 PageCraft. All rights reserved. Built with ❤️ for creators everywhere.</p>
             </div>
         </div>
     </footer>
@@ -448,5 +515,6 @@
         });
     </script>
 
-  </body>
-</html>
+  
+
+</body></html>
