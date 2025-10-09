@@ -21,6 +21,8 @@ public class DependencyManager {
     private final String urlPrefix;
     private final Set<String> processedModules = new HashSet<>();
     private final Map<String, String> moduleCache = new HashMap<>();
+
+    private final boolean active = false;
     
     /**
      * Creates a new dependency manager.
@@ -44,6 +46,10 @@ public class DependencyManager {
      * @return The processed HTML with the import proxy helper script added
      */
     public String processHtml(String htmlContent) {
+        if (!active) {
+            return htmlContent;
+        }
+
         // First, add our import proxy helper script to the head section
         String proxyHelperScript = generateImportProxyScript();
         String htmlWithHelper = addHelperScript(htmlContent, proxyHelperScript);
@@ -54,7 +60,11 @@ public class DependencyManager {
         return processedHtml;
     }
     
-    public String processCss(String cssContent) {        
+    public String processCss(String cssContent) {     
+        if (!active) {
+            return cssContent;
+        }
+
         String processedCss = UrlReplacer.replaceCssUrls(cssContent, urlPrefix, baseUrl);
         return processedCss;
     }
@@ -63,6 +73,10 @@ public class DependencyManager {
      * Adds the import proxy helper script to the HTML head section.
      */
     private String addHelperScript(String htmlContent, String script) {
+        if (!active) {
+            return htmlContent;
+        }
+
         // Find the end of the head tag
         Pattern headPattern = Pattern.compile("</head>", Pattern.CASE_INSENSITIVE);
         Matcher matcher = headPattern.matcher(htmlContent);
@@ -140,6 +154,10 @@ public class DependencyManager {
      * @return The processed JavaScript content
      */
     public String processJsModule(String jsPath, String content) throws IOException {
+        if (!active) {
+            return content;
+        }
+
         // Check if we've already processed this module
         if (processedModules.contains(jsPath)) {
             return moduleCache.get(jsPath);
