@@ -1588,13 +1588,19 @@
               if (activeContainer && window.editor) {
                 // Format the editor content first
                 await formatEditorContent(window.editor);
-                const editorValue = window.editor.getValue();
+                let editorValue = window.editor.getValue();
                 
                 // Preserve element attributes before updating
                 const preservedAttributes = preserveElementAttributes(activeContainer);
                 
+                // Extract CSS content if the editor value includes style tags
+                const styleTagMatch = editorValue.match(/<style[^>]*>([\s\S]*)<\/style>/i);
+                if (styleTagMatch) {
+                  editorValue = styleTagMatch[1]; // Get content between the style tags
+                }
+                
                 if (inHead) {
-                  // For head style elements, save content as is
+                  // For head style elements, save just the CSS content
                   activeContainer.textContent = editorValue;
                 } else {
                   // For non-head style elements, wrap in :where() with parent selector
@@ -1603,13 +1609,16 @@
                     let wrappedContent = `:where(${parentSelector}) {\n  ${editorValue.replace(/\n/g, '\n  ')}\n}`;
                     activeContainer.textContent = wrappedContent;
                   } else {
-                    // If no parent selector, just save the content as is
+                    // If no parent selector, just save the CSS content as is
                     activeContainer.textContent = editorValue;
                   }
                 }
                 
                 // Restore element attributes after updating
                 restoreElementAttributes(activeContainer, preservedAttributes);
+                
+                // Show success message
+                alert('Style changes saved successfully!');
               }
             });
           } else {
@@ -1684,7 +1693,14 @@
                     // Preserve element attributes before updating
                     const preservedAttributes = preserveElementAttributes(activeContainer);
                     
-                    const value = this.value;
+                    let value = this.value;
+                    
+                    // Extract CSS content if the editor value includes style tags
+                    const styleTagMatch = value.match(/<style[^>]*>([\s\S]*)<\/style>/i);
+                    if (styleTagMatch) {
+                      value = styleTagMatch[1]; // Get content between the style tags
+                    }
+                    
                     if (inHead) {
                       activeContainer.textContent = value;
                     } else {
@@ -2196,7 +2212,17 @@
                       // Preserve element attributes before updating
                       const preservedAttributes = preserveElementAttributes(activeContainer);
                       
-                      activeContainer.textContent = this.value;
+                      let value = this.value;
+                      
+                      // For script elements, extract content if it includes script tags
+                      if (activeContainer.tagName.toLowerCase() === 'script') {
+                        const scriptTagMatch = value.match(/<script[^>]*>([\s\S]*)<\/script>/i);
+                        if (scriptTagMatch) {
+                          value = scriptTagMatch[1]; // Get content between the script tags
+                        }
+                      }
+                      
+                      activeContainer.textContent = value;
                       
                       // Restore element attributes after updating
                       restoreElementAttributes(activeContainer, preservedAttributes);
