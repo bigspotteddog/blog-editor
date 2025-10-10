@@ -22,7 +22,9 @@ public class DependencyManager {
     private final Set<String> processedModules = new HashSet<>();
     private final Map<String, String> moduleCache = new HashMap<>();
 
-    private final boolean active = true;
+    // This should remain off if we are going to save pages because it changes the urls.
+    // Pages to be edited should simply be served from the same domain.
+    private final boolean active = false;
     
     /**
      * Creates a new dependency manager.

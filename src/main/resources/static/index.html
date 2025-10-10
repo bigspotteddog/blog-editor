@@ -3968,8 +3968,14 @@
   </script>
 
   <script>
+    let src = undefined;
+
     // Check for URL query parameter on page load
     window.addEventListener('load', function() {
+      if (src) {
+        return;
+      }
+
       const urlParams = new URLSearchParams(window.location.search);
       const urlParam = urlParams.get('url');
       
@@ -3979,7 +3985,10 @@
         
         // Load the iframe with the URL parameter
         document.cookie = "proxy=" + urlParam + "; path=/;";
-        iframe.src = "editor/" + "?url=" + urlParam + "&t=" + new Date().getTime();
+        src = "editor/" + "?url=" + urlParam + "&t=" + new Date().getTime();
+        setTimeout(() => {
+          iframe.src = src;
+        }, 100);
       }
     });
 
