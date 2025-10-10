@@ -398,6 +398,46 @@
       word-break: break-all;
     }
 
+    .editor-panel {
+      background: white;
+      overflow-y: auto;
+      max-height: calc(100vh - 400px);
+      position: relative;
+      margin-top: 20px;
+      margin-bottom: 20px;
+    }
+
+    .editor-panel.active {
+      display: block;
+    }
+
+    .editor-panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-top: 1px solid #eee;
+      border-bottom: 1px solid #eee;
+    }
+
+    .editor-panel-title {
+      font-weight: 600;
+      color: #1D202B;
+    }
+
+    .editor-panel-close {
+      cursor: pointer;
+      padding: 4px;
+      border-radius: 4px;
+      color: #707684;
+    }
+
+    .editor-panel-close:hover {
+      background: #f8f9fa;
+      color: #1D202B;
+    }
+
 
     .highlight-margin {
       position: absolute;
@@ -577,6 +617,21 @@
             </thead>
             <tbody></tbody>
           </table>
+        </div>
+        <!-- Editor panel element -->
+        <div class="editor-panel" style="display: none;">
+          <div class="styles-dialog-header">
+            <div class="styles-dialog-title">Editor</div>
+            <div class="editor-panel-close">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                <path stroke="currentColor" stroke-width="2" d="M6 6l12 12M6 18L18 6" />
+              </svg>
+            </div>
+          </div>
+          <div id="editor-container" style="width: 100%; height: 300px; border: 1px solid #ddd; border-radius: 4px;"></div>
+          <div style="padding: 8px; text-align: right;">
+            <button id="save-editor-changes" class="btn btn-primary btn-sm">Save Changes</button>
+          </div>
         </div>
       </div>
     </div>
@@ -1472,6 +1527,13 @@
     function updateStylesDialog(element) {
       const stylesDialogElement = document.querySelector(".styles-dialog-element");
       stylesDialogElement.innerHTML = getElementDisplayName(element);
+      
+      // Hide the editor panel by default
+      const editorPanel = document.querySelector('.editor-panel');
+      if (editorPanel) {
+        editorPanel.style.display = 'none';
+      }
+      
       // Add inline styles section
       const inlineHeaderRow = document.createElement('tr');
       inlineHeaderRow.innerHTML = `
@@ -1592,20 +1654,10 @@
         const inHead = element.parentElement && element.parentElement.tagName.toLowerCase() === 'head';
         let parentSelector = getCssSelector(element.parentElement);
 
-        // Add style content editor section
-        const styleHeaderRow = document.createElement('tr');
-        if (inHead) {
-          styleHeaderRow.innerHTML = `
-            <td style="background: #f8f9fa; font-weight: 600; color: #1D202B;" colspan="1">Global Style Editor</td>
-            <td style="background: #f8f9fa; text-align: right;"><button id="save-button" class="btn btn-primary btn-sm">Save Changes</button></td>
-          `;
-        } else {
-          styleHeaderRow.innerHTML = `
-            <td style="background: #f8f9fa; font-weight: 600; color: #1D202B;" colspan="1">Style Editor (context: :where(${parentSelector}))</td>
-            <td style="background: #f8f9fa; text-align: right;"><button id="save-button" class="btn btn-primary btn-sm">Save Changes</button></td>
-          `;
+        // Show the editor panel and hide the properties table editor rows
+        if (editorPanel) {
+          editorPanel.style.display = 'block';
         }
-        stylesTable.appendChild(styleHeaderRow);
         
         // Prepare CSS content including the full style tag with attributes
         let originalContent = element.outerHTML || '';
@@ -1655,15 +1707,6 @@
           }
         }
         
-        // Create a container for the Monaco editor
-        const styleRow = document.createElement('tr');
-        styleRow.innerHTML = `
-          <td colspan="2" class="p-0">
-            <div id="editor-container" style="width: 100%; height: 300px; border: 1px solid #ddd; border-radius: 4px;"></div>
-          </td>
-        `;
-        stylesTable.appendChild(styleRow);
-        
         // Initialize Monaco editor after a brief delay to ensure DOM is ready
         // Clear any existing editor if present to avoid duplication
         if (window.editor) {
@@ -1681,7 +1724,7 @@
             // Create the editor instance
             if (!window.styleEditor) {
               window.editor = monaco.editor.create(document.getElementById('editor-container'), {
-                language: 'html',
+                language: 'css',
                 theme: 'vs-light',
                 automaticLayout: true,
                 minimap: { enabled: false },
@@ -1702,7 +1745,8 @@
             }, 100);
             
             // Attach click event listener to the save button
-            document.getElementById('save-button').addEventListener('click', async () => {
+            document.getElementById('save-editor-changes').addEventListener('click', async (e) => {
+              e.preventDefault();
               if (activeContainer && window.editor) {
                 // Format the editor content first
                 await formatEditorContent(window.editor);
@@ -1746,7 +1790,7 @@
                 if (!window.editor) {
                   window.editor = monaco.editor.create(document.getElementById('editor-container'), {
                     value: displayContent,
-                    language: 'html',
+                    language: 'css',
                     theme: 'vs-light',
                     automaticLayout: true,
                     minimap: { enabled: false },
@@ -1767,7 +1811,8 @@
                 }, 100);
 
                 // Attach click event listener to the save button
-                document.getElementById('save-button').addEventListener('click', async () => {
+                document.getElementById('save-editor-changes').addEventListener('click', async (e) => {
+                  e.preventDefault();
                   if (activeContainer && window.editor) {
                     // Format the editor content first
                     await formatEditorContent(window.editor);
@@ -1838,13 +1883,212 @@
               }
             }, 500);
           }
-        }, 100);
+        }, 100);        
+      } else if (element.tagName && element.tagName.toLowerCase() === 'script') {
+        // Check if the selected element is a script element
+        // Add attributes section for script elements
+        const attributesHeaderRow = document.createElement('tr');
+        attributesHeaderRow.innerHTML = `
+          <td style="background: #f8f9fa; font-weight: 600; color: #1D202B;">Attributes</td>
+          <td style="background: #f8f9fa;"><button class="btn btn-sm btn-outline-primary" onclick="addAttributeRow()">+</button></td>
+        `;
+        stylesTable.appendChild(attributesHeaderRow);
         
-        return; // Return early for style elements to avoid other editors
-      }
-      
-      // Check if the selected element is the html element
-      if (element.tagName) {
+        // Add existing attributes for the script element
+        const attributes = element.attributes;
+        for (let i = 0; i < attributes.length; i++) {
+          const attr = attributes[i];
+          
+          const attrRow = document.createElement('tr');
+          attrRow.innerHTML = `
+            <td contenteditable="true" class="attr-name">${attr.name}</td>
+            <td contenteditable="true" class="attr-value">${attr.value}</td>
+          `;
+          stylesTable.appendChild(attrRow);
+          
+          // Add event listeners to update attributes when changed
+          const nameCell = attrRow.querySelector('.attr-name');
+          const valueCell = attrRow.querySelector('.attr-value');
+          
+          nameCell.addEventListener('blur', updateAttribute);
+          valueCell.addEventListener('blur', updateAttribute);
+          
+          nameCell.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+              e.preventDefault();
+              this.blur();
+            }
+          });
+          
+          valueCell.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+              e.preventDefault();
+              this.blur();
+            } else if (e.key === 'Tab' && !(e.ctrlKey || e.altKey || e.shiftKey || e.metaKey)) {
+              e.preventDefault();
+              this.blur();
+              setTimeout(() => {
+                addAttributeRow();
+              }, 100);
+            }
+          });
+        }
+        
+        // Determine if the script element is in the head
+        const inHead = element.parentElement && element.parentElement.tagName.toLowerCase() === 'head';
+        
+        // Show the editor panel for script elements
+        if (editorPanel) {
+          editorPanel.style.display = 'block';
+        }
+        
+        // Get the script content
+        let scriptContent = element.textContent || '';
+        
+        // Initialize Monaco editor after a brief delay to ensure DOM is ready
+        // Clear any existing editor if present to avoid duplication
+        if (window.editor) {
+          window.editor.dispose();
+          window.editor = null;
+        }
+        // Ensure the container is clean
+        const editorContainer = document.getElementById('editor-container');
+        if (editorContainer) {
+          editorContainer.innerHTML = '';
+        }
+        
+        setTimeout(() => {
+          if (typeof monaco !== 'undefined' && monaco.editor) {
+            // Create the editor instance
+            if (!window.editor) {
+              window.editor = monaco.editor.create(document.getElementById('editor-container'), {
+                language: 'javascript',
+                theme: 'vs-light',
+                automaticLayout: true,
+                minimap: { enabled: false },
+                fontSize: 12,
+                tabSize: 2,
+                insertSpaces: true,
+                scrollBeyondLastLine: false,
+                roundedSelection: false,
+                padding: { top: 10, bottom: 10 },
+                fontFamily: 'monospace'
+              });
+            }
+
+            // Format content on initialization
+            setTimeout(() => {
+              window.editor.setValue(scriptContent);
+              formatEditorContent(window.editor);
+            }, 100);
+
+            
+            // Attach click event listener to the save button
+            document.getElementById('save-editor-changes').addEventListener('click', async (e) => {
+              e.preventDefault();
+              if (activeContainer && window.editor) {
+                // Format the editor content first
+                await formatEditorContent(window.editor);
+                // Save the content as is to the script element
+                
+                // Preserve element attributes before updating
+                const preservedAttributes = preserveElementAttributes(activeContainer);
+                
+                activeContainer.textContent = window.editor.getValue();
+                
+                // Restore element attributes after updating
+                restoreElementAttributes(activeContainer, preservedAttributes);
+                
+                // Show success message
+                alert('Script changes saved successfully!');
+              }
+            });
+          } else {
+            // If Monaco is not yet available, try again after a longer delay
+            setTimeout(() => {
+              if (typeof monaco !== 'undefined' && monaco.editor) {
+                if (!window.editor) {                
+                  window.editor = monaco.editor.create(document.getElementById('editor-container'), {
+                    value: scriptContent,
+                    language: 'javascript',
+                    theme: 'vs-light',
+                    automaticLayout: true,
+                    minimap: { enabled: false },
+                    fontSize: 12,
+                    tabSize: 2,
+                    insertSpaces: true,
+                    scrollBeyondLastLine: false,
+                    roundedSelection: false,
+                    padding: { top: 10, bottom: 10 },
+                    fontFamily: 'monospace'
+                  });                  
+                }
+
+                // Format content on initialization
+                setTimeout(() => {
+                window.editor.setValue(scriptContent);
+                formatEditorContent(window.editor);
+                }, 100);
+
+                // Attach click event listener to the save button
+                document.getElementById('save-editor-changes').addEventListener('click', async (e) => {
+                  e.preventDefault();
+                  if (activeContainer && window.editor) {
+                    // Format the editor content first
+                    await formatEditorContent(window.editor);
+                    // Save the content as is to the script element
+                    
+                    // Preserve element attributes before updating
+                    const preservedAttributes = preserveElementAttributes(activeContainer);
+                    
+                    activeContainer.textContent = window.editor.getValue();
+                    
+                    // Restore element attributes after updating
+                    restoreElementAttributes(activeContainer, preservedAttributes);
+                    
+                    // Show success message
+                    alert('Script changes saved successfully!');
+                  }
+                });
+              } else {
+                console.error('Monaco editor is not available for script element');
+                // Fallback: display content in a regular textarea
+                const container = document.getElementById('editor-container');
+                if (container) {
+                  container.innerHTML = `
+                    <textarea style="width: 100%; height: 300px; font-family: monospace; padding: 10px;">${scriptContent}</textarea>
+                  `;
+                  const textarea = container.querySelector('textarea');
+                  textarea.addEventListener('blur', function() {
+                    if (activeContainer) {
+                      // This would be a simplified update for the fallback
+                      
+                      // Preserve element attributes before updating
+                      const preservedAttributes = preserveElementAttributes(activeContainer);
+                      
+                      let value = this.value;
+                      
+                      // For script elements, extract content if it includes script tags
+                      if (activeContainer.tagName.toLowerCase() === 'script') {
+                        const scriptTagMatch = value.match(/<script[^>]*>([\s\S]*)<\/script>/i);
+                        if (scriptTagMatch) {
+                          value = scriptTagMatch[1]; // Get content between the script tags
+                        }
+                      }
+                      
+                      activeContainer.textContent = value;
+                      
+                      // Restore element attributes after updating
+                      restoreElementAttributes(activeContainer, preservedAttributes);
+                    }
+                  });
+                }
+              }
+            }, 500);
+          }
+        }, 100);
+      } else if (element.tagName) {
+        // Check if the selected element is the html element specifically
         // Add attributes section for html element
         const attributesHeaderRow = document.createElement('tr');
         attributesHeaderRow.innerHTML = `
@@ -1893,25 +2137,13 @@
           });
         }
         
-        // Add HTML content editor section
-        const htmlHeaderRow = document.createElement('tr');
-        htmlHeaderRow.innerHTML = `
-          <td style="background: #f8f9fa; font-weight: 600; color: #1D202B;" colspan="1">HTML Editor</td>
-          <td style="background: #f8f9fa; text-align: right;"><button id="save-button" class="btn btn-primary btn-sm">Save Changes</button></td>
-        `;
-        stylesTable.appendChild(htmlHeaderRow);
+        // Show the editor panel for HTML elements
+        if (editorPanel) {
+          editorPanel.style.display = 'block';
+        }
         
         // Get the HTML content with proper formatting
         let htmlContent = element.outerHTML || '';
-        
-        // Create a container for the Monaco editor
-        const htmlRow = document.createElement('tr');
-        htmlRow.innerHTML = `
-          <td colspan="2" class="p-0">
-            <div id="editor-container" style="width: 100%; height: 300px; border: 1px solid #ddd; border-radius: 4px;"></div>
-          </td>
-        `;
-        stylesTable.appendChild(htmlRow);
         
         // Initialize Monaco editor after a brief delay to ensure DOM is ready
         // Clear any existing editor if present to avoid duplication
@@ -1953,7 +2185,8 @@
             }, 100);
 
             // Attach click event listener to the save button
-            document.getElementById('save-button').addEventListener('click', async () => {
+            document.getElementById('save-editor-changes').addEventListener('click', async (e) => {
+              e.preventDefault();
               if (activeContainer && window.editor) {
                 // Format the editor content first
                 await formatEditorContent(window.editor);
@@ -2020,7 +2253,8 @@
           }, 100);
 
                 // Attach click event listener to the save button
-                document.getElementById('save-html-button').addEventListener('click', async () => {
+                document.getElementById('save-editor-changes').addEventListener('click', async (e) => {
+                  e.preventDefault();
                   if (activeContainer && window.htmlEditor) {
                     // Format the editor content first
                     await formatEditorContent(window.htmlEditor);
@@ -2071,7 +2305,7 @@
               } else {
                 console.error('Monaco editor is not available for HTML element');
                 // Fallback: display content in a regular textarea
-                const container = document.getElementById('html-editor-container');
+                const container = document.getElementById('editor-container');
                 if (container) {
                   container.innerHTML = `
                     <textarea style="width: 100%; height: 300px; font-family: monospace; padding: 10px;">${htmlContent}</textarea>
@@ -2127,232 +2361,6 @@
             }, 500);
           }
         }, 100);
-        
-        return; // Return early for html element to avoid other editors
-      }
-      
-      // Check if the selected element is a script element
-      if (element.tagName && element.tagName.toLowerCase() === 'script') {
-        // Add attributes section for script elements
-        const attributesHeaderRow = document.createElement('tr');
-        attributesHeaderRow.innerHTML = `
-          <td style="background: #f8f9fa; font-weight: 600; color: #1D202B;">Attributes</td>
-          <td style="background: #f8f9fa;"><button class="btn btn-sm btn-outline-primary" onclick="addAttributeRow()">+</button></td>
-        `;
-        stylesTable.appendChild(attributesHeaderRow);
-        
-        // Add existing attributes for the script element
-        const attributes = element.attributes;
-        for (let i = 0; i < attributes.length; i++) {
-          const attr = attributes[i];
-          
-          const attrRow = document.createElement('tr');
-          attrRow.innerHTML = `
-            <td contenteditable="true" class="attr-name">${attr.name}</td>
-            <td contenteditable="true" class="attr-value">${attr.value}</td>
-          `;
-          stylesTable.appendChild(attrRow);
-          
-          // Add event listeners to update attributes when changed
-          const nameCell = attrRow.querySelector('.attr-name');
-          const valueCell = attrRow.querySelector('.attr-value');
-          
-          nameCell.addEventListener('blur', updateAttribute);
-          valueCell.addEventListener('blur', updateAttribute);
-          
-          nameCell.addEventListener('keydown', function(e) {
-            if (e.key === 'Enter') {
-              e.preventDefault();
-              this.blur();
-            }
-          });
-          
-          valueCell.addEventListener('keydown', function(e) {
-            if (e.key === 'Enter') {
-              e.preventDefault();
-              this.blur();
-            } else if (e.key === 'Tab' && !(e.ctrlKey || e.altKey || e.shiftKey || e.metaKey)) {
-              e.preventDefault();
-              this.blur();
-              setTimeout(() => {
-                addAttributeRow();
-              }, 100);
-            }
-          });
-        }
-        
-        // Determine if the script element is in the head
-        const inHead = element.parentElement && element.parentElement.tagName.toLowerCase() === 'head';
-        
-        // Add script content editor section
-        const scriptHeaderRow = document.createElement('tr');
-        if (inHead) {
-          scriptHeaderRow.innerHTML = `
-            <td style="background: #f8f9fa; font-weight: 600; color: #1D202B;" colspan="1">Global Script Editor</td>
-            <td style="background: #f8f9fa; text-align: right;"><button id="save-button" class="btn btn-primary btn-sm">Save Changes</button></td>
-          `;
-        } else {
-          scriptHeaderRow.innerHTML = `
-            <td style="background: #f8f9fa; font-weight: 600; color: #1D202B;" colspan="1">Script Editor</td>
-            <td style="background: #f8f9fa; text-align: right;"><button id="save-button" class="btn btn-primary btn-sm">Save Changes</button></td>
-          `;
-        }
-        stylesTable.appendChild(scriptHeaderRow);
-        
-        // Get the script content
-        let scriptContent = element.textContent || '';
-        
-        // Create a container for the Monaco editor
-        const scriptRow = document.createElement('tr');
-        scriptRow.innerHTML = `
-          <td colspan="2" class="p-0">
-            <div id="editor-container" style="width: 100%; height: 300px; border: 1px solid #ddd; border-radius: 4px;"></div>
-          </td>
-        `;
-        stylesTable.appendChild(scriptRow);
-        
-        // Initialize Monaco editor after a brief delay to ensure DOM is ready
-        // Clear any existing editor if present to avoid duplication
-        if (window.editor) {
-          window.editor.dispose();
-          window.editor = null;
-        }
-        // Ensure the container is clean
-        const editorContainer = document.getElementById('editor-container');
-        if (editorContainer) {
-          editorContainer.innerHTML = '';
-        }
-        
-        setTimeout(() => {
-          if (typeof monaco !== 'undefined' && monaco.editor) {
-            // Create the editor instance
-            if (!window.editor) {
-              window.editor = monaco.editor.create(document.getElementById('editor-container'), {
-                language: 'html',
-                theme: 'vs-light',
-                automaticLayout: true,
-                minimap: { enabled: false },
-                fontSize: 12,
-                tabSize: 2,
-                insertSpaces: true,
-                scrollBeyondLastLine: false,
-                roundedSelection: false,
-                padding: { top: 10, bottom: 10 },
-                fontFamily: 'monospace'
-              });
-            }
-
-            // Format content on initialization
-            setTimeout(() => {
-              window.editor.setValue(scriptContent);
-              formatEditorContent(window.editor);
-            }, 100);
-
-            
-            // Attach click event listener to the save button
-            document.getElementById('save-button').addEventListener('click', async () => {
-              if (activeContainer && window.editor) {
-                // Format the editor content first
-                await formatEditorContent(window.editor);
-                // Save the content as is to the script element
-                
-                // Preserve element attributes before updating
-                const preservedAttributes = preserveElementAttributes(activeContainer);
-                
-                activeContainer.textContent = window.editor.getValue();
-                
-                // Restore element attributes after updating
-                restoreElementAttributes(activeContainer, preservedAttributes);
-                
-                // Show success message
-                alert('Script changes saved successfully!');
-              }
-            });
-          } else {
-            // If Monaco is not yet available, try again after a longer delay
-            setTimeout(() => {
-              if (typeof monaco !== 'undefined' && monaco.editor) {
-                if (!window.editor) {                
-                  window.editor = monaco.editor.create(document.getElementById('editor-container'), {
-                    value: scriptContent,
-                    language: 'html',
-                    theme: 'vs-light',
-                    automaticLayout: true,
-                    minimap: { enabled: false },
-                    fontSize: 12,
-                    tabSize: 2,
-                    insertSpaces: true,
-                    scrollBeyondLastLine: false,
-                    roundedSelection: false,
-                    padding: { top: 10, bottom: 10 },
-                    fontFamily: 'monospace'
-                  });                  
-                }
-
-                // Format content on initialization
-                setTimeout(() => {
-                window.editor.setValue(scriptContent);
-                formatEditorContent(window.editor);
-                }, 100);
-
-                // Attach click event listener to the save button
-                document.getElementById('save-button').addEventListener('click', async () => {
-                  if (activeContainer && window.editor) {
-                    // Format the editor content first
-                    await formatEditorContent(window.editor);
-                    // Save the content as is to the script element
-                    
-                    // Preserve element attributes before updating
-                    const preservedAttributes = preserveElementAttributes(activeContainer);
-                    
-                    activeContainer.textContent = window.editor.getValue();
-                    
-                    // Restore element attributes after updating
-                    restoreElementAttributes(activeContainer, preservedAttributes);
-                    
-                    // Show success message
-                    alert('Script changes saved successfully!');
-                  }
-                });
-              } else {
-                console.error('Monaco editor is not available for script element');
-                // Fallback: display content in a regular textarea
-                const container = document.getElementById('editor-container');
-                if (container) {
-                  container.innerHTML = `
-                    <textarea style="width: 100%; height: 300px; font-family: monospace; padding: 10px;">${scriptContent}</textarea>
-                  `;
-                  const textarea = container.querySelector('textarea');
-                  textarea.addEventListener('blur', function() {
-                    if (activeContainer) {
-                      // This would be a simplified update for the fallback
-                      
-                      // Preserve element attributes before updating
-                      const preservedAttributes = preserveElementAttributes(activeContainer);
-                      
-                      let value = this.value;
-                      
-                      // For script elements, extract content if it includes script tags
-                      if (activeContainer.tagName.toLowerCase() === 'script') {
-                        const scriptTagMatch = value.match(/<script[^>]*>([\s\S]*)<\/script>/i);
-                        if (scriptTagMatch) {
-                          value = scriptTagMatch[1]; // Get content between the script tags
-                        }
-                      }
-                      
-                      activeContainer.textContent = value;
-                      
-                      // Restore element attributes after updating
-                      restoreElementAttributes(activeContainer, preservedAttributes);
-                    }
-                  });
-                }
-              }
-            }, 500);
-          }
-        }, 100);
-        
-        return; // Return early for script elements to avoid other editors
       }
       
       // Add attributes section
@@ -3421,6 +3429,22 @@
     stylesDialogClose.addEventListener('click', () => {
       stylesDialog.classList.remove('active');
     });
+    
+    // Add editor panel close functionality
+    const editorPanel = document.querySelector('.editor-panel');
+    const editorPanelClose = document.querySelector('.editor-panel-close');
+    if (editorPanelClose) {
+      editorPanelClose.addEventListener('click', () => {
+        if (editorPanel) {
+          editorPanel.style.display = 'none';
+        }
+        // Also dispose of the editor to free resources
+        if (window.editor) {
+          window.editor.dispose();
+          window.editor = null;
+        }
+      });
+    }
 
     document.addEventListener('mouseout', (e) => {
       const relatedTarget = e.relatedTarget;
