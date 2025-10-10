@@ -22,7 +22,7 @@ public class DependencyManager {
     private final Set<String> processedModules = new HashSet<>();
     private final Map<String, String> moduleCache = new HashMap<>();
 
-    private final boolean active = false;
+    private final boolean active = true;
     
     /**
      * Creates a new dependency manager.
