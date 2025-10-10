@@ -1998,7 +1998,7 @@
       parentDiv.addEventListener('click', (e) => {
         e.stopPropagation();
         if (e.detail !== 2) {
-          showMiniSelector(parent, e.clientX, e.clientY, e.detail, true);
+          showMiniSelector(parent, e.clientX + 20, e.clientY, e.detail, true);
         }
         refreshSelector(parent);
         if (!isInViewport(parent)) {
@@ -3578,6 +3578,48 @@
       
       // Clean up
       URL.revokeObjectURL(url);
+    });
+
+    // Resizable panel functionality
+    document.addEventListener('DOMContentLoaded', function() {
+      const resizer = document.getElementById('resizer');
+      const leftPanel = document.querySelector('.panel.left');
+      const rightPanel = document.querySelector('.panel.right');
+      const container = document.querySelector('.resizable-container');
+      
+      if (resizer && leftPanel && rightPanel) {
+        let isResizing = false;
+        let startX = 0;
+        let startWidth = 0;
+        
+        resizer.addEventListener('mousedown', function(e) {
+          isResizing = true;
+          startX = e.clientX;
+          startWidth = leftPanel.offsetWidth;
+          document.body.style.cursor = 'col-resize';
+          e.preventDefault();
+        });
+        
+        document.addEventListener('mousemove', function(e) {
+          if (!isResizing) return;
+          
+          const containerWidth = container.offsetWidth;
+          const dx = e.clientX - startX;
+          const newLeftWidth = startWidth + dx;
+          const newRightWidth = containerWidth - newLeftWidth - resizer.offsetWidth;
+          
+          // Apply minimum widths
+          if (newLeftWidth >= 300 && newRightWidth >= 300) {
+            leftPanel.style.flex = `0 0 ${newLeftWidth}px`;
+            rightPanel.style.width = `${newRightWidth}px`;
+          }
+        });
+        
+        document.addEventListener('mouseup', function() {
+          isResizing = false;
+          document.body.style.cursor = '';
+        });
+      }
     });
   </script>
 </body>
