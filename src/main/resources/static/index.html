@@ -326,8 +326,6 @@
       overflow-y: auto;
       max-height: calc(100vh - 400px); /* Use max-height instead of height */
       position: relative;
-      margin-top: 20px;
-      margin-bottom: 20px; /* Add margin at bottom */
     }
 
     .styles-dialog.active {
@@ -542,6 +540,10 @@
     nav form {
       width: 70%;
     }
+
+    .accordion-body {
+      padding: 0px;
+    }
   </style>
 </head>
 
@@ -583,53 +585,59 @@
       <div class="col-sm p-0">
         <iframe id="editor-frame" allow="fullscreen *; keyboard-map *"></iframe>
       </div>
-      <div class="col-sm-3 p-1 pt-0" style="height: 100vh; overflow: scroll;">
-        <!-- Component selector element -->
-        <div class="styles-dialog-header">
-          <div class="styles-dialog-title">Elements</div>
-          <div class="styles-dialog-close">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none">
-              <path stroke="currentColor" stroke-width="2" d="M6 6l12 12M6 18L18 6" />
-            </svg>
-          </div>
-        </div>
-        <div id="component-selector" class="component-selector">
-          <div class="hierarchy-menu"></div>
-        </div>
-        <!-- Styles dialog element -->
-        <div class="styles-dialog">
-          <div class="styles-dialog-header">
-            <div class="styles-dialog-title">Computed Styles</div>
-            <div class="styles-dialog-close">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none">
-                <path stroke="currentColor" stroke-width="2" d="M6 6l12 12M6 18L18 6" />
-              </svg>
+      <div class="col-sm-3 p-1 pt-0" style="height: calc(100vh - 80px); overflow: scroll;">
+        <div class="accordion" id="accordionPanelsStayOpenExample">
+          <div class="accordion-item">
+            <h2 class="accordion-header">
+              <button class="accordion-button bg-white fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseOne" aria-expanded="true" aria-controls="panelsStayOpen-collapseOne">
+                Elements
+              </button>
+            </h2>
+            <div id="panelsStayOpen-collapseOne" class="accordion-collapse collapse show" style="">
+              <div class="accordion-body">
+                <div id="component-selector" class="component-selector">
+                  <div class="hierarchy-menu"></div>
+                </div>
+              </div>
             </div>
           </div>
-          <div class="styles-dialog-element"></div>
-          <table>
-            <thead>
-              <tr>
-                <th>Property</th>
-                <th>Value</th>
-              </tr>
-            </thead>
-            <tbody></tbody>
-          </table>
-        </div>
-        <!-- Editor panel element -->
-        <div class="editor-panel" style="display: none;">
-          <div class="styles-dialog-header">
-            <div class="styles-dialog-title">Editor</div>
-            <div class="editor-panel-close">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none">
-                <path stroke="currentColor" stroke-width="2" d="M6 6l12 12M6 18L18 6" />
-              </svg>
+          <div class="accordion-item">
+            <h2 class="accordion-header">
+              <button class="accordion-button bg-white fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseTwo" aria-expanded="true" aria-controls="panelsStayOpen-collapseTwo">
+                Properties
+              </button>
+            </h2>
+            <div id="panelsStayOpen-collapseTwo" class="accordion-collapse collapse show" style="">
+              <div class="accordion-body">
+                <div class="styles-dialog">
+                  <div class="styles-dialog-element"></div>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Property</th>
+                        <th>Value</th>
+                      </tr>
+                    </thead>
+                    <tbody></tbody>
+                  </table>
+                </div>
+              </div>
             </div>
           </div>
-          <div id="editor-container" style="width: 100%; height: 300px; border: 1px solid #ddd; border-radius: 4px;"></div>
-          <div style="padding: 8px; text-align: right;">
-            <button id="save-editor-changes" class="btn btn-primary btn-sm">Save Changes</button>
+          <div class="accordion-item">
+            <h2 class="accordion-header">
+              <button class="accordion-button bg-white fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseThree" aria-expanded="true" aria-controls="panelsStayOpen-collapseThree">
+                Editor
+              </button>
+            </h2>
+            <div id="panelsStayOpen-collapseThree" class="accordion-collapse collapse show" style="">
+              <div class="accordion-body">
+                <div id="editor-container" style="width: 100%; height: 300px; border: 1px solid #ddd; border-radius: 4px;"></div>
+                <div style="padding: 8px; text-align: right;">
+                  <button id="save-editor-changes" class="btn btn-primary btn-sm">Save Changes</button>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
         <div class="mini-selector"></div>
@@ -2952,10 +2960,6 @@
       });
     }
 
-    stylesDialogClose.addEventListener('click', () => {
-      stylesDialog.classList.remove('active');
-    });
-    
     // Add editor panel close functionality
     const editorPanel = document.querySelector('.editor-panel');
     const editorPanelClose = document.querySelector('.editor-panel-close');
