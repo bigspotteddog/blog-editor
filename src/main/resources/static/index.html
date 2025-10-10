@@ -1107,6 +1107,7 @@
     let activeContainer = null;
     let mouseX = 0;
     let mouseY = 0;
+    let clipboardBuffer = null; // In-page memory buffer for cut/paste operations
 
     function isInViewport(element) {
       const rect = element.getBoundingClientRect();
@@ -3227,10 +3228,11 @@
 
     // Add cut functionality
     const cutOptionSettings = document.querySelector('[data-action="cut"]');
-    cutOptionSettings.addEventListener('click', async () => {
+    cutOptionSettings.addEventListener('click', () => {
       if (activeContainer) {
         try {
-          await navigator.clipboard.writeText(activeContainer.outerHTML);
+          // Store element HTML in in-page memory buffer
+          clipboardBuffer = activeContainer.outerHTML;
           const parentElement = activeContainer.parentElement;
           activeContainer.remove();
           miniSelector.style.display = 'none';
@@ -3249,10 +3251,11 @@
 
     // Add copy functionality 
     const copyOptionSettings = document.querySelector('[data-action="copy"]');
-    copyOptionSettings.addEventListener('click', async () => {
+    copyOptionSettings.addEventListener('click', () => {
       if (activeContainer) {
         try {
-          await navigator.clipboard.writeText(activeContainer.outerHTML);
+          // Store element HTML in in-page memory buffer
+          clipboardBuffer = activeContainer.outerHTML;
           settingsMenu.classList.remove('active');
           toolbarElement.style.display = 'none';
         } catch (err) {
@@ -3263,12 +3266,11 @@
 
     // Add paste before functionality
     const pasteBeforeOption = document.querySelector('[data-action="paste-before"]');
-    pasteBeforeOption.addEventListener('click', async () => {
-      if (activeContainer) {
+    pasteBeforeOption.addEventListener('click', () => {
+      if (activeContainer && clipboardBuffer) {
         try {
-          const clipboardData = await navigator.clipboard.readText();
           const tempDiv = document.createElement('div');
-          tempDiv.innerHTML = clipboardData;
+          tempDiv.innerHTML = clipboardBuffer;
           const newElement = tempDiv.firstChild;
           
           // Insert before the active container
@@ -3287,19 +3289,18 @@
             activeContainer = newElement;
           }, 100);
         } catch (err) {
-          console.error('Failed to read clipboard contents:', err);
+          console.error('Failed to paste element from buffer:', err);
         }
       }
     });
 
     // Add paste inside (original paste) functionality
     const pasteInsideOption = document.querySelector('[data-action="paste"]');
-    pasteInsideOption.addEventListener('click', async () => {
-      if (activeContainer) {
+    pasteInsideOption.addEventListener('click', () => {
+      if (activeContainer && clipboardBuffer) {
         try {
-          const clipboardData = await navigator.clipboard.readText();
           const tempDiv = document.createElement('div');
-          tempDiv.innerHTML = clipboardData;
+          tempDiv.innerHTML = clipboardBuffer;
           const newElement = tempDiv.firstChild;
           
           // Insert inside the active container
@@ -3318,19 +3319,18 @@
             activeContainer = newElement;
           }, 100);
         } catch (err) {
-          console.error('Failed to read clipboard contents:', err);
+          console.error('Failed to paste element from buffer:', err);
         }
       }
     });
 
     // Add paste after functionality
     const pasteAfterOption = document.querySelector('[data-action="paste-after"]');
-    pasteAfterOption.addEventListener('click', async () => {
-      if (activeContainer) {
+    pasteAfterOption.addEventListener('click', () => {
+      if (activeContainer && clipboardBuffer) {
         try {
-          const clipboardData = await navigator.clipboard.readText();
           const tempDiv = document.createElement('div');
-          tempDiv.innerHTML = clipboardData;
+          tempDiv.innerHTML = clipboardBuffer;
           const newElement = tempDiv.firstChild;
           
           // Insert after the active container
@@ -3349,7 +3349,7 @@
             activeContainer = newElement;
           }, 100);
         } catch (err) {
-          console.error('Failed to read clipboard contents:', err);
+          console.error('Failed to paste element from buffer:', err);
         }
       }
     });
