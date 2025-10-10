@@ -1472,13 +1472,126 @@
     function updateStylesDialog(element) {
       const stylesDialogElement = document.querySelector(".styles-dialog-element");
       stylesDialogElement.innerHTML = getElementDisplayName(element);
+      // Add inline styles section
+      const inlineHeaderRow = document.createElement('tr');
+      inlineHeaderRow.innerHTML = `
+        <td style="background: #f8f9fa; font-weight: 600; color: #1D202B;">Inline Styles</td>
+        <td style="background: #f8f9fa;"><button class="btn btn-sm btn-outline-primary" onclick="addInlineStyle()">+</button></td>
+      `;
+      stylesTable.appendChild(inlineHeaderRow);
+
+      // Add existing inline styles
+      const inlineStyles = [];
+      const computedStyle = window.getComputedStyle(element);
+      const cssRules = element.attributes.style ? ("{" + element.attributes.style.value + "}").split('{')[1].split('}')[0].split(';') : [];
       
+      cssRules.forEach(rule => {
+        const [property, value] = rule.split(':').map(s => s.trim());
+        if (property && value) {
+          inlineStyles.push({
+            property: property,
+            value: value,
+            computedValue: computedStyle.getPropertyValue(property)
+          });
+        }
+      });
+      const declaredStyles = {};
+      
+      // Get all declared styles
+      for (let i = 0; i < inlineStyles.length; i++) {
+        const property = inlineStyles[i];
+        declaredStyles[property.property] = property.value;
+      }
+
+      // Sort properties alphabetically
+      const sortedProperties = Object.keys(declaredStyles).sort();
+
+      // Create rows for each declared style
+      for (const property of sortedProperties) {
+        const value = declaredStyles[property];
+        
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td contenteditable="true">${property}</td>
+          <td contenteditable="true">${value}</td>
+        `;
+        
+        // Add change handlers for both cells
+        const cells = row.querySelectorAll('td[contenteditable="true"]');
+        cells[0].addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            updateInlineStyle(e);
+          }
+        });
+        cells[1].addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            updateInlineStyle(e);
+          } else if (e.key === 'Tab' && !(event.ctrlKey || event.altKey || event.shiftKey || event.metaKey)) {
+            e.preventDefault();
+            updateInlineStyle(e);
+            setTimeout(() => {
+              addInlineStyle();
+            }, 100);
+          }
+        });
+        
+        cells[0].addEventListener('focus', focusSelect);
+        cells[1].addEventListener('focus', focusSelect);
+
+        stylesTable.appendChild(row);
+      }
+
+      // Get and add stylesheet rules
+      const rules = getStylesheetsRules(element);
+      
+      // Add stylesheet rules section if there are any
+      if (rules.length > 0) {
+        const headerRow = document.createElement('tr');
+        headerRow.id = "stylesheet-rules"; 
+        headerRow.innerHTML = `
+          <td colspan="2" style="background: #f8f9fa; font-weight: 600; color: #1D202B;">
+            Stylesheet Rules
+          </td>
+        `;
+        stylesTable.appendChild(headerRow);
+
+        rules.forEach(({selector, styles, source}) => {
+          // Add selector row
+          const selectorRow = document.createElement('tr');
+          selectorRow.innerHTML = `
+            <td colspan="2" style="color: #666;">
+              ${selector} <span style="opacity: 0.5;">(${source.split('/').pop()})</span>
+            </td>
+          `;
+          stylesTable.appendChild(selectorRow);
+
+          // Add each style rule
+          styles.forEach(({property, value, computedValue}) => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+              <td style="padding-left: 20px;">${property}</td>
+              <td contenteditable="true">${value}</td>
+              `;
+              
+            // Add change handler for editable value
+            const valueCell = row.querySelector('td[contenteditable="true"]');
+            addStyleHandlers(valueCell, property);
+            
+            stylesTable.appendChild(row);
+          });
+        });
+      }
+
+      // Monaco editor stuff starts here
+
       // Check if the selected element is a style or script element
       if (element.tagName.toLowerCase() === 'style') {
         // Determine if the style element is in the head
         const inHead = element.parentElement && element.parentElement.tagName.toLowerCase() === 'head';
         let parentSelector = getCssSelector(element.parentElement);
-        
+
         // Add style content editor section
         const styleHeaderRow = document.createElement('tr');
         if (inHead) {
@@ -2324,121 +2437,7 @@
             this.blur();
           }
         });
-      }
-      
-
-      
-      // Add inline styles section
-      const inlineHeaderRow = document.createElement('tr');
-      inlineHeaderRow.innerHTML = `
-        <td style="background: #f8f9fa; font-weight: 600; color: #1D202B;">Inline Styles</td>
-        <td style="background: #f8f9fa;"><button class="btn btn-sm btn-outline-primary" onclick="addInlineStyle()">+</button></td>
-      `;
-      stylesTable.appendChild(inlineHeaderRow);
-
-      // Add existing inline styles
-      const inlineStyles = [];
-      const computedStyle = window.getComputedStyle(element);
-      const cssRules = element.attributes.style ? ("{" + element.attributes.style.value + "}").split('{')[1].split('}')[0].split(';') : [];
-      
-      cssRules.forEach(rule => {
-        const [property, value] = rule.split(':').map(s => s.trim());
-        if (property && value) {
-          inlineStyles.push({
-            property: property,
-            value: value,
-            computedValue: computedStyle.getPropertyValue(property)
-          });
-        }
-      });
-      const declaredStyles = {};
-      
-      // Get all declared styles
-      for (let i = 0; i < inlineStyles.length; i++) {
-        const property = inlineStyles[i];
-        declaredStyles[property.property] = property.value;
-      }
-
-      // Sort properties alphabetically
-      const sortedProperties = Object.keys(declaredStyles).sort();
-
-      // Create rows for each declared style
-      for (const property of sortedProperties) {
-        const value = declaredStyles[property];
-        
-        const row = document.createElement('tr');
-        row.innerHTML = `
-          <td contenteditable="true">${property}</td>
-          <td contenteditable="true">${value}</td>
-        `;
-        
-        // Add change handlers for both cells
-        const cells = row.querySelectorAll('td[contenteditable="true"]');
-        cells[0].addEventListener('keydown', (e) => {
-          if (e.key === 'Enter') {
-            e.preventDefault();
-            updateInlineStyle(e);
-          }
-        });
-        cells[1].addEventListener('keydown', (e) => {
-          if (e.key === 'Enter') {
-            e.preventDefault();
-            updateInlineStyle(e);
-          } else if (e.key === 'Tab' && !(event.ctrlKey || event.altKey || event.shiftKey || event.metaKey)) {
-            e.preventDefault();
-            updateInlineStyle(e);
-            setTimeout(() => {
-              addInlineStyle();
-            }, 100);
-          }
-        });
-        
-        cells[0].addEventListener('focus', focusSelect);
-        cells[1].addEventListener('focus', focusSelect);
-
-        stylesTable.appendChild(row);
-      }
-
-      // Get and add stylesheet rules
-      const rules = getStylesheetsRules(element);
-      
-      // Add stylesheet rules section if there are any
-      if (rules.length > 0) {
-        const headerRow = document.createElement('tr');
-        headerRow.id = "stylesheet-rules"; 
-        headerRow.innerHTML = `
-          <td colspan="2" style="background: #f8f9fa; font-weight: 600; color: #1D202B;">
-            Stylesheet Rules
-          </td>
-        `;
-        stylesTable.appendChild(headerRow);
-
-        rules.forEach(({selector, styles, source}) => {
-          // Add selector row
-          const selectorRow = document.createElement('tr');
-          selectorRow.innerHTML = `
-            <td colspan="2" style="color: #666;">
-              ${selector} <span style="opacity: 0.5;">(${source.split('/').pop()})</span>
-            </td>
-          `;
-          stylesTable.appendChild(selectorRow);
-
-          // Add each style rule
-          styles.forEach(({property, value, computedValue}) => {
-            const row = document.createElement('tr');
-            row.innerHTML = `
-              <td style="padding-left: 20px;">${property}</td>
-              <td contenteditable="true">${value}</td>
-              `;
-              
-            // Add change handler for editable value
-            const valueCell = row.querySelector('td[contenteditable="true"]');
-            addStyleHandlers(valueCell, property);
-            
-            stylesTable.appendChild(row);
-          });
-        });
-      }
+      }      
     }
 
     function showMiniSelector(element, mouseX, mouseY, detail, keepPosition = false) {
