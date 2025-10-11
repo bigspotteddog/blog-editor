@@ -583,6 +583,9 @@
     <div class="row">
       <div class="col-sm p-0">
         <iframe id="editor-frame" allow="fullscreen *; keyboard-map *"></iframe>
+        <button class="btn btn-sm btn-outline-secondary" id="toggle-panel-btn" type="button" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); z-index: 1000; background: white;">
+          <i class="bi bi-chevron-double-right" id="toggle-icon"></i>
+        </button>
       </div>
       <div class="col-sm-3 p-1 pt-0" style="height: calc(100vh - 60px); overflow: scroll;">
         <div class="accordion" id="accordionPanelsStayOpenExample">
@@ -3269,6 +3272,12 @@
 
     // Function to show highlight overlay for an element
     function showHighlight(element) {
+      // Only show highlight if the properties panel is not hidden
+      if (panelHidden) {
+        hideHighlight();
+        return;
+      }
+      
       const rect = element.getBoundingClientRect();
       const frameRect = iframe.getBoundingClientRect();
       const computedStyle = window.getComputedStyle(element);
@@ -3480,6 +3489,28 @@
       // Clear expanded nodes when loading a new page
       expandedNodes.clear();
     });
+
+    // Toggle right-side panel functionality
+    let panelHidden = false;
+    const rightPanel = document.querySelector('.col-sm-3');
+    const togglePanelBtn = document.getElementById('toggle-panel-btn');
+    const toggleIcon = document.getElementById('toggle-icon');
+    
+    if (togglePanelBtn) {
+      togglePanelBtn.addEventListener('click', function() {
+        if (panelHidden) {
+          // Show the panel
+          rightPanel.classList.remove('d-none');
+          toggleIcon.className = 'bi bi-chevron-double-right';
+          panelHidden = false;
+        } else {
+          // Hide the panel
+          rightPanel.classList.add('d-none');
+          toggleIcon.className = 'bi bi-chevron-double-left';
+          panelHidden = true;
+        }
+      });
+    }
 
     document.getElementById('save').addEventListener('click', () => {
       const iframe = document.getElementById('editor-frame');
