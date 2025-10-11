@@ -5,7 +5,7 @@
   <meta name="description" content="Build beautiful, high-converting landing pages with our intuitive drag-and-drop editor. Mix and match pre-built sections, customize everything, and launch in minutes.">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-  <style>
+  <style><style>
   body {
     font-family: 'Inter', sans-serif;
   }
@@ -18,6 +18,18 @@
   .nav-link {
     color: black;
     font-weight: 400;
+  }
+
+  @keyframes up-down {
+
+    0%,
+    100% {
+      transform: translateY(3px);
+    }
+
+    50% {
+      transform: translateY(-3px);
+    }
   }
 
   .lead,
@@ -197,14 +209,14 @@
     width: 133%;
     height: 133%;
   }
-</style>
+</style></style>
 </head>
 
 <body>
 
-  <nav class="navbar navbar-expand-lg fixed-top bg-white shadow-sm" style="background: rgba(255, 255, 255, 0.98); box-shadow: rgba(0, 0, 0, 0.1) 0px 2px 20px; opacity: 0.9; padding: 1rem;">
+  <nav class="navbar navbar-expand-lg fixed-top bg-white shadow-sm" style="background: rgba(255, 255, 255, 0.95); box-shadow: none; opacity: 0.9; padding: 1rem;">
     <div class="container-fluid">
-      <a class="navbar-brand fw-bold text-primary" href="#">
+      <a class="navbar-brand fw-bold text-primary" href="#home">
         <i class="fas fa-magic"></i> PageCraft
       </a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -212,61 +224,62 @@
       </button>
       <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
         <ul class="navbar-nav">
-          <li class="nav-item">
+          <li class="nav-item" style="animation: 2s ease-in-out 0s infinite alternate-reverse both running up-down;">
+            <a class="nav-link" href="#demo-container" contenteditable="false" style="outline: none; color: rgb(30, 64, 175); font-weight: 600;">Try It!</a>
+          </li><li class="nav-item">
             <a class="nav-link" href="#features" style="font-weight: 400;">Features</a>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="#how-it-works">How It Works</a>
           </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#templates">Templates</a>
-          </li>
+          
           <li class="nav-item">
             <a class="nav-link" href="#pricing">Pricing</a>
           </li>
         </ul>
         <div class="ms-lg-3">
           <a href="#" class="btn btn-outline-primary me-2 p-2" style="font-weight: 600; border: 2px solid #3b82f6;&nbsp;color: #3b82f6;">Sign In</a>
-          <a href="#" class="btn btn-primary p-2" style="background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%); font-weight: 600; border-width: 2px;">Get
+          <a href="#pricing" class="btn btn-primary p-2" style="background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%); font-weight: 600; border-width: 2px;">Get
             Started</a>
         </div>
       </div>
     </div>
   </nav>
 
-  <section class="hero bg-primary py-5 text-white text-center position-relative overflow-hidden" style="padding-top: 8rem !important; padding-bottom: 6rem !important;">
-    <canvas id="gradient-canvas" width="1296" height="1229"></canvas>
+  <section class="hero bg-primary py-5 text-white text-center position-relative overflow-hidden" style="padding-top: 8rem !important; padding-bottom: 6rem !important;" id="home">
+    <canvas id="gradient-canvas" width="1296" height="1281"></canvas>
     <div class="container">
       <h1 class="display-3 fw-bold mb-3">Create Stunning Landing Pages<br>in Minutes</h1>
-      <p class="lead mb-4 mx-auto" style="max-width: 600px; opacity: 0.9;">
+      <p class="lead mb-4 mx-auto" style="max-width: 800px; opacity: 0.8;">
         Build beautiful, high-converting landing pages with our intuitive drag-and-drop editor.
         Mix and match pre-built sections, customize everything, and launch in minutes.
       </p>
-      <div class="d-flex justify-content-center gap-3 mb-5">
-        <a href="#" class="btn btn-white btn-lg" style="color: #3b82f6">
+      <div class="d-flex justify-content-center gap-3 mt-3">
+        <a href="#pricing" class="btn btn-white btn-lg" style="color: #3b82f6">
           <i class="fas fa-play me-2"></i> Get Started
         </a>
-        <button class="btn btn-primary btn-lg watch-demo">
-          <i class="fas fa-video me-2"></i> Watch Demo
-        </button>
+        <a class="btn btn-primary btn-lg watch-demo" href="#demo-container" style="width: 180px; outline: none; animation: 2s ease-in-out 0s infinite alternate-reverse both running up-down;" contenteditable="false">
+  <i class="fas fa-magic me-2"></i> Try It!</a>
       </div>
 
-      <div class="p-0 bg-white rounded-4 shadow-lg mx-auto" style="max-width: 1200px;">
-        <div class="bg-light rounded-3 p-2 mb-3">
-          <div class="d-flex align-items-center gap-2 mb-2">
-            <div class="d-flex gap-1" style="position: absolute;">
-              <div class="rounded-circle" style="width: 12px; height: 12px; background-color: #ef4444;"></div>
-              <div class="rounded-circle" style="width: 12px; height: 12px; background-color: #f59e0b;"></div>
-              <div class="rounded-circle" style="width: 12px; height: 12px; background-color: #10b981;"></div>
-            </div>
-            <div class="bg-white rounded-pill px-3 py-1 text-muted text-center mx-auto" style="font-size: 0.8rem;">
-              pagecraft.com/editor</div>
-          </div>
-          <div class="bg-white rounded-3 position-relative" style="height: 540px;">
-            <iframe id="demo" src="http://localhost:8888/?url=http://localhost:5555/index_bs5_copy.html" allow="fullscreen *; keyboard-map *"></iframe>
-          </div>
-        </div>
+      <div style="padding-top: 100px;" id="demo-container">
+  <div class="p-0 bg-white rounded-4 shadow-lg mx-auto" id="demo-panel" style="max-width: 1200px;">
+  <div class="bg-light rounded-3 p-2 mb-3" contenteditable="false" style="outline: none;">
+    <div class="d-flex align-items-center gap-2 mb-2">
+      <div class="d-flex gap-1" style="position: absolute;">
+        <div class="rounded-circle" style="width: 12px; height: 12px; background-color: #ef4444;"></div>
+        <div class="rounded-circle" style="width: 12px; height: 12px; background-color: #f59e0b;"></div>
+        <div class="rounded-circle" style="width: 12px; height: 12px; background-color: #10b981;"></div>
       </div>
+      <div class="bg-white rounded-pill px-3 py-1 text-muted text-center mx-auto" style="font-size: 0.8rem;">
+        pagecraft.com/editor</div>
+    </div>
+    <div class="bg-white rounded-3 position-relative" style="height: 540px;">
+      <iframe id="demo" src="http://localhost:8888/?url=http://localhost:5555/index_bs5_copy.html" allow="fullscreen *; keyboard-map *"></iframe>
+    </div>
+  </div>
+</div>
+</div>
     </div>
   </section>
 
