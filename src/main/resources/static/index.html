@@ -1321,11 +1321,8 @@
         }
       });
 
-      // Insert after the attributes header row
-      const attributesHeaderRow = Array.from(stylesTable.querySelectorAll('tr')).find(row => {
-        const firstCell = row.querySelector('td');
-        return firstCell && firstCell.textContent.includes('Attributes');
-      });
+      // Insert after the attributes header row (using the ID we added)
+      const attributesHeaderRow = stylesTable.querySelector('tr#attributes-header');
       if (attributesHeaderRow) {
         attributesHeaderRow.after(row);
       } else {
@@ -1411,9 +1408,19 @@
       cells[0].addEventListener('focus', focusSelect);
       cells[1].addEventListener('focus', focusSelect);
 
-      // Insert after the header row
-      const headerRow = stylesTable.querySelector('tr#stylesheet-rules');
-      headerRow.before(row);
+      // Insert after the inline styles header row
+      const inlineStylesHeader = stylesTable.querySelector('tr#inline-styles-header');
+      if (inlineStylesHeader) {
+        inlineStylesHeader.after(row);
+      } else {
+        // Fallback - insert at beginning of table body
+        const firstRow = stylesTable.querySelector('tr');
+        if (firstRow) {
+          firstRow.before(row);
+        } else {
+          stylesTable.appendChild(row);
+        }
+      }
       
       // Focus the property cell
       cells[0].focus();
@@ -1695,6 +1702,7 @@
 
       // Add inline styles section
       const inlineHeaderRow = document.createElement('tr');
+      inlineHeaderRow.id = "inline-styles-header";
       inlineHeaderRow.innerHTML = `
         <td style="background: #f8f9fa; font-weight: 600; color: #1D202B;">Inline Styles</td>
         <td style="background: #f8f9fa;"><button class="btn btn-sm btn-outline-primary" onclick="addInlineStyle()">+</button></td>
@@ -1703,6 +1711,7 @@
 
       // Add attributes section
       const attributesHeaderRow = document.createElement('tr');
+      attributesHeaderRow.id = "attributes-header";
       attributesHeaderRow.innerHTML = `
         <td style="background: #f8f9fa; font-weight: 600; color: #1D202B;">Attributes</td>
         <td style="background: #f8f9fa;"><button class="btn btn-sm btn-outline-primary" onclick="addAttributeRow()">+</button></td>
@@ -1721,7 +1730,15 @@
           <td contenteditable="true" class="attr-name">${attr.name}</td>
           <td contenteditable="true" class="attr-value">${attr.value}</td>
         `;
-        stylesTable.appendChild(attrRow);
+        
+        // Insert after the attributes header row (using the ID we added)
+        const attributesHeaderRow = stylesTable.querySelector('tr#attributes-header');
+        if (attributesHeaderRow) {
+          attributesHeaderRow.after(attrRow);
+        } else {
+          // Fallback - append to table
+          stylesTable.appendChild(attrRow);
+        }
         
         // Add event listeners to update attributes when changed
         const nameCell = attrRow.querySelector('.attr-name');
@@ -1811,7 +1828,14 @@
         cells[0].addEventListener('focus', focusSelect);
         cells[1].addEventListener('focus', focusSelect);
 
-        stylesTable.appendChild(row);
+        // Insert after the inline styles header row (using the ID we added)
+        const inlineStylesHeader = stylesTable.querySelector('tr#inline-styles-header');
+        if (inlineStylesHeader) {
+          inlineStylesHeader.after(row);
+        } else {
+          // Fallback - append to table
+          stylesTable.appendChild(row);
+        }
       }
 
       // Get and add stylesheet rules
