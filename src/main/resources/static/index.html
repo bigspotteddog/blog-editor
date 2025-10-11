@@ -2010,7 +2010,7 @@
         // Calculate position ensuring menu stays in viewport
         miniSelector.style.left = Math.min(mouseX, window.innerWidth - miniSelector.offsetWidth) + 20 + 'px';
         const proposedTop = mouseY - miniSelector.offsetHeight - 10;
-        miniSelector.style.top = Math.max(0, proposedTop) + 'px';
+        miniSelector.style.top = Math.max(0, proposedTop) + iframe.offsetTop + 'px';
       }
       if (editorDocument.activeElement === element && element.classList.contains('editable')) {
         miniSelector.style.display = 'none';
