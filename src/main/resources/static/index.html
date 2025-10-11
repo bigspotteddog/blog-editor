@@ -3623,6 +3623,19 @@
         });
       }
     });
+
+    const menuBar = document.querySelector('.navbar');
+
+    setInterval(() => {
+      const rect = menuBar.getBoundingClientRect();
+
+      // Check if menu is above the viewport
+      if (rect.top < 0) {
+        console.log('Menu scrolled out of view!');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        // or menuBar.scrollIntoView({ behavior: 'smooth' });
+      }
+    }, 50); // Check every 100ms
   </script>
 </body>
 
