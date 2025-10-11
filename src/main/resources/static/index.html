@@ -1912,6 +1912,14 @@
     }
     
     function showMiniSelector(element, mouseX, mouseY, detail, keepPosition = false) {
+      // Only show highlight if the properties panel is not hidden
+      if (panelHidden) {
+        miniSelector.style.display = 'none';
+        toolbox.classList.remove('active');
+        toolbarElement.style.display = 'none';
+        return;
+      }
+
       const parent = element.parentElement;
       if (!parent) return;
 
@@ -2651,6 +2659,9 @@
     });
 
     function makeElementEditable(element, clickEvent = null) {
+      if (panelHidden) {
+        return;
+      }      
       if (element) {
         element.contentEditable = true;
         element.classList.add('editable');
@@ -2829,6 +2840,9 @@
     });
 
     document.addEventListener('click', (e) => {
+      if (panelHidden) {
+        return;
+      }
       if (toolbox.contains(e.target) || settingsMenu.contains(e.target)) {
         return;
       }
@@ -2979,6 +2993,9 @@
       
       // Add a click event listener to the iframe document to update the selector when elements are clicked
       iframeDocument.addEventListener('click', (e) => {
+        if (panelHidden) {
+          return;
+        }
         e.preventDefault();
         e.stopPropagation();
         
@@ -3028,6 +3045,10 @@
       });
 
       editorDocument.addEventListener('click', (e) => {
+        if (panelHidden) {
+          return;
+        }
+
         e.preventDefault();
         e.stopPropagation();
 
@@ -3089,6 +3110,10 @@
       });
 
       editorDocument.addEventListener('click', (e) => {
+        if (panelHidden) {
+          return;
+        }
+
         e.preventDefault();
         e.stopPropagation();
 
@@ -3138,6 +3163,10 @@
       });
 
       editorDocument.addEventListener('click', (e) => {
+        if (panelHidden) {
+          return;
+        }
+
         e.preventDefault();
         e.stopPropagation();
 
@@ -3163,6 +3192,10 @@
 
       // Hide mini selector when clicking outside
       document.addEventListener('click', (e) => {
+        if (panelHidden) {
+          return;
+        }
+
         if (!miniSelector.contains(e.target)) {
           miniSelector.style.display = 'none';
         }
@@ -3507,6 +3540,11 @@
           // Hide the panel
           rightPanel.classList.add('d-none');
           toggleIcon.className = 'bi bi-chevron-double-left';
+
+          toolbox.classList.remove('active');
+          toolbarElement.style.display = 'none';
+          miniSelector.style.display = 'none';
+
           panelHidden = true;
         }
       });
