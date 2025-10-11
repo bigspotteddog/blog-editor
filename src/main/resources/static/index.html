@@ -1444,7 +1444,8 @@
     }
 
     function getStylesheetsRules(element) {
-      const matchedRules = [];
+      const inlineRules = [];
+      const externalRules = [];
       const allSheets = editorDocument.styleSheets;
       
       try {
@@ -1458,9 +1459,6 @@
             continue;
           }
 
-          if (allSheets[i].href === 'http://editor.local:8888/website/assets/css/main.css') {
-            console.log('main.css');
-          }
           // Loop through all rules in the stylesheet
           for (let j = 0; j < cssRules.length; j++) {
             const rule = cssRules[j];
@@ -1483,11 +1481,18 @@
                   }
                 });
                 
-                matchedRules.push({
+                const ruleObj = {
                   selector: rule.selectorText,
                   styles: styles,
                   source: allSheets[i].href || 'inline stylesheet'
-                });
+                };
+                
+                // Separate inline and external stylesheets
+                if (allSheets[i].href) {
+                  externalRules.push(ruleObj);
+                } else {
+                  inlineRules.push(ruleObj);
+                }
               }
             } catch (e) {
               // Skip rules that can't be processed
@@ -1499,7 +1504,8 @@
         console.error('Error accessing stylesheets:', e);
       }
       
-      return matchedRules;
+      // Return inline rules first, then external rules
+      return [...inlineRules, ...externalRules];
     }
 
     function getCssSelector(element) {
