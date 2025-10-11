@@ -887,8 +887,30 @@
     window.addEventListener('load', () => {
       new LiquidGradient();
     });
+
+    const iframe = document.querySelector('#demo-container');
+
+    let holdScroll = -1;
+
+    setInterval(() => {
+      if (holdScroll !== -1 && window.pageYOffset !== holdScroll) {
+        window.scrollTo({ top: holdScroll, behavior: "instant" });
+      }
+    }, 10);
+
+    iframe.addEventListener('mouseenter', function(e) {
+      holdScroll = window.pageYOffset;      
+      console.log("iframe mouse enter", holdScroll);
+      // Disable scrolling
+      document.body.style.overflow = 'hidden';
+    });
+
+    iframe.addEventListener('mouseleave', function(e) {
+      console.log("iframe mouse leave")
+      holdScroll = -1;
+      // Re-enable scrolling
+      document.body.style.overflow = '';
+    });    
   </script>
-
-
 
 </body></html>
