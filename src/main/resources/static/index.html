@@ -1828,6 +1828,54 @@
             this.blur();
           }
         });
+
+        // Add content section
+        const contentHeaderRow = document.createElement('tr');
+        contentHeaderRow.innerHTML = `
+          <td style="background: #f8f9fa; font-weight: 600; color: #1D202B;">Content</td>
+          <td style="background: #f8f9fa;"></td>
+          <td style="background: #f8f9fa;"></td>
+        `;
+        stylesTable.appendChild(contentHeaderRow);
+
+        // Add a row for the content editor
+        const contentRow = document.createElement('tr');
+        // Get the text content if the element only has text, otherwise get innerHTML
+        let contentValue = '';
+        if (element.childNodes.length === 1 && element.childNodes[0].nodeType === Node.TEXT_NODE) {
+          contentValue = element.textContent;
+        } else {
+          contentValue = element.innerHTML;
+        }
+        
+        contentRow.innerHTML = `
+          <td contenteditable="false" style="font-weight: 600;">content</td>
+          <td contenteditable="true" id="content-editor">${contentValue}</td>
+          <td></td>
+        `;
+        stylesTable.appendChild(contentRow);
+
+        // Add event listener to update content when changed
+        const contentEditor = contentRow.querySelector('#content-editor');
+        contentEditor.addEventListener('blur', function() {
+          if (activeContainer) {
+            // Check if the element contains only text or other elements
+            if (activeContainer.children.length === 0) {
+              // If it's just text content, update textContent
+              activeContainer.textContent = this.textContent;
+            } else {
+              // If it contains HTML elements, update innerHTML
+              activeContainer.innerHTML = this.innerHTML || this.textContent;
+            }
+          }
+        });
+
+        contentEditor.addEventListener('keydown', function(e) {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            this.blur();
+          }
+        });
       }      
 
       // Add inline styles section
