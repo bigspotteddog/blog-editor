@@ -354,7 +354,17 @@
 
     .styles-dialog th:first-child,
     .styles-dialog td:first-child {
+      width: 40%;
+    }
+
+    .styles-dialog th:nth-child(2),
+    .styles-dialog td:nth-child(2) {
       width: 50%;
+    }
+
+    .styles-dialog th:nth-child(3),
+    .styles-dialog td:nth-child(3) {
+      width: 10%;
     }
 
     .styles-dialog-header {
@@ -542,6 +552,13 @@
     .accordion-body {
       padding: 0px;
     }
+
+    .styles-dialog .remove-inline-style,
+    .styles-dialog .remove-attribute {
+      border: none;
+      padding: 0px;
+      font-size: 18px;
+    }
   </style>
 </head>
 
@@ -618,6 +635,7 @@
                       <tr>
                         <th>Property</th>
                         <th>Value</th>
+                        <th></th>
                       </tr>
                     </thead>
                     <tbody></tbody>
@@ -1283,11 +1301,13 @@
       row.innerHTML = `
         <td contenteditable="true" class="attr-name" placeholder="attribute">attribute</td>
         <td contenteditable="true" class="attr-value" placeholder="value">value</td>
+        <td><button class="btn btn-sm btn-outline-danger remove-attribute" title="Remove attribute"><i class="bi bi-trash3"></i></button></td>
       `;
       
       // Add event listeners to update attributes when changed
       const nameCell = row.querySelector('.attr-name');
       const valueCell = row.querySelector('.attr-value');
+      const removeButton = row.querySelector('.remove-attribute');
       
       nameCell.addEventListener('blur', updateAttribute);
       valueCell.addEventListener('blur', updateAttribute);
@@ -1323,6 +1343,18 @@
           this.textContent = '';
         }
       });
+      
+      // Add click handler for remove button
+      removeButton.addEventListener('click', (e) => {
+        const row = e.target.closest('tr');
+        const nameCell = row.querySelector('.attr-name');
+        const attrName = nameCell.textContent.trim();
+        
+        if (activeContainer && attrName && attrName !== 'attribute') {
+          activeContainer.removeAttribute(attrName);
+          row.remove();
+        }
+      });
 
       // Insert after the attributes header row (using the ID we added)
       const attributesHeaderRow = stylesTable.querySelector('tr#attributes-header');
@@ -1351,14 +1383,18 @@
       const attrValue = valueCell.textContent.trim();
       
       if (activeContainer) {
-        // If the attribute name is empty, remove the attribute and the row
+        // If the attribute name is empty, remove the attribute 
         if (!attrName || attrName === 'attribute') {
           // If both name and value are empty, remove the row
           if ((!attrValue || attrValue === 'value') && (nameCell.textContent.trim() === '' || nameCell.textContent.trim() === 'attribute')) {
             row.remove();
           } else {
-            // If only name is empty but value exists, set the value to an empty string
-            activeContainer.setAttribute(attrName, attrValue);
+            // If only name is empty but value exists, remove the old attribute by name
+            const oldAttrName = nameCell.dataset.oldName;
+            if (oldAttrName) {
+              activeContainer.removeAttribute(oldAttrName);
+              nameCell.dataset.oldName = '';
+            }
           }
           return;
         }
@@ -1385,10 +1421,13 @@
       row.innerHTML = `
         <td contenteditable="true">property</td>
         <td contenteditable="true">value</td>
+        <td><button class="btn btn-sm btn-outline-danger remove-inline-style" title="Remove style"><i class="bi bi-trash3"></i></button></td>
       `;
       
       // Add change handlers for both cells
       const cells = row.querySelectorAll('td[contenteditable="true"]');
+      const removeButton = row.querySelector('.remove-inline-style');
+      
       cells[0].addEventListener('keydown', (e) => {
         if (e.key === 'Enter') {
           e.preventDefault();
@@ -1410,6 +1449,18 @@
       
       cells[0].addEventListener('focus', focusSelect);
       cells[1].addEventListener('focus', focusSelect);
+      
+      // Add click handler for remove button
+      removeButton.addEventListener('click', (e) => {
+        const row = e.target.closest('tr');
+        const propertyCell = row.querySelector('td[contenteditable="true"]');
+        const property = propertyCell.textContent.trim();
+        
+        if (activeContainer && property) {
+          activeContainer.style.removeProperty(property);
+          row.remove();
+        }
+      });
 
       // Insert after the inline styles header row
       const inlineStylesHeader = stylesTable.querySelector('tr#inline-styles-header');
@@ -1441,7 +1492,9 @@
           activeContainer.style[property] = value;
         } else if (property) {
           activeContainer.style.removeProperty(property);
-          row.remove();
+          if (!value) { // If value is also empty, remove the row
+            row.remove();
+          }
         }
       }
     }
@@ -1682,6 +1735,7 @@
         classHeaderRow.innerHTML = `
           <td style="background: #f8f9fa; font-weight: 600; color: #1D202B;">Class List</td>
           <td style="background: #f8f9fa;"></td>
+          <td style="background: #f8f9fa;"></td>
         `;
         stylesTable.appendChild(classHeaderRow);
         
@@ -1690,6 +1744,7 @@
         classRow.innerHTML = `
           <td contenteditable="false" style="font-weight: 600;">class</td>
           <td contenteditable="true" id="class-list-editor">${element.className || ''}</td>
+          <td></td>
         `;
         stylesTable.appendChild(classRow);
         
@@ -1715,6 +1770,7 @@
       inlineHeaderRow.innerHTML = `
         <td style="background: #f8f9fa; font-weight: 600; color: #1D202B;">Inline Styles</td>
         <td style="background: #f8f9fa;"><button class="btn btn-sm btn-outline-primary" onclick="addInlineStyle()">+</button></td>
+        <td style="background: #f8f9fa;""></td>
       `;
       stylesTable.appendChild(inlineHeaderRow);
 
@@ -1724,6 +1780,7 @@
       attributesHeaderRow.innerHTML = `
         <td style="background: #f8f9fa; font-weight: 600; color: #1D202B;">Attributes</td>
         <td style="background: #f8f9fa;"><button class="btn btn-sm btn-outline-primary" onclick="addAttributeRow()">+</button></td>
+        <td style="background: #f8f9fa;""></td>
       `;
       stylesTable.appendChild(attributesHeaderRow);
       
@@ -1738,6 +1795,7 @@
         attrRow.innerHTML = `
           <td contenteditable="true" class="attr-name">${attr.name}</td>
           <td contenteditable="true" class="attr-value">${attr.value}</td>
+          <td><button class="btn btn-sm btn-outline-danger remove-attribute" title="Remove attribute"><i class="bi bi-trash3"></i></button></td>
         `;
         
         // Insert after the attributes header row (using the ID we added)
@@ -1752,6 +1810,7 @@
         // Add event listeners to update attributes when changed
         const nameCell = attrRow.querySelector('.attr-name');
         const valueCell = attrRow.querySelector('.attr-value');
+        const removeButton = attrRow.querySelector('.remove-attribute');
         
         nameCell.addEventListener('blur', updateAttribute);
         valueCell.addEventListener('blur', updateAttribute);
@@ -1773,6 +1832,18 @@
             setTimeout(() => {
               addAttributeRow();
             }, 100);
+          }
+        });
+        
+        // Add click handler for remove button
+        removeButton.addEventListener('click', (e) => {
+          const row = e.target.closest('tr');
+          const nameCell = row.querySelector('.attr-name');
+          const attrName = nameCell.textContent.trim();
+          
+          if (activeContainer && attrName && attrName !== 'attribute') {
+            activeContainer.removeAttribute(attrName);
+            row.remove();
           }
         });
       }
@@ -1811,10 +1882,12 @@
         row.innerHTML = `
           <td contenteditable="true">${property}</td>
           <td contenteditable="true">${value}</td>
+          <td><button class="btn btn-sm btn-outline-danger remove-inline-style" title="Remove style"><i class="bi bi-trash3"></i></button></td>
         `;
         
         // Add change handlers for both cells
         const cells = row.querySelectorAll('td[contenteditable="true"]');
+        const removeButton = row.querySelector('.remove-inline-style');
         cells[0].addEventListener('keydown', (e) => {
           if (e.key === 'Enter') {
             e.preventDefault();
@@ -1836,6 +1909,18 @@
         
         cells[0].addEventListener('focus', focusSelect);
         cells[1].addEventListener('focus', focusSelect);
+        
+        // Add click handler for remove button
+        removeButton.addEventListener('click', (e) => {
+          const row = e.target.closest('tr');
+          const propertyCell = row.querySelector('td[contenteditable="true"]');
+          const property = propertyCell.textContent.trim();
+          
+          if (activeContainer && property) {
+            activeContainer.style.removeProperty(property);
+            row.remove();
+          }
+        });
 
         // Insert after the inline styles header row (using the ID we added)
         const inlineStylesHeader = stylesTable.querySelector('tr#inline-styles-header');
@@ -1855,7 +1940,7 @@
         const headerRow = document.createElement('tr');
         headerRow.id = "stylesheet-rules"; 
         headerRow.innerHTML = `
-          <td colspan="2" style="background: #f8f9fa; font-weight: 600; color: #1D202B;">
+          <td colspan="3" style="background: #f8f9fa; font-weight: 600; color: #1D202B;">
             Stylesheet Rules
           </td>
         `;
@@ -1865,7 +1950,7 @@
           // Add selector row
           const selectorRow = document.createElement('tr');
           selectorRow.innerHTML = `
-            <td colspan="2" style="color: #666;">
+            <td colspan="3" style="color: #666;">
               ${selector} <span style="opacity: 0.5;">(${source.split('/').pop()})</span>
             </td>
           `;
@@ -1877,6 +1962,7 @@
             row.innerHTML = `
               <td style="padding-left: 20px;">${property}</td>
               <td contenteditable="true">${value}</td>
+              <td></td>
               `;
               
             // Add change handler for editable value
