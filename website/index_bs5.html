@@ -78,7 +78,7 @@
       opacity: 1;
     }
 
-    .hero {
+    .hero.mine {
       padding: 8rem 0 6rem;
       text-align: center;
       color: white;
@@ -87,7 +87,7 @@
       z-index: 2;
     }
 
-    .hero::before {
+    .hero.mine::before {
       content: '';
       position: absolute;
       top: 0;
@@ -108,7 +108,7 @@
       z-index: -1;
     }
 
-    .hero>* {
+    .hero.mine>* {
       position: relative;
       z-index: 2;
       /* Content on top of both layers */
@@ -248,7 +248,7 @@
     </div>
   </nav>
 
-  <section class="hero bg-primary py-5 text-white text-center position-relative overflow-hidden" style="padding-top: 8rem !important; padding-bottom: 6rem !important;" id="home">
+  <section class="hero mine bg-primary py-5 text-white text-center position-relative overflow-hidden" style="padding-top: 8rem !important; padding-bottom: 6rem !important;" id="home">
     <canvas id="gradient-canvas" width="1108" height="1283"></canvas>
     <div class="container">
       <h1 class="display-3 fw-bold mb-3">Create Stunning Landing Pages<br>in Minutes</h1>
