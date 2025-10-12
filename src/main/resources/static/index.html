@@ -713,6 +713,68 @@
             </div>
             <div class="ce-popover__item-label">Section</div>
           </div>
+
+
+          <div class="ce-popover__item" data-type="hero">
+            <div class="ce-popover__item-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24">
+                <path stroke="currentColor" stroke-width="2"
+                  d="M4 7h4m4 0h4m4 0h-4m-4 0H8m4 0v10M4 12h2m12 0h2M4 17h2m12 0h2" />
+              </svg>
+            </div>
+            <div class="ce-popover__item-label">Hero</div>
+            <div class="ce-popover__submenu">
+              <div class="ce-popover__submenu-item" data-type="centered-hero">
+                <div class="ce-popover__submenu-item-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                    <text x="4" y="17" fill="currentColor" style="font: bold 14px sans-serif;">H1</text>
+                  </svg>
+                </div>
+                <div class="ce-popover__item-label">Centered Hero</div>
+              </div>
+              <div class="ce-popover__submenu-item" data-type="centered-screenshot">
+                <div class="ce-popover__submenu-item-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                    <text x="4" y="17" fill="currentColor" style="font: bold 14px sans-serif;">H2</text>
+                  </svg>
+                </div>
+                <div class="ce-popover__item-label">Centered Screenshot</div>
+              </div>
+              <div class="ce-popover__submenu-item" data-type="h3">
+                <div class="ce-popover__submenu-item-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                    <text x="4" y="17" fill="currentColor" style="font: bold 14px sans-serif;">H3</text>
+                  </svg>
+                </div>
+                <div class="ce-popover__item-label">Heading 3</div>
+              </div>
+              <div class="ce-popover__submenu-item" data-type="h4">
+                <div class="ce-popover__submenu-item-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                    <text x="4" y="17" fill="currentColor" style="font: bold 14px sans-serif;">H4</text>
+                  </svg>
+                </div>
+                <div class="ce-popover__item-label">Heading 4</div>
+              </div>
+              <div class="ce-popover__submenu-item" data-type="h5">
+                <div class="ce-popover__submenu-item-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                    <text x="4" y="17" fill="currentColor" style="font: bold 14px sans-serif;">H5</text>
+                  </svg>
+                </div>
+                <div class="ce-popover__item-label">Heading 5</div>
+              </div>
+              <div class="ce-popover__submenu-item" data-type="h6">
+                <div class="ce-popover__submenu-item-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                    <text x="4" y="17" fill="currentColor" style="font: bold 14px sans-serif;">H6</text>
+                  </svg>
+                </div>
+                <div class="ce-popover__item-label">Heading 6</div>
+              </div>
+            </div>
+          </div>
+
           <div class="ce-popover__item" data-type="container">
             <div class="ce-popover__item-icon">
               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24">
@@ -2173,6 +2235,24 @@
       }
     }
 
+    toolbox.addEventListener('click', async (e) => {
+      let item = e.target;
+      while (!item.classList.contains("ce-popover__submenu-item")) {
+        item = item.parentElement;
+      }
+      const dataType = item.dataset.type;
+
+      console.log("type", dataType);
+
+      try {
+        const response = await fetch(`templates/${dataType}.html`);
+        const html = await response.text();
+        console.log(html);
+      } catch (error) {
+        console.error('Error fetching HTML:', error);
+      }      
+    });
+
     // Add header creation functionality
     function createHeader(level) {
       if (activeContainer) {
@@ -2325,6 +2405,72 @@
       toolbox.classList.remove('active');
       toolbarElement.style.display = 'none';
     });
+
+    const centeredHeroOption = document.querySelector('[data-type="centered-hero"]');
+    centeredHeroOption.addEventListener('click', (event) => {
+      const div = document.createElement('div');
+      div.innerHTML = `<section id="hero">
+  <div class="px-4 py-5 my-5 text-center"> <img class="d-block mx-auto mb-4"
+      src="https://getbootstrap.com/docs/5.3/assets/brand/bootstrap-logo.svg" alt="" width="72" height="57">
+    <h1 class="display-5 fw-bold text-body-emphasis">Centered hero</h1>
+    <div class="col-lg-6 mx-auto">
+      <p class="lead mb-4">Quickly design and customize responsive mobile-first sites with Bootstrap, the world’s most
+          popular front-end open source toolkit, featuring Sass variables and mixins, responsive grid system,
+          extensive prebuilt components, and powerful JavaScript plugins.</p>
+      <div class="d-grid gap-2 d-sm-flex justify-content-sm-center"> <button type="button"
+          class="btn btn-primary btn-lg px-4 gap-3">Primary button</button> <button type="button"
+          class="btn btn-outline-secondary btn-lg px-4">Secondary</button> </div>
+    </div>
+  </div>
+</section>`;
+
+      const newElement = div.firstChild;
+
+      if (event.metaKey && event.shiftKey) {
+        activeContainer.before(newElement);
+      } else if (event.metaKey) {
+        activeContainer.after(newElement);
+      } else {
+        activeContainer.appendChild(newElement);
+      }
+      
+      refreshSelector(newElement);
+      showMiniSelector(activeContainer, mouseX, mouseY, 1);
+
+      toolbox.classList.remove('active');
+      toolbarElement.style.display = 'none';
+    });
+
+    const centeredScreenshotOption = document.querySelector('[data-type="centered-screenshot"]');
+    centeredScreenshotOption.addEventListener('click', () => {
+      const div = document.createElement('div');
+      div.innerHTML = `<section id="hero">
+  <div class="px-4 pt-5 my-5 text-center border-bottom">
+    <h1 class="display-4 fw-bold text-body-emphasis">Centered screenshot</h1>
+    <div class="col-lg-6 mx-auto">
+      <p class="lead mb-4">Quickly design and customize responsive mobile-first sites with Bootstrap, the world’s most
+        popular front-end open source toolkit, featuring Sass variables and mixins, responsive grid system,
+        extensive prebuilt components, and powerful JavaScript plugins.</p>
+      <div class="d-grid gap-2 d-sm-flex justify-content-sm-center mb-5"> <button type="button"
+          class="btn btn-primary btn-lg px-4 me-sm-3">Primary button</button> <button type="button"
+          class="btn btn-outline-secondary btn-lg px-4">Secondary</button> </div>
+    </div>
+    <div class="overflow-hidden" style="max-height: 30vh;">
+      <div class="container px-5"> <img src="https://getbootstrap.com/docs/5.3/examples/heroes/bootstrap-docs.png" class="img-fluid border rounded-3 shadow-lg mb-4"
+          alt="Example image" width="700" height="500" loading="lazy"> </div>
+    </div>
+  </div>
+</section>`;
+
+      const newElement = div.firstChild;
+      activeContainer.appendChild(newElement);
+      refreshSelector(newElement);
+      showMiniSelector(activeContainer, mouseX, mouseY, 1);
+
+      toolbox.classList.remove('active');
+      toolbarElement.style.display = 'none';
+    });
+
 
     // Add section creation functionality
     const sectionOption = document.querySelector('[data-type="section"]');
@@ -3603,7 +3749,8 @@
         
         // Load the iframe with the URL parameter
         document.cookie = "proxy=" + urlParam + "; path=/;";
-        src = "editor/" + "?url=" + urlParam + "&t=" + new Date().getTime();
+        // src = "editor/" + "?url=" + urlParam + "&t=" + new Date().getTime();
+        src = urlParam;
         setTimeout(() => {
           iframe.src = src;
         }, 100);

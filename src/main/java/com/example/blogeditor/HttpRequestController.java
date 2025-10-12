@@ -25,7 +25,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
-@RequestMapping(value = "/**")
+@RequestMapping(value = "remove-this-to-enable/**")
 @CrossOrigin(origins = "*")
 public class HttpRequestController {
     @GetMapping
