@@ -559,6 +559,15 @@
       padding: 0px;
       font-size: 18px;
     }
+    .styles-dialog .add-inline-style,
+    .styles-dialog .add-attribute {
+      border: none;
+      padding: 0px;
+      font-size: 20px;
+      padding-left: 4px;
+      padding-right: 4px;
+    }
+
   </style>
 </head>
 
@@ -1769,8 +1778,8 @@
       inlineHeaderRow.id = "inline-styles-header";
       inlineHeaderRow.innerHTML = `
         <td style="background: #f8f9fa; font-weight: 600; color: #1D202B;">Inline Styles</td>
-        <td style="background: #f8f9fa;"><button class="btn btn-sm btn-outline-primary" onclick="addInlineStyle()">+</button></td>
-        <td style="background: #f8f9fa;""></td>
+        <td style="background: #f8f9fa;"></td>
+        <td style="background: #f8f9fa;"><button class="btn btn-sm btn-outline-primary add-inline-style" onclick="addInlineStyle()">+</button></td>
       `;
       stylesTable.appendChild(inlineHeaderRow);
 
@@ -1779,8 +1788,8 @@
       attributesHeaderRow.id = "attributes-header";
       attributesHeaderRow.innerHTML = `
         <td style="background: #f8f9fa; font-weight: 600; color: #1D202B;">Attributes</td>
-        <td style="background: #f8f9fa;"><button class="btn btn-sm btn-outline-primary" onclick="addAttributeRow()">+</button></td>
-        <td style="background: #f8f9fa;""></td>
+        <td style="background: #f8f9fa;"></td>
+        <td style="background: #f8f9fa;"><button class="btn btn-sm btn-outline-primary add-attribute" onclick="addAttributeRow()">+</button></td>
       `;
       stylesTable.appendChild(attributesHeaderRow);
       
