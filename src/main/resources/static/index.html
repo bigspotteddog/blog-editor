@@ -352,6 +352,19 @@
       word-break: break-word;
     }
 
+    .styles-dialog td[contenteditable="true"] {
+      white-space: pre-wrap;       /* Preserves both spaces and newlines */
+      word-wrap: break-word;       /* Allows long lines to wrap */
+      min-height: 20px;
+      outline: none;
+      font-family: monospace;      /* Use monospace font to make line breaks more visible */
+      line-height: 1.4;
+    }
+
+    .styles-dialog td[contenteditable="true"]:focus {
+      background-color: #f8f9fa;
+    }
+
     .styles-dialog th:first-child,
     .styles-dialog td:first-child {
       width: 40%;
@@ -1829,53 +1842,88 @@
           }
         });
 
-        // Add content section
-        const contentHeaderRow = document.createElement('tr');
-        contentHeaderRow.innerHTML = `
-          <td style="background: #f8f9fa; font-weight: 600; color: #1D202B;">Content</td>
-          <td style="background: #f8f9fa;"></td>
-          <td style="background: #f8f9fa;"></td>
-        `;
-        stylesTable.appendChild(contentHeaderRow);
-
-        // Add a row for the content editor
-        const contentRow = document.createElement('tr');
-        // Get the text content if the element only has text, otherwise get innerHTML
-        let contentValue = '';
-        if (element.childNodes.length === 1 && element.childNodes[0].nodeType === Node.TEXT_NODE) {
-          contentValue = element.textContent;
-        } else {
-          contentValue = element.innerHTML;
-        }
+        // Add content section only if element has only text content and allowed elements (like br tags)
+        const allowedElements = ['BR']; // Allow br tags for line breaks
+        const hasOnlyTextAndAllowedElements = Array.from(element.childNodes).every(node => {
+          return node.nodeType === Node.TEXT_NODE || 
+                 (node.nodeType === Node.ELEMENT_NODE && allowedElements.includes(node.tagName));
+        });
         
-        contentRow.innerHTML = `
-          <td contenteditable="false" style="font-weight: 600;">content</td>
-          <td contenteditable="true" id="content-editor">${contentValue}</td>
-          <td></td>
-        `;
-        stylesTable.appendChild(contentRow);
+        if (hasOnlyTextAndAllowedElements && element.textContent.trim() !== '') {
+          const contentHeaderRow = document.createElement('tr');
+          contentHeaderRow.innerHTML = `
+            <td style="background: #f8f9fa; font-weight: 600; color: #1D202B;">Content</td>
+            <td style="background: #f8f9fa;"></td>
+            <td style="background: #f8f9fa;"></td>
+          `;
+          stylesTable.appendChild(contentHeaderRow);
 
-        // Add event listener to update content when changed
-        const contentEditor = contentRow.querySelector('#content-editor');
-        contentEditor.addEventListener('blur', function() {
-          if (activeContainer) {
-            // Check if the element contains only text or other elements
-            if (activeContainer.children.length === 0) {
-              // If it's just text content, update textContent
-              activeContainer.textContent = this.textContent;
-            } else {
-              // If it contains HTML elements, update innerHTML
-              activeContainer.innerHTML = this.innerHTML || this.textContent;
+          // Add a row for the content editor
+          const contentRow = document.createElement('tr');
+          // Get text content but preserve line breaks from br tags
+          let contentValue = '';
+          Array.from(element.childNodes).forEach(node => {
+            if (node.nodeType === Node.TEXT_NODE) {
+              contentValue += node.textContent;
+            } else if (node.nodeType === Node.ELEMENT_NODE && node.tagName === 'BR') {
+              contentValue += '\n'; // Represent br tag as a newline
             }
-          }
-        });
+          });
+          
+          // Process the content to mimic HTML presentation:
+          // 1. Remove leading and trailing whitespace
+          // 2. Replace multiple consecutive spaces with single space
+          contentValue = contentValue.replace(/^\s+|\s+$/g, '').replace(/\s{2,}/g, ' ');
+          
+          contentRow.innerHTML = `
+            <td contenteditable="false" style="font-weight: 600;">content</td>
+            <td contenteditable="true" id="content-editor">${contentValue}</td>
+            <td></td>
+          `;
+          stylesTable.appendChild(contentRow);
 
-        contentEditor.addEventListener('keydown', function(e) {
-          if (e.key === 'Enter') {
-            e.preventDefault();
-            this.blur();
-          }
-        });
+          // Add event listener to update content when changed
+          const contentEditor = contentRow.querySelector('#content-editor');
+          contentEditor.addEventListener('blur', function() {
+            if (activeContainer) {
+              // Clear current content
+              while (activeContainer.firstChild) {
+                activeContainer.removeChild(activeContainer.firstChild);
+              }
+              
+              // Split content by newlines and add text nodes and br elements
+              const lines = this.textContent.split('\n');
+              for (let i = 0; i < lines.length; i++) {
+                if (i > 0) {
+                  // Add br element for line breaks
+                  const br = document.createElement('br');
+                  activeContainer.appendChild(br);
+                }
+                // Add text node
+                if (lines[i] !== '') {
+                  activeContainer.appendChild(document.createTextNode(lines[i]));
+                } else if (i > 0 && i < lines.length - 1) { 
+                  // Add empty text node if it's an empty line that's not the first or last
+                  activeContainer.appendChild(document.createTextNode('\n'));
+                }
+              }
+            }
+          });
+
+          contentEditor.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+              e.preventDefault();
+              // Insert a newline character at the cursor position
+              const selection = window.getSelection();
+              if (selection.rangeCount > 0) {
+                const range = selection.getRangeAt(0);
+                range.deleteContents();
+                range.insertNode(document.createTextNode('\n'));
+                range.collapse(false);
+              }
+            }
+          });
+        }
       }      
 
       // Add inline styles section
