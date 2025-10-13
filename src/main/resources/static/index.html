@@ -1911,7 +1911,7 @@
           });
 
           contentEditor.addEventListener('keydown', function(e) {
-            if (e.key === 'Enter') {
+            if (e.key === 'Enter' && e.shiftKey) {
               e.preventDefault();
               // Insert a newline character at the cursor position
               const selection = window.getSelection();
@@ -1921,6 +1921,9 @@
                 range.insertNode(document.createTextNode('\n'));
                 range.collapse(false);
               }
+            } else if (e.key === 'Enter' && !e.shiftKey) {
+              e.preventDefault();
+              this.blur(); // Apply changes by blurring the field
             }
           });
         }
