@@ -2358,6 +2358,9 @@
 
       try {
         const response = await fetch(`templates/${dataType}.html`);
+        if (response.status !== 200) {
+          return;
+        }
         const html = await response.text();
         console.log(html);
 
