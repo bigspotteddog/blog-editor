@@ -1,191 +1,191 @@
-<html lang="en"><head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>PageCraft - Create Stunning Landing Pages in Minutes</title>
-    <meta name="description" content="Build beautiful, high-converting landing pages with our intuitive drag-and-drop editor. Mix and match pre-built sections, customize everything, and launch in minutes.">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="pencil.css">
+    <meta
+      name="description"
+      content="Build beautiful, high-converting landing pages with our intuitive drag-and-drop editor. Mix and match pre-built sections, customize everything, and launch in minutes."
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      crossorigin="anonymous"
+    />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="cerulean.css" />
     <style>
-  body {
-    /* font-family: 'Inter', sans-serif; */
-  }
+      body {
+        /* font-family: 'Inter', sans-serif; */
+      }
 
-  .navbar-toggler {
-    z-index: 1001;
-    /* Ensure it's above other elements */
-  }
+      .navbar-toggler {
+        z-index: 1001;
+        /* Ensure it's above other elements */
+      }
 
-  .nav-link {
-  }
+      .nav-link {
+      }
 
-  @keyframes up-down {
+      @keyframes up-down {
+        0%,
+        100% {
+          transform: translateY(3px);
+        }
 
-    0%,
-    100% {
-      transform: translateY(3px);
-    }
+        50% {
+          transform: translateY(-3px);
+        }
+      }
 
-    50% {
-      transform: translateY(-3px);
-    }
-  }
+      .lead,
+      .text-muted {
+      }
 
-  .lead,
-  .text-muted {
-  }
+      .py-5 {
+        padding-top: 6rem !important;
+        padding-bottom: 6rem !important;
+      }
 
-  .py-5 {
-    padding-top: 6rem !important;
-    padding-bottom: 6rem !important;
-  }
+      .btn {
+        transition: all 0.3s ease;
+      }
 
-  /* .btn {
-    border-radius: 8px;
-    padding: 1rem;
-    font-weight: 600;
-    transition: all 0.3s ease;
-  } */
+      .btn-white {
+      }
 
-  .btn-white {
-  }
+      .btn-white:hover {
+      }
 
-  .btn-white:hover {
-  }
+      .btn:hover {
+        transform: translateY(-3px);
+        /* box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3); */
+      }
 
-  .btn:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
-  }
+      .card:hover {
+        transform: translateY(-5px);
+        /* box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3) !important; */
+      }
 
-  .card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3) !important;
-  }
+      .btn.watch-demo {
+      }
 
-  .btn.watch-demo {
-  }
+      .btn.watch-demo:hover {
+      }
 
-  .btn.watch-demo:hover {
-  }
+      .hero.mine {
+        padding: 8rem 0 6rem;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+        z-index: 2;
+      }
 
-  .hero.mine {
-    padding: 8rem 0 6rem;
-    text-align: center;
-    position: relative;
-    overflow: hidden;
-    z-index: 2;
-  }
+      .hero.mine::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+        opacity: 0.3;
+        z-index: 0;
+      }
 
-  /* .hero.mine::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
-      opacity: 0.3;
-      z-index: 0;
-    } */
+      #gradient-canvas {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+      }
 
-  #gradient-canvas {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: -1;
-  }
+      .hero.mine > * {
+        position: relative;
+        z-index: 2;
+        /* Content on top of both layers */
+      }
 
-  .hero.mine>* {
-    position: relative;
-    z-index: 2;
-    /* Content on top of both layers */
-  }
+      .pricing-card.featured .pricing-features .check {
+      }
 
-  .pricing-card.featured .pricing-features .check {
-  }
+      .pricing-features .check {
+        font-weight: bold;
+      }
 
-  .pricing-features .check {
-    font-weight: bold;
-  }
+      .pricing-card.featured {
+        transform: scale(1.05);
+      }
 
-  .pricing-card.featured {
-    transform: scale(1.05);
-  }
+      .pricing-card.featured:hover {
+        transform: scale(1.05) translateY(-5px);
+      }
 
-  .pricing-card.featured:hover {
-    transform: scale(1.05) translateY(-5px);
-  }
+      .animate-on-scroll {
+        animation: fadeInUp 0.6s ease-out;
+      }
 
-  .animate-on-scroll {
-    animation: fadeInUp 0.6s ease-out;
-  }
+      .card {
+        transition: all 0.3s ease;
+      }
 
-  .card {
-    border-radius: 20px;
-    transition: all 0.3s ease;
-  }
+      .pricing-card {
+        padding: 2rem;
+        text-align: center;
+        position: relative;
+        transition: all 0.3s ease;
+      }
 
-  .pricing-card {
-    border-radius: 16px;
-    padding: 2rem;
-    text-align: center;
-    position: relative;
-    transition: all 0.3s ease;
-  }
+      .pricing-badge {
+        position: absolute;
+        top: -20px;
+        left: 50%;
+        transform: translateX(-50%);
+        padding: 0.5rem 1rem;
+        font-size: 0.8rem;
+        font-weight: 600;
+      }
 
-  .pricing-badge {
-    position: absolute;
-    top: -20px;
-    left: 50%;
-    transform: translateX(-50%);
-    padding: 0.5rem 1rem;
-    border-radius: 20px;
-    font-size: 0.8rem;
-    font-weight: 600;
-  }
+      .enterprise-highlight {
+        padding: 2rem;
+        margin-top: 3rem;
+        text-align: center;
+      }
 
-  .enterprise-highlight {
-    border-radius: 12px;
-    padding: 2rem;
-    margin-top: 3rem;
-    text-align: center;
-  }
+      .tech-badges {
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+        flex-wrap: wrap;
+        margin-bottom: 1.5rem;
+      }
 
-  .tech-badges {
-    display: flex;
-    justify-content: center;
-    gap: 1rem;
-    flex-wrap: wrap;
-    margin-bottom: 1.5rem;
-  }
+      .tech-badge {
+        padding: 0.5rem 1rem;
+        font-size: 0.9rem;
+        font-weight: 600;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      }
 
-  .tech-badge {
-    padding: 0.5rem 1rem;
-    border-radius: 20px;
-    font-size: 0.9rem;
-    font-weight: 600;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  }
+      .cta {
+      }
 
-  .cta {
-  }
-
-  #demo {
-    cursor: auto;
-    border-radius: 0px;
-    display: block;
-    object-fit: contain;
-    object-position: 50% 50%;
-    border: none;
-    transform: scale(0.75);
-    transform-origin: 0 0;
-    width: 133%;
-    height: 133%;
-  }
-</style>
+      #demo {
+        cursor: auto;
+        display: block;
+        object-fit: contain;
+        object-position: 50% 50%;
+        transform: scale(0.75);
+        transform-origin: 0 0;
+        width: 133%;
+        height: 133%;
+      }
+    </style>
 
     <style>
       @keyframes slideIn {
@@ -213,24 +213,58 @@
   </head>
 
   <body style="">
-    <nav class="navbar navbar-expand-lg fixed-top bg-white shadow-sm" style="background: rgba(255, 255, 255, 0.98); box-shadow: rgba(0, 0, 0, 0.1) 0px 2px 20px; opacity: 0.9; padding: 1rem;">
+    <nav
+      class="navbar navbar-expand-lg fixed-top bg-white shadow-sm"
+      style="
+        background: rgba(255, 255, 255, 0.98);
+        box-shadow: rgba(0, 0, 0, 0.1) 0px 2px 20px;
+        opacity: 0.9;
+        padding: 1rem;
+      "
+    >
       <div class="container-fluid">
         <a class="navbar-brand fw-bold text-primary" href="#home">
           <i class="fas fa-magic"></i> <span>PageCraft</span>
         </a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+          aria-controls="navbarNav"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
           <span class="navbar-toggler-icon"></span>
         </button>
-        <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+        <div
+          class="collapse navbar-collapse justify-content-end"
+          id="navbarNav"
+        >
           <ul class="navbar-nav">
-            <li class="nav-item" style="
+            <li
+              class="nav-item"
+              style="
                 animation: 2s ease-in-out 0s infinite alternate-reverse both
                   running up-down;
-              ">
-              <a class="nav-link" href="#demo-container" contenteditable="false" style="outline: none; color: var(--bs-primary); font-weight: 600;">Try It!</a>
+              "
+            >
+              <a
+                class="nav-link"
+                href="#demo-container"
+                contenteditable="false"
+                style="
+                  outline: none;
+                  color: var(--bs-primary);
+                  font-weight: 600;
+                "
+                >Try It!</a
+              >
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="#features" style="font-weight: 400">Features</a>
+              <a class="nav-link" href="#features" style="font-weight: 400"
+                >Features</a
+              >
             </li>
             <li class="nav-item">
               <a class="nav-link" href="#how-it-works">How It Works</a>
@@ -241,22 +275,24 @@
             </li>
           </ul>
           <div class="ms-lg-3">
-            <a href="#" class="btn me-2 p-2" style="font-weight: 600; border: 2px solid var(--bs-primary); color: var(--bs-primary);">Sign In</a>
-            <a href="#pricing" class="btn btn-primary p-2" style="
-                /* background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%); */
-                font-weight: 600;
-                border-width: 2px;
-              ">Get Started</a>
+            <a href="#" class="btn me-2 p-2" style="font-weight: 600"
+              >Sign In</a
+            >
+            <a href="#pricing" class="btn btn-primary p-2">Get Started</a>
           </div>
         </div>
       </div>
     </nav>
 
-    <section class="hero mine py-5 text-center position-relative overflow-hidden bg-dark text-light" style="padding-top: 8rem !important; padding-bottom: 6rem !important" id="home">
+    <section
+      class="hero mine py-5 text-center position-relative overflow-hidden bg-dark text-light"
+      style="padding-top: 8rem !important; padding-bottom: 6rem !important"
+      id="home"
+    >
       <canvas id="gradient-canvas" width="1477" height="1281" class=""></canvas>
       <div class="container">
         <h1 class="display-3 fw-bold mb-3 text-light">
-          Create Stunning Landing Pages<br>in Minutes
+          Create Stunning Landing Pages<br />in Minutes
         </h1>
         <p class="lead mb-4 mx-auto" style="max-width: 800px; opacity: 0.8">
           Build beautiful, high-converting landing pages with our intuitive
@@ -264,36 +300,65 @@
           everything, and launch in minutes.
         </p>
         <div class="d-flex justify-content-center gap-3 mt-3">
-          <a href="#pricing" class="btn btn-outline-primary btn-lg" style="/* color: #3b82f6; */">
+          <a
+            href="#pricing"
+            class="btn btn-outline-primary btn-lg"
+            style="/* color: #3b82f6; */"
+          >
             <i class="fas fa-play me-2"></i> <span>Get Started</span>
           </a>
-          <a class="btn btn-primary btn-lg" href="#demo-container" style="
+          <a
+            class="btn btn-primary btn-lg"
+            href="#demo-container"
+            style="
               width: 160px;
               outline: none;
               animation: 2s ease-in-out 0s infinite alternate-reverse both
                 running up-down;
-            ">
-            <i class="fas fa-magic me-2"></i> <span>Try It!</span></a>
+            "
+          >
+            <i class="fas fa-magic me-2"></i> <span>Try It!</span></a
+          >
         </div>
 
         <div style="padding-top: 100px" id="demo-container">
           <p style="opacity: 0.7">
             * While your mouse is over the demo the main page will not scroll.
           </p>
-          <div class="pencil p-2 bg-primary" id="demo-panel" style="max-width: 1200px">
+          <div class="card pencil p-2 bg-primary" id="demo-panel">
             <div class="" contenteditable="false" style="outline: none">
               <div class="d-flex align-items-center gap-2 mb-2">
                 <div class="d-flex gap-1" style="position: absolute">
-                  <div class="rounded-circle" style="width: 12px; height: 12px; background-color: #ef4444"></div>
-                  <div class="rounded-circle" style="width: 12px; height: 12px; background-color: #f59e0b"></div>
-                  <div class="rounded-circle" style="width: 12px; height: 12px; background-color: #10b981"></div>
+                  <div
+                    class="rounded-circle"
+                    style="width: 12px; height: 12px; background-color: #ef4444"
+                  ></div>
+                  <div
+                    class="rounded-circle"
+                    style="width: 12px; height: 12px; background-color: #f59e0b"
+                  ></div>
+                  <div
+                    class="rounded-circle"
+                    style="width: 12px; height: 12px; background-color: #10b981"
+                  ></div>
                 </div>
-                <div class="bg-white rounded-pill px-3 py-1 text-center mx-auto" style="font-size: 0.8rem; color: var(--bs-primary-text-emphasis);">
+                <div
+                  class="bg-white rounded-pill px-3 py-1 text-center mx-auto"
+                  style="
+                    font-size: 0.8rem;
+                    color: var(--bs-primary-text-emphasis);
+                  "
+                >
                   pagecraft.com/editor
                 </div>
               </div>
               <div class="rounded-3 position-relative" style="height: 540px">
-                <iframe id="demo" src="/?url=index_bs5_copy" allow="fullscreen *; keyboard-map *"></iframe>
+                <iframe
+                  id="demo"
+                  src="/?url=index_bs5_copy"
+                  class="card"
+                  allow="fullscreen *; keyboard-map *"
+                ></iframe>
               </div>
             </div>
           </div>
@@ -305,7 +370,7 @@
       <div class="container">
         <div class="text-center mb-5">
           <h2 class="display-4 fw-bold mb-3" style="outline: none">
-            Everything You Need to Build<br>Amazing Pages
+            Everything You Need to Build<br />Amazing Pages
           </h2>
           <p class="lead mx-auto" style="max-width: 600px">
             Our powerful editor combines simplicity with professional features,
@@ -315,7 +380,7 @@
 
         <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
           <div class="col">
-            <div class="card h-100 p-4 border-0 shadow-sm">
+            <div class="card h-100 p-4 shadow-sm">
               <div class="mb-3">
                 <i class="fas fa-layer-group fs-1 text-primary"></i>
               </div>
@@ -329,7 +394,7 @@
           </div>
 
           <div class="col">
-            <div class="card h-100 p-4 border-0 shadow-sm">
+            <div class="card h-100 p-4 shadow-sm">
               <div class="mb-3">
                 <i class="fas fa-edit fs-1 text-primary"></i>
               </div>
@@ -343,7 +408,7 @@
           </div>
 
           <div class="col">
-            <div class="card h-100 p-4 border-0 shadow-sm">
+            <div class="card h-100 p-4 shadow-sm">
               <div class="mb-3">
                 <i class="fas fa-mobile-alt fs-1 text-primary"></i>
               </div>
@@ -357,7 +422,7 @@
           </div>
 
           <div class="col">
-            <div class="card h-100 p-4 border-0 shadow-sm">
+            <div class="card h-100 p-4 shadow-sm">
               <div class="mb-3">
                 <i class="fas fa-envelope fs-1 text-primary"></i>
               </div>
@@ -371,7 +436,7 @@
           </div>
 
           <div class="col">
-            <div class="card h-100 p-4 border-0 shadow-sm">
+            <div class="card h-100 p-4 shadow-sm">
               <div class="mb-3">
                 <i class="fas fa-rocket fs-1 text-primary"></i>
               </div>
@@ -384,7 +449,7 @@
           </div>
 
           <div class="col">
-            <div class="card h-100 p-4 border-0 shadow-sm">
+            <div class="card h-100 p-4 shadow-sm">
               <div class="mb-3">
                 <i class="fas fa-chart-line fs-1 text-primary"></i>
               </div>
@@ -412,12 +477,15 @@
         <div class="row row-cols-1 row-cols-md-3 g-4 mt-5">
           <div class="col">
             <div class="text-center">
-              <div class="mx-auto mb-3 bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="
+              <div
+                class="mx-auto mb-3 bg-primary text-white rounded-circle d-flex align-items-center justify-content-center"
+                style="
                   width: 60px;
                   height: 60px;
                   font-size: 1.5rem;
                   font-weight: 700; /* background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%); */
-                ">
+                "
+              >
                 1
               </div>
               <h3 class="h5 fw-bold mb-2">Choose Your Sections</h3>
@@ -430,12 +498,15 @@
 
           <div class="col">
             <div class="text-center">
-              <div class="mx-auto mb-3 bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="
+              <div
+                class="mx-auto mb-3 bg-primary text-white rounded-circle d-flex align-items-center justify-content-center"
+                style="
                   width: 60px;
                   height: 60px;
                   font-size: 1.5rem;
                   font-weight: 700; /* background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%); */
-                ">
+                "
+              >
                 2
               </div>
               <h3 class="h5 fw-bold mb-2">Customize Everything</h3>
@@ -448,12 +519,15 @@
 
           <div class="col">
             <div class="text-center">
-              <div class="mx-auto mb-3 bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="
+              <div
+                class="mx-auto mb-3 bg-primary text-white rounded-circle d-flex align-items-center justify-content-center"
+                style="
                   width: 60px;
                   height: 60px;
                   font-size: 1.5rem;
                   font-weight: 700; /* background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%); */
-                ">
+                "
+              >
                 3
               </div>
               <h3 class="h5 fw-bold mb-2">Publish &amp; Share</h3>
@@ -480,10 +554,12 @@
           </p>
         </div>
 
-        <div class="pricing-grid row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mt-5">
+        <div
+          class="pricing-grid row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mt-5"
+        >
           <!-- Free Plan -->
           <div class="col">
-            <div class="pricing-card card h-100 p-4 border-2 animate-on-scroll">
+            <div class="pricing-card card h-100 p-4 animate-on-scroll">
               <div class="pricing-plan h5 fw-bold mb-2">DIY Creator</div>
               <div class="pricing-price display-4 fw-bold">Free</div>
               <div class="pricing-period text-muted mb-4">Forever</div>
@@ -515,18 +591,28 @@
                   <span>Community support</span>
                 </li>
               </ul>
-              <a href="#" class="pricing-cta btn btn-primary w-100 mt-auto" style="
+              <a
+                href="#"
+                class="pricing-cta btn btn-primary w-100 mt-auto"
+                style="
                   /* background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%); */ /* color: white; */
                   font-weight: 600;
                   padding: 1rem;
-                ">Get Started Free</a>
+                "
+                >Get Started Free</a
+              >
             </div>
           </div>
 
           <!-- Hosted Plan -->
           <div class="col">
-            <div class="pricing-card bg-primary text-light featured card h-100 p-4 border-2 position-relative animate-on-scroll">
-              <div class="pricing-badge position-absolute translate-middle-x bg-success text-white rounded-pill" style="zoom: 120%; border: 2px solid var(--bs-border-color-translucent);">
+            <div
+              class="pricing-card bg-primary text-light featured card h-100 p-4 position-relative animate-on-scroll"
+            >
+              <div
+                class="pricing-badge position-absolute translate-middle-x bg-success text-white rounded-pill"
+                style="zoom: 120%"
+              >
                 Most Popular
               </div>
               <div class="pricing-plan h5 fw-bold mb-2 mt-3">Hosted Pro</div>
@@ -538,11 +624,15 @@
               </p>
               <ul class="pricing-features list-unstyled text-start mb-4">
                 <li class="d-flex align-items-center mb-2">
-                  <span class="check me-2" style="color: var(--bs-dard);">✓</span>
+                  <span class="check me-2" style="color: var(--bs-dard)"
+                    >✓</span
+                  >
                   <span>Everything in DIY Creator</span>
                 </li>
                 <li class="d-flex align-items-center mb-2">
-                  <span class="check me-2" style="color: var(--bs-light);">✓</span>
+                  <span class="check me-2" style="color: var(--bs-light)"
+                    >✓</span
+                  >
                   <span>Professional hosting included</span>
                 </li>
                 <li class="d-flex align-items-center mb-2">
@@ -566,15 +656,24 @@
                   <span>99.9% uptime guarantee</span>
                 </li>
               </ul>
-              <a href="#" class="pricing-cta featured btn bg-white w-100 mt-auto" style="color: var(--bs-primary);">Get Started</a>
+              <a
+                href="#"
+                class="pricing-cta featured btn bg-white w-100 mt-auto"
+                style="color: var(--bs-primary)"
+                >Get Started</a
+              >
             </div>
           </div>
 
           <!-- Custom Plan -->
           <div class="col">
-            <div class="pricing-card card h-100 p-4 border-2 animate-on-scroll">
+            <div class="pricing-card card h-100 p-4 animate-on-scroll">
               <div class="pricing-plan h5 fw-bold mb-2">Custom Development</div>
-              <div class="pricing-price display-4 fw-bold" contenteditable="false" style="outline: none">
+              <div
+                class="pricing-price display-4 fw-bold"
+                contenteditable="false"
+                style="outline: none"
+              >
                 Contact Us
               </div>
               <div class="pricing-period text-muted mb-4">Project-based</div>
@@ -585,7 +684,9 @@
               <ul class="pricing-features list-unstyled text-start mb-4">
                 <li class="d-flex align-items-center mb-2">
                   <span class="check me-2">✓</span>
-                  <span contenteditable="false" class="" style="outline: none">Custom web applications</span>
+                  <span contenteditable="false" class="" style="outline: none"
+                    >Custom web applications</span
+                  >
                 </li>
                 <li class="d-flex align-items-center mb-2">
                   <span class="check me-2">✓</span>
@@ -614,16 +715,21 @@
                   <span>Dedicated project manager</span>
                 </li>
               </ul>
-              <a href="#" class="pricing-cta btn btn-primary w-100 mt-auto" style="
+              <a
+                href="#"
+                class="pricing-cta btn btn-primary w-100 mt-auto"
+                style="
                   /* background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%); */
                   font-weight: 600;
                   padding: 1rem;
-                ">Schedule Consultation</a>
+                "
+                >Schedule Consultation</a
+              >
             </div>
           </div>
         </div>
       </div>
-      <div class="container enterprise-highlight pencil" style="border: 2px solid var(--bs-border-color-translucent);">
+      <div class="container enterprise-highlight pencil">
         <h3 class="enterprise-title">Enterprise-Grade Development Team</h3>
         <p class="enterprise-description text-muted">
           Our team consists of principal engineers with decades of experience
@@ -650,31 +756,55 @@
           <span class="tech-badge">Kubernetes</span>
           <span class="tech-badge">Microservices</span>
         </div>
-        <a class="btn btn-primary" href="#" style="
+        <a
+          class="btn btn-primary"
+          href="#"
+          style="
             /* background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%); */
             padding: 1rem;
             font-weight: 600;
-          ">
-          <i class="fas fa-calendar"></i> <span>Book a Strategy Call</span></a>
+          "
+        >
+          <i class="fas fa-calendar"></i> <span>Book a Strategy Call</span></a
+        >
       </div>
     </section>
 
     <section class="py-5 text-center cta" style="">
       <div class="container">
-        <h2 class="display-4 fw-bold mb-3" style="">Ready to Build Your First Page?</h2>
-        <p class="lead mb-4 mx-auto" style="max-width: 800px; outline: none" contenteditable="false">
+        <h2 class="display-4 fw-bold mb-3" style="">
+          Ready to Build Your First Page?
+        </h2>
+        <p
+          class="lead mb-4 mx-auto"
+          style="max-width: 800px; outline: none"
+          contenteditable="false"
+        >
           Join thousands of businesses creating beautiful landing pages with
-          PageCraft.<br>
+          PageCraft.<br />
           Get started today - no credit card required for the free plan.
         </p>
 
-        <form id="signupForm" class="d-flex justify-content-center gap-2 mx-auto" style="max-width: 600px">
-          <input type="email" class="form-control" placeholder="Enter your email address" required="">
-          <button type="submit" class="btn btn-primary" style="
+        <form
+          id="signupForm"
+          class="d-flex justify-content-center gap-2 mx-auto"
+          style="max-width: 600px"
+        >
+          <input
+            type="email"
+            class="form-control"
+            placeholder="Enter your email address"
+            required=""
+          />
+          <button
+            type="submit"
+            class="btn btn-primary"
+            style="
               width: 180px;
               padding: 1rem; /* background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%); */
               font-weight: 600;
-            ">
+            "
+          >
             Get Started
           </button>
         </form>
@@ -691,7 +821,9 @@
 
     <footer class="footer bg-dark text-white py-5">
       <div class="container">
-        <div class="footer-content row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4 mb-5">
+        <div
+          class="footer-content row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4 mb-5"
+        >
           <div class="footer-section col">
             <h3 class="h5 mb-3 text-white">
               <i class="fas fa-magic me-2"></i> <span>PageCraft</span>
@@ -701,10 +833,18 @@
               visitors into customers.
             </p>
             <div class="social-links d-flex gap-3">
-              <a href="#" class="text-white-50 fs-5"><i class="fab fa-twitter"></i></a>
-              <a href="#" class="text-white-50 fs-5"><i class="fab fa-facebook"></i></a>
-              <a href="#" class="text-white-50 fs-5"><i class="fab fa-linkedin"></i></a>
-              <a href="#" class="text-white-50 fs-5"><i class="fab fa-instagram"></i></a>
+              <a href="#" class="text-white-50 fs-5"
+                ><i class="fab fa-twitter"></i
+              ></a>
+              <a href="#" class="text-white-50 fs-5"
+                ><i class="fab fa-facebook"></i
+              ></a>
+              <a href="#" class="text-white-50 fs-5"
+                ><i class="fab fa-linkedin"></i
+              ></a>
+              <a href="#" class="text-white-50 fs-5"
+                ><i class="fab fa-instagram"></i
+              ></a>
             </div>
           </div>
 
@@ -712,16 +852,24 @@
             <h3 class="h5 mb-3 text-white">Product</h3>
             <ul class="list-unstyled">
               <li class="mb-2">
-                <a href="#" class="text-white-50 text-decoration-none">Features</a>
+                <a href="#" class="text-white-50 text-decoration-none"
+                  >Features</a
+                >
               </li>
               <li class="mb-2">
-                <a href="#" class="text-white-50 text-decoration-none">Templates</a>
+                <a href="#" class="text-white-50 text-decoration-none"
+                  >Templates</a
+                >
               </li>
               <li class="mb-2">
-                <a href="#" class="text-white-50 text-decoration-none">Pricing</a>
+                <a href="#" class="text-white-50 text-decoration-none"
+                  >Pricing</a
+                >
               </li>
               <li class="mb-2">
-                <a href="#" class="text-white-50 text-decoration-none">Integrations</a>
+                <a href="#" class="text-white-50 text-decoration-none"
+                  >Integrations</a
+                >
               </li>
               <li class="mb-2">
                 <a href="#" class="text-white-50 text-decoration-none">API</a>
@@ -733,19 +881,27 @@
             <h3 class="h5 mb-3 text-white">Resources</h3>
             <ul class="list-unstyled">
               <li class="mb-2">
-                <a href="#" class="text-white-50 text-decoration-none">Help Center</a>
+                <a href="#" class="text-white-50 text-decoration-none"
+                  >Help Center</a
+                >
               </li>
               <li class="mb-2">
-                <a href="#" class="text-white-50 text-decoration-none">Tutorials</a>
+                <a href="#" class="text-white-50 text-decoration-none"
+                  >Tutorials</a
+                >
               </li>
               <li class="mb-2">
                 <a href="#" class="text-white-50 text-decoration-none">Blog</a>
               </li>
               <li class="mb-2">
-                <a href="#" class="text-white-50 text-decoration-none">Community</a>
+                <a href="#" class="text-white-50 text-decoration-none"
+                  >Community</a
+                >
               </li>
               <li class="mb-2">
-                <a href="#" class="text-white-50 text-decoration-none">Webinars</a>
+                <a href="#" class="text-white-50 text-decoration-none"
+                  >Webinars</a
+                >
               </li>
             </ul>
           </div>
@@ -754,19 +910,29 @@
             <h3 class="h5 mb-3 text-white">Company</h3>
             <ul class="list-unstyled">
               <li class="mb-2">
-                <a href="#" class="text-white-50 text-decoration-none">About Us</a>
+                <a href="#" class="text-white-50 text-decoration-none"
+                  >About Us</a
+                >
               </li>
               <li class="mb-2">
-                <a href="#" class="text-white-50 text-decoration-none">Careers</a>
+                <a href="#" class="text-white-50 text-decoration-none"
+                  >Careers</a
+                >
               </li>
               <li class="mb-2">
-                <a href="#" class="text-white-50 text-decoration-none">Contact</a>
+                <a href="#" class="text-white-50 text-decoration-none"
+                  >Contact</a
+                >
               </li>
               <li class="mb-2">
-                <a href="#" class="text-white-50 text-decoration-none">Privacy Policy</a>
+                <a href="#" class="text-white-50 text-decoration-none"
+                  >Privacy Policy</a
+                >
               </li>
               <li class="mb-2">
-                <a href="#" class="text-white-50 text-decoration-none">Terms of Service</a>
+                <a href="#" class="text-white-50 text-decoration-none"
+                  >Terms of Service</a
+                >
               </li>
             </ul>
           </div>
@@ -781,7 +947,10 @@
       </div>
     </footer>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
+      crossorigin="anonymous"
+    ></script>
     <script>
       // Smooth scrolling for navigation links
       document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
@@ -863,9 +1032,9 @@
           this.speed = 0.5;
           this.scale = 1.0;
           this.colorStops = [
-            [59 / 255, 130 / 255, 246 / 255, 1], // #3b82f6
-            [30 / 255, 64 / 255, 175 / 255, 1], // #1e40af
-            [30 / 255, 64 / 255, 175 / 255, 1], // #1e40af
+            [34 / 255, 34 / 255, 34 / 255, 1], // #222222
+            [68 / 255, 68 / 255, 68 / 255, 1], // #444444
+            [68 / 255, 68 / 255, 68 / 255, 1], // #444444
           ];
 
           this.vertexShaderSource = `
@@ -1115,6 +1284,5 @@
     </script>
 
     <browser-mcp-container data-wxt-shadow-root=""></browser-mcp-container>
-  
-
-</body></html>
+  </body>
+</html>
