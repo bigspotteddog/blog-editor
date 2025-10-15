@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PageCraft - Create Stunning Landing Pages in Minutes</title>
+  <meta name="description" content="Build beautiful, high-converting landing pages with our intuitive drag-and-drop editor. Mix and match pre-built sections, customize everything, and launch in minutes.">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <!-- <link rel="stylesheet" href="pencil.css"> -->
+   <link rel="stylesheet" href="pencil.css">
+  <style>
+
+    body {
+      /* font-family: 'Inter', sans-serif; */
+    }
+
+    .navbar-toggler {
+      z-index: 1001;
+      /* Ensure it's above other elements */
+    }
+
+    .nav-link {
+      color: black;
+      font-weight: 400;
+    }
+
+    @keyframes up-down {
+
+      0%,
+      100% {
+        transform: translateY(3px);
+      }
+
+      50% {
+        transform: translateY(-3px);
+      }
+    }
+
+    .lead,
+    .text-muted {
+      opacity: 0.9;
+    }
+
+    .py-5 {
+      padding-top: 6rem !important;
+      padding-bottom: 6rem !important;
+    }
+
+    .btn {
+      border-radius: 8px;
+      padding: 1rem;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+
+    .btn-white {
+      background-color: white;
+    }
+
+    .btn-white:hover {
+      background-color: white;
+    }
+
+    .btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3) !important;
+    }
+
+    .btn.watch-demo {
+      opacity: 0.5;
+      color: white;
+      border: 2px solid white;
+      background-color: #3b82f6;
+    }
+
+    .btn.watch-demo:hover {
+      opacity: 1;
+    }
+
+    .hero.mine {
+      padding: 8rem 0 6rem;
+      text-align: center;
+      /* color: white; */
+      position: relative;
+      overflow: hidden;
+      z-index: 2;
+    }
+
+    /* .hero.mine::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+      opacity: 0.3;
+      z-index: 0;
+    } */
+
+    #gradient-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+    }
+
+    .hero.mine>* {
+      position: relative;
+      z-index: 2;
+      /* Content on top of both layers */
+    }
+
+    .pricing-card.featured .pricing-features .check {
+      color: #a7f3d0;
+    }
+
+    .pricing-features .check {
+      color: #10b981;
+      font-weight: bold;
+    }
+
+    .pricing-card.featured {
+      border-color: #3b82f6;
+      background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+      color: white;
+      transform: scale(1.05);
+    }
+
+    .pricing-card.featured:hover {
+      transform: scale(1.05) translateY(-5px);
+    }
+
+    .animate-on-scroll {
+      animation: fadeInUp 0.6s ease-out;
+    }
+
+    .card {
+      border-radius: 20px;
+      transition: all 0.3s ease;
+    }
+
+    .pricing-card {
+      background: white;
+      border: 2px solid #e5e7eb;
+      border-radius: 16px;
+      padding: 2rem;
+      text-align: center;
+      position: relative;
+      transition: all 0.3s ease;
+    }
+
+    .pricing-badge {
+      position: absolute;
+      top: -20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #10b981;
+      color: white;
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+
+    .enterprise-highlight {
+      background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+      border-radius: 12px;
+      padding: 2rem;
+      margin-top: 3rem;
+      text-align: center;
+    }
+
+    .tech-badges {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-bottom: 1.5rem;
+    }
+
+    .tech-badge {
+      background: white;
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #374151;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .cta {
+      background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
+    }
+
+    #demo {
+      cursor: auto;
+      border-radius: 0px;
+      display: block;
+      object-fit: contain;
+      background-color: rgba(0, 0, 0, 0);
+      object-position: 50% 50%;
+      border: none;
+      transform: scale(0.75);
+      transform-origin: 0 0;
+      width: 133%;
+      height: 133%;
+    }
+  </style>
+  
+</head>
+
+<body style="">
+
+  <nav class="navbar navbar-expand-lg fixed-top bg-white shadow-sm" style="background: rgba(255, 255, 255, 0.95); box-shadow: none; opacity: 0.9; padding: 1rem;">
+    <div class="container-fluid">
+      <a class="navbar-brand fw-bold text-primary" href="#home">
+  <i class="fas fa-magic"></i> <span>PageCraft</span>
+</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+        <ul class="navbar-nav">
+          <li class="nav-item" style="animation: 2s ease-in-out 0s infinite alternate-reverse both running up-down;">
+            <a class="nav-link" href="#demo-container" contenteditable="false" style="outline: none; color: rgb(30, 64, 175); font-weight: 600;">Try It!</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#features" style="font-weight: 400;">Features</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#how-it-works">How It Works</a>
+          </li>
+
+          <li class="nav-item">
+            <a class="nav-link" href="#pricing">Pricing</a>
+          </li>
+        </ul>
+        <div class="ms-lg-3">
+          <a href="#" class="btn btn-outline-primary me-2 p-2" style="font-weight: 600; border: 2px solid #3b82f6;&nbsp;color: #3b82f6;">Sign In</a>
+          <a href="#pricing" class="btn btn-primary p-2" style="background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%); font-weight: 600; border-width: 2px;">Get
+            Started</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <section class="hero mine bg-primary py-5 text-white text-center position-relative overflow-hidden" style="padding-top: 8rem !important; padding-bottom: 6rem !important;" id="home">
+    <canvas id="gradient-canvas" width="1477" height="1281"></canvas>
+    <div class="container">
+      <h1 class="display-3 fw-bold mb-3">Create Stunning Landing Pages<br>in Minutes</h1>
+      <p class="lead mb-4 mx-auto" style="max-width: 800px; opacity: 0.8;">
+        Build beautiful, high-converting landing pages with our intuitive drag-and-drop editor.
+        Mix and match pre-built sections, customize everything, and launch in minutes.
+      </p>
+      <div class="d-flex justify-content-center gap-3 mt-3">
+        <a href="#pricing" class="btn btn-white btn-lg" style="color: #3b82f6">
+          <i class="fas fa-play me-2"></i> <span>Get Started</span>
+        </a>
+        <a class="btn btn-primary btn-lg watch-demo" href="#demo-container" style="width: 180px; outline: none; animation: 2s ease-in-out 0s infinite alternate-reverse both running up-down;">
+          <i class="fas fa-magic me-2"></i> <span>Try It!</span></a>
+      </div>
+
+      <div style="padding-top: 100px;" id="demo-container">
+        <p style="opacity: 0.7;">* While your mouse is over the demo the main page will not scroll.</p>
+        <div class="pencil bg-primary p-2" id="demo-panel" style="max-width: 1200px;">
+          <div class="" contenteditable="false" style="outline: none;">
+            <div class="d-flex align-items-center gap-2 mb-2">
+              <div class="d-flex gap-1" style="position: absolute;">
+                <div class="rounded-circle" style="width: 12px; height: 12px; background-color: #ef4444;"></div>
+                <div class="rounded-circle" style="width: 12px; height: 12px; background-color: #f59e0b;"></div>
+                <div class="rounded-circle" style="width: 12px; height: 12px; background-color: #10b981;"></div>
+              </div>
+              <div class="bg-white rounded-pill px-3 py-1 text-muted text-center mx-auto" style="font-size: 0.8rem;">
+                pagecraft.com/editor</div>
+            </div>
+            <div class="rounded-3 position-relative" style="height: 540px;">
+              <iframe id="demo" src="/?url=index_bs5_copy" allow="fullscreen *; keyboard-map *"></iframe>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="features" class="py-5 bg-light">
+    <div class="container">
+      <div class="text-center mb-5">
+        <h2 class="display-4 fw-bold mb-3" style="outline: none;">Everything You Need to
+          Build<br>Amazing Pages</h2>
+        <p class="lead mx-auto" style="max-width: 600px;">
+          Our powerful editor combines simplicity with professional features,
+          giving you complete control over every aspect of your landing page.
+        </p>
+      </div>
+
+      <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+        <div class="col">
+          <div class="card h-100 p-4 border-0 shadow-sm">
+            <div class="mb-3">
+              <i class="fas fa-layer-group fs-1 text-primary"></i>
+            </div>
+            <h3 class="h5 fw-bold mb-2">Mix &amp; Match Sections</h3>
+            <p class="text-muted">
+              Choose from dozens of pre-built sections and arrange them as simple as pages in a flip book.
+              Headers, features, testimonials, pricing - everything you need.
+            </p>
+          </div>
+        </div>
+
+        <div class="col">
+          <div class="card h-100 p-4 border-0 shadow-sm">
+            <div class="mb-3">
+              <i class="fas fa-edit fs-1 text-primary"></i>
+            </div>
+            <h3 class="h5 fw-bold mb-2">Direct HTML Editing</h3>
+            <p class="text-muted">
+              Click any element to edit text, change colors, adjust fonts, swap images,
+              and modify any style property. No coding knowledge required.
+            </p>
+          </div>
+        </div>
+
+        <div class="col">
+          <div class="card h-100 p-4 border-0 shadow-sm">
+            <div class="mb-3">
+              <i class="fas fa-mobile-alt fs-1 text-primary"></i>
+            </div>
+            <h3 class="h5 fw-bold mb-2">Mobile Responsive</h3>
+            <p class="text-muted">
+              Every template and section is fully responsive. Your pages will look
+              perfect on desktop, tablet, and mobile devices automatically.
+            </p>
+          </div>
+        </div>
+
+        <div class="col">
+          <div class="card h-100 p-4 border-0 shadow-sm">
+            <div class="mb-3">
+              <i class="fas fa-envelope fs-1 text-primary"></i>
+            </div>
+            <h3 class="h5 fw-bold mb-2">Built-in Contact Forms</h3>
+            <p class="text-muted">
+              Every page includes customizable contact forms. With our hosted plan,
+              we process submissions and let you name your own custom fields for any data you need.
+            </p>
+          </div>
+        </div>
+
+        <div class="col">
+          <div class="card h-100 p-4 border-0 shadow-sm">
+            <div class="mb-3">
+              <i class="fas fa-rocket fs-1 text-primary"></i>
+            </div>
+            <h3 class="h5 fw-bold mb-2">Lightning Fast</h3>
+            <p class="text-muted">
+              Optimized code and modern web standards ensure your pages load instantly,
+              improving user experience and search rankings.
+            </p>
+          </div>
+        </div>
+
+        <div class="col">
+          <div class="card h-100 p-4 border-0 shadow-sm">
+            <div class="mb-3">
+              <i class="fas fa-chart-line fs-1 text-primary"></i>
+            </div>
+            <h3 class="h5 fw-bold mb-2">Analytics Ready</h3>
+            <p class="text-muted">
+              Built-in tracking and analytics integration helps you measure performance
+              and optimize your pages for better conversions.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="how-it-works" class="py-5 bg-white">
+    <div class="container">
+      <div class="text-center mb-5">
+        <h2 class="display-4 fw-bold mb-3">How It Works</h2>
+        <p class="lead mx-auto" style="max-width: 600px;">
+          From idea to published page in just three simple steps.
+          No design experience or technical skills required.
+        </p>
+      </div>
+
+      <div class="row row-cols-1 row-cols-md-3 g-4 mt-5">
+        <div class="col">
+          <div class="text-center">
+            <div class="mx-auto mb-3 bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 60px; height: 60px; font-size: 1.5rem; font-weight: 700; background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);">
+              1
+            </div>
+            <h3 class="h5 fw-bold mb-2">Choose Your Sections</h3>
+            <p class="text-muted">
+              Browse our library of professionally designed sections.
+              Pick the ones that match your goals and arrange them in any order.
+            </p>
+          </div>
+        </div>
+
+        <div class="col">
+          <div class="text-center">
+            <div class="mx-auto mb-3 bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 60px; height: 60px; font-size: 1.5rem; font-weight: 700; background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);">
+              2
+            </div>
+            <h3 class="h5 fw-bold mb-2">Customize Everything</h3>
+            <p class="text-muted">
+              Click any element to edit. Change text, colors, fonts, images,
+              and styling with our intuitive visual editor.
+            </p>
+          </div>
+        </div>
+
+        <div class="col">
+          <div class="text-center">
+            <div class="mx-auto mb-3 bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 60px; height: 60px; font-size: 1.5rem; font-weight: 700; background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);">
+              3
+            </div>
+            <h3 class="h5 fw-bold mb-2">Publish &amp; Share</h3>
+            <p class="text-muted">
+              Hit publish and your page goes live instantly.
+              Share your custom URL or embed it on your existing website.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="pricing" class="pricing py-5 bg-white">
+    <div class="container">
+      <div class="text-center mb-5 section-header">
+        <h2 class="display-4 fw-bold mb-3 section-title">Choose Your Perfect Plan</h2>
+        <p class="lead mx-auto section-subtitle">
+          From DIY creators to enterprise solutions, we have the right plan for your needs.
+          All plans include our powerful drag-and-drop editor and professional templates.
+        </p>
+      </div>
+
+      <div class="pricing-grid row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mt-5">
+        <!-- Free Plan -->
+        <div class="col">
+          <div class="pricing-card card h-100 p-4 border-2 animate-on-scroll">
+            <div class="pricing-plan h5 fw-bold mb-2">DIY Creator</div>
+            <div class="pricing-price display-4 fw-bold">Free</div>
+            <div class="pricing-period text-muted mb-4">Forever</div>
+            <p class="pricing-description text-muted mb-4">
+              Perfect for individuals and small businesses who want to create and host their own landing pages.
+            </p>
+            <ul class="pricing-features list-unstyled text-start mb-4">
+              <li class="d-flex align-items-center mb-2"><span class="check me-2">✓</span> <span>Full access to page editor
+              </span></li>
+              <li class="d-flex align-items-center mb-2"><span class="check me-2">✓</span> <span>All template sections</span></li>
+              <li class="d-flex align-items-center mb-2"><span class="check me-2">✓</span> <span>Unlimited pages</span></li>
+              <li class="d-flex align-items-center mb-2"><span class="check me-2">✓</span> <span>Export HTML/CSS</span></li>
+              <li class="d-flex align-items-center mb-2"><span class="check me-2">✓</span> <span>Self-hosting required</span></li>
+              <li class="d-flex align-items-center mb-2"><span class="check me-2">✓</span> <span>Community support</span></li>
+            </ul>
+            <a href="#" class="pricing-cta secondary btn btn-outline-primary w-100 mt-auto" style="background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%); color: white; font-weight: 600; padding: 1rem;">Get
+              Started Free</a>
+          </div>
+        </div>
+
+        <!-- Hosted Plan -->
+        <div class="col">
+          <div class="pricing-card featured card h-100 p-4 border-2 position-relative animate-on-scroll">
+            <div class="pricing-badge position-absolute translate-middle-x text-white rounded-pill" style="zoom: 120%;">
+              Most Popular</div>
+            <div class="pricing-plan h5 fw-bold mb-2 mt-3">Hosted Pro</div>
+            <div class="pricing-price display-4 fw-bold">$23</div>
+            <div class="pricing-period text-white-50 mb-4">per month</div>
+            <p class="pricing-description text-white-75 mb-4">
+              Same powerful editor, but we handle all the hosting so you can focus on creating amazing pages.
+            </p>
+            <ul class="pricing-features list-unstyled text-start mb-4">
+              <li class="d-flex align-items-center mb-2"><span class="check me-2">✓</span> <span>Everything in DIY Creator</span></li>
+              <li class="d-flex align-items-center mb-2"><span class="check me-2">✓</span> <span>Professional hosting included</span></li>
+              <li class="d-flex align-items-center mb-2"><span class="check me-2">✓</span> <span>Custom domain support</span></li>
+              <li class="d-flex align-items-center mb-2"><span class="check me-2">✓</span> <span>SSL certificates</span></li>
+              <li class="d-flex align-items-center mb-2"><span class="check me-2">✓</span> <span>Contact form processing</span></li>
+              <li class="d-flex align-items-center mb-2"><span class="check me-2">✓</span> <span>Custom form fields (name your own)</span></li>
+              <li class="d-flex align-items-center mb-2"><span class="check me-2">✓</span> <span>99.9% uptime guarantee</span></li>
+            </ul>
+            <a href="#" class="pricing-cta featured btn btn-white w-100 mt-auto" style="color: #3b82f6;">Get Started</a>
+          </div>
+        </div>
+
+        <!-- Custom Plan -->
+        <div class="col">
+          <div class="pricing-card card h-100 p-4 border-2 animate-on-scroll">
+            <div class="pricing-plan h5 fw-bold mb-2">Custom Development</div>
+            <div class="pricing-price display-4 fw-bold" contenteditable="false" style="outline: none;">Contact Us</div>
+            <div class="pricing-period text-muted mb-4">Project-based</div>
+            <p class="pricing-description text-muted mb-4">
+              Need something beyond a landing page? Our principal engineers build custom enterprise solutions.
+            </p>
+            <ul class="pricing-features list-unstyled text-start mb-4">
+              <li class="d-flex align-items-center mb-2"><span class="check me-2">✓</span> <span contenteditable="false" class="" style="outline: none;">Custom web applications</span></li>
+              <li class="d-flex align-items-center mb-2"><span class="check me-2">✓</span> <span>Enterprise integrations</span></li>
+              <li class="d-flex align-items-center mb-2"><span class="check me-2">✓</span> <span>Database design</span></li>
+              <li class="d-flex align-items-center mb-2"><span class="check me-2">✓</span> <span>API development</span></li>
+              <li class="d-flex align-items-center mb-2"><span class="check me-2">✓</span> <span>Cloud architecture</span></li>
+              <li class="d-flex align-items-center mb-2"><span class="check me-2">✓</span> <span>DevOps &amp; deployment</span></li>
+              <li class="d-flex align-items-center mb-2"><span class="check me-2">✓</span> <span>Ongoing maintenance</span></li>
+              <li class="d-flex align-items-center mb-2"><span class="check me-2">✓</span> <span>Dedicated project manager</span></li>
+            </ul>
+            <a href="#" class="pricing-cta primary btn btn-primary w-100 mt-auto" style="background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%); font-weight: 600; padding: 1rem;">Schedule
+              Consultation</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="container enterprise-highlight">
+      <h3 class="enterprise-title">Enterprise-Grade Development Team</h3>
+      <p class="enterprise-description text-muted">
+        Our team consists of principal engineers with decades of experience building scalable enterprise systems.
+        We've architected solutions running on major cloud platforms, handling millions of users and transactions.
+      </p>
+      <div class="tech-badges">
+        <span class="tech-badge">HTML</span>
+        <span class="tech-badge">CSS</span>
+        <span class="tech-badge">JavaScript</span>
+        <span class="tech-badge">Java</span>
+        <span class="tech-badge">Node.js</span>
+        <span class="tech-badge">PostgreSQL</span>
+        <span class="tech-badge">NoSQL</span>
+        <span class="tech-badge">Ecommerce</span>
+        <span class="tech-badge">Integrations</span>
+        <span class="tech-badge">APIs</span>
+        <span class="tech-badge">MVPs</span>
+        <span class="tech-badge">AI</span>
+        <span class="tech-badge">AWS</span>
+        <span class="tech-badge">Google Cloud</span>
+        <span class="tech-badge">Microsoft Azure</span>
+        <span class="tech-badge">Kubernetes</span>
+        <span class="tech-badge">Microservices</span>
+      </div>
+      <a class="btn btn-primary" href="#" style="background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%); padding: 1rem; font-weight: 600;">
+  <i class="fas fa-calendar"></i> <span>Book a Strategy Call</span></a>
+    </div>
+  </section>
+
+  <section class="py-5 bg-dark text-white text-center cta">
+    <div class="container">
+      <h2 class="display-4 fw-bold mb-3">Ready to Build Your First Page?</h2>
+      <p class="lead mb-4 mx-auto" style="max-width: 800px; outline: none;" contenteditable="false">
+        Join thousands of businesses creating beautiful landing pages with PageCraft.<br>
+        Get started today - no credit card required for the free plan.
+      </p>
+
+      <form id="signupForm" class="d-flex justify-content-center gap-2 mx-auto" style="max-width: 600px;">
+        <input type="email" class="form-control" placeholder="Enter your email address" required="">
+        <button type="submit" class="btn btn-primary" style="width: 180px; padding: 1rem; background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%); font-weight: 600;">Get
+          Started</button>
+      </form>
+
+      <p class="mt-3 text-white-50" style="font-size: 0.9rem;">
+  <span class="check me-1">✓</span> <span class="me-2">Free plan available</span> <span class="check me-1">✓</span>
+  <span class="me-2">No credit card required</span> <span class="check me-1">✓</span> <span>Upgrade anytime</span>
+</p>
+    </div>
+  </section>
+
+  <footer class="footer bg-dark text-white py-5">
+    <div class="container">
+      <div class="footer-content row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4 mb-5">
+        <div class="footer-section col">
+          <h3 class="h5 mb-3 text-white"><i class="fas fa-magic me-2"></i> <span>PageCraft</span></h3>
+          <p class="text-white-50 mb-3">
+            The easiest way to create stunning landing pages that convert visitors into customers.
+          </p>
+          <div class="social-links d-flex gap-3">
+            <a href="#" class="text-white-50 fs-5"><i class="fab fa-twitter"></i></a>
+            <a href="#" class="text-white-50 fs-5"><i class="fab fa-facebook"></i></a>
+            <a href="#" class="text-white-50 fs-5"><i class="fab fa-linkedin"></i></a>
+            <a href="#" class="text-white-50 fs-5"><i class="fab fa-instagram"></i></a>
+          </div>
+        </div>
+
+        <div class="footer-section col">
+          <h3 class="h5 mb-3 text-white">Product</h3>
+          <ul class="list-unstyled">
+            <li class="mb-2"><a href="#" class="text-white-50 text-decoration-none">Features</a></li>
+            <li class="mb-2"><a href="#" class="text-white-50 text-decoration-none">Templates</a></li>
+            <li class="mb-2"><a href="#" class="text-white-50 text-decoration-none">Pricing</a></li>
+            <li class="mb-2"><a href="#" class="text-white-50 text-decoration-none">Integrations</a></li>
+            <li class="mb-2"><a href="#" class="text-white-50 text-decoration-none">API</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-section col">
+          <h3 class="h5 mb-3 text-white">Resources</h3>
+          <ul class="list-unstyled">
+            <li class="mb-2"><a href="#" class="text-white-50 text-decoration-none">Help Center</a></li>
+            <li class="mb-2"><a href="#" class="text-white-50 text-decoration-none">Tutorials</a></li>
+            <li class="mb-2"><a href="#" class="text-white-50 text-decoration-none">Blog</a></li>
+            <li class="mb-2"><a href="#" class="text-white-50 text-decoration-none">Community</a></li>
+            <li class="mb-2"><a href="#" class="text-white-50 text-decoration-none">Webinars</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-section col">
+          <h3 class="h5 mb-3 text-white">Company</h3>
+          <ul class="list-unstyled">
+            <li class="mb-2"><a href="#" class="text-white-50 text-decoration-none">About Us</a></li>
+            <li class="mb-2"><a href="#" class="text-white-50 text-decoration-none">Careers</a></li>
+            <li class="mb-2"><a href="#" class="text-white-50 text-decoration-none">Contact</a></li>
+            <li class="mb-2"><a href="#" class="text-white-50 text-decoration-none">Privacy Policy</a></li>
+            <li class="mb-2"><a href="#" class="text-white-50 text-decoration-none">Terms of Service</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom text-center pt-4 border-top border-secondary">
+        <p class="text-white-50">© 2024 PageCraft. All rights reserved. Built with ❤️ for creators everywhere.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+  <script>
+    // Smooth scrolling for navigation links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+          target.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+          });
+        }
+      });
+    });
+
+    // Form submission
+    document.getElementById('signupForm').addEventListener('submit', function (e) {
+      e.preventDefault();
+      const email = this.querySelector('input[type="email"]').value;
+
+      // Here you would typically send the email to your backend
+      alert(`Thanks for your interest! We'll send access details to ${email} so you can start building your landing page.`);
+
+      // Reset form
+      this.reset();
+    });
+
+    // Add scroll effect to navbar
+    window.addEventListener('scroll', function () {
+      const navbar = document.querySelector('.navbar');
+      if (window.scrollY > 100) {
+        navbar.style.background = 'rgba(255, 255, 255, 0.98)';
+        navbar.style.boxShadow = '0 2px 20px rgba(0, 0, 0, 0.1)';
+      } else {
+        navbar.style.background = 'rgba(255, 255, 255, 0.95)';
+        navbar.style.boxShadow = 'none';
+      }
+    });
+
+    // Animate elements on scroll
+    const observerOptions = {
+      threshold: 0.1,
+      rootMargin: '0px 0px -50px 0px'
+    };
+
+    const observer = new IntersectionObserver(function (entries) {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('animate-on-scroll');
+        }
+      });
+    }, observerOptions);
+
+    // Observe all feature cards, steps, and pricing cards
+    document.querySelectorAll('.feature-card, .step, .pricing-card').forEach(el => {
+      observer.observe(el);
+    });
+  </script>
+
+  <script id="liquid-script">
+    class LiquidGradient {
+      constructor() {
+        this.canvas = document.getElementById('gradient-canvas');
+        this.gl = this.canvas.getContext('webgl') || this.canvas.getContext('experimental-webgl');
+
+        if (!this.gl) {
+          alert('WebGL not supported in your browser.');
+          return;
+        }
+
+        this.speed = 0.5;
+        this.scale = 1.0;
+        this.colorStops = [
+          [59 / 255, 130 / 255, 246 / 255, 1],    // #3b82f6
+          [30 / 255, 64 / 255, 175 / 255, 1],     // #1e40af
+          [30 / 255, 64 / 255, 175 / 255, 1]      // #1e40af
+        ];
+
+        this.vertexShaderSource = `
+          attribute vec2 a_position;
+          
+          void main() {
+            gl_Position = vec4(a_position, 0.0, 1.0);
+          }
+        `;
+
+        this.fragmentShaderSource = `
+          precision mediump float;
+          
+          uniform float u_time;
+          uniform vec2 u_resolution;
+          uniform float u_scale;
+          uniform vec4 u_colors[3];
+          
+          // Simplex 2D noise function
+          vec3 permute(vec3 x) { return mod(((x*34.0)+1.0)*x, 289.0); }
+          
+          float snoise(vec2 v) {
+            const vec4 C = vec4(0.211324865405187, 0.366025403784439,
+                              -0.577350269189626, 0.024390243902439);
+            vec2 i  = floor(v + dot(v, C.yy));
+            vec2 x0 = v -   i + dot(i, C.xx);
+            vec2 i1;
+            i1 = (x0.x > x0.y) ? vec2(1.0, 0.0) : vec2(0.0, 1.0);
+            vec4 x12 = x0.xyxy + C.xxzz;
+            x12.xy -= i1;
+            i = mod(i, 289.0);
+            vec3 p = permute(permute(i.y + vec3(0.0, i1.y, 1.0))
+                  + i.x + vec3(0.0, i1.x, 1.0));
+            vec3 m = max(0.5 - vec3(dot(x0,x0), dot(x12.xy,x12.xy),
+                                  dot(x12.zw,x12.zw)), 0.0);
+            m = m*m;
+            m = m*m;
+            vec3 x = 2.0 * fract(p * C.www) - 1.0;
+            vec3 h = abs(x) - 0.5;
+            vec3 ox = floor(x + 0.5);
+            vec3 a0 = x - ox;
+            m *= 1.79284291400159 - 0.85373472095314 * (a0*a0 + h*h);
+            vec3 g;
+            g.x  = a0.x  * x0.x  + h.x  * x0.y;
+            g.yz = a0.yz * x12.xz + h.yz * x12.yw;
+            return 130.0 * dot(m, g);
+          }
+          
+          void main() {
+            vec2 st = gl_FragCoord.xy / u_resolution.xy;
+            st.x *= u_resolution.x / u_resolution.y;
+            
+            // Animated noise fields
+            float noise1 = snoise(st * u_scale + vec2(u_time * 0.2, u_time * 0.1)) * 0.5 + 0.5;
+            float noise2 = snoise(st * u_scale * 0.8 + vec2(-u_time * 0.15, u_time * 0.05)) * 0.5 + 0.5;
+            float noise3 = snoise(st * u_scale * 1.5 + vec2(u_time * 0.1, -u_time * 0.2)) * 0.5 + 0.5;
+            
+            // Combine noise fields
+            float combinedNoise = noise1 * 0.5 + noise2 * 0.3 + noise3 * 0.2;
+            
+            // Create a flowing gradient using our noise
+            vec4 color = mix(u_colors[0], u_colors[1], smoothstep(0.2, 0.8, combinedNoise));
+            color = mix(color, u_colors[2], smoothstep(0.4, 0.9, noise2));
+            
+            gl_FragColor = color;
+          }
+        `;
+
+        this.init();
+        this.resize();
+        window.addEventListener('resize', this.resize.bind(this));
+        this.animate();
+      }
+
+      init() {
+        // Create shader program
+        const vertexShader = this.createShader(this.gl.VERTEX_SHADER, this.vertexShaderSource);
+        const fragmentShader = this.createShader(this.gl.FRAGMENT_SHADER, this.fragmentShaderSource);
+        this.program = this.createProgram(vertexShader, fragmentShader);
+
+        // Look up attribute and uniform locations
+        this.positionAttributeLocation = this.gl.getAttribLocation(this.program, 'a_position');
+        this.timeUniformLocation = this.gl.getUniformLocation(this.program, 'u_time');
+        this.resolutionUniformLocation = this.gl.getUniformLocation(this.program, 'u_resolution');
+        this.scaleUniformLocation = this.gl.getUniformLocation(this.program, 'u_scale');
+        this.colorsUniformLocation = this.gl.getUniformLocation(this.program, 'u_colors');
+
+        // Create position buffer and set attributes
+        const positionBuffer = this.gl.createBuffer();
+        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, positionBuffer);
+
+        // Two triangles that cover the entire canvas
+        const positions = [
+          -1, -1,
+          1, -1,
+          -1, 1,
+          -1, 1,
+          1, -1,
+          1, 1,
+        ];
+        this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(positions), this.gl.STATIC_DRAW);
+      }
+
+      createShader(type, source) {
+        const shader = this.gl.createShader(type);
+        this.gl.shaderSource(shader, source);
+        this.gl.compileShader(shader);
+
+        const success = this.gl.getShaderParameter(shader, this.gl.COMPILE_STATUS);
+        if (success) {
+          return shader;
+        }
+
+        console.error(this.gl.getShaderInfoLog(shader));
+        this.gl.deleteShader(shader);
+      }
+
+      createProgram(vertexShader, fragmentShader) {
+        const program = this.gl.createProgram();
+        this.gl.attachShader(program, vertexShader);
+        this.gl.attachShader(program, fragmentShader);
+        this.gl.linkProgram(program);
+
+        const success = this.gl.getProgramParameter(program, this.gl.LINK_STATUS);
+        if (success) {
+          return program;
+        }
+
+        console.error(this.gl.getProgramInfoLog(program));
+        this.gl.deleteProgram(program);
+      }
+
+      resize() {
+        // Set the canvas size to match the display size
+        const displayWidth = this.canvas.clientWidth;
+        const displayHeight = this.canvas.clientHeight;
+
+        if (this.canvas.width !== displayWidth || this.canvas.height !== displayHeight) {
+          this.canvas.width = displayWidth;
+          this.canvas.height = displayHeight;
+          this.gl.viewport(0, 0, this.gl.canvas.width, this.gl.canvas.height);
+        }
+      }
+
+      animate() {
+        this.render();
+        requestAnimationFrame(this.animate.bind(this));
+      }
+
+      render() {
+        // Set the time for animation
+        const currentTime = performance.now() / 1000;
+
+        // Tell WebGL to use our program
+        this.gl.useProgram(this.program);
+
+        // Update uniforms
+        this.gl.uniform1f(this.timeUniformLocation, currentTime * this.speed);
+        this.gl.uniform2f(this.resolutionUniformLocation, this.canvas.width, this.canvas.height);
+        this.gl.uniform1f(this.scaleUniformLocation, this.scale);
+
+        // Set colors
+        const flattenedColors = [];
+        this.colorStops.forEach(color => {
+          flattenedColors.push(...color);
+        });
+        this.gl.uniform4fv(this.colorsUniformLocation, new Float32Array(flattenedColors));
+
+        // Set up position attribute
+        this.gl.enableVertexAttribArray(this.positionAttributeLocation);
+        this.gl.vertexAttribPointer(
+          this.positionAttributeLocation,
+          2,          // 2 components per iteration
+          this.gl.FLOAT,  // the data is 32bit floats
+          false,      // don't normalize the data
+          0,          // 0 = move forward size * sizeof(type) each iteration to get the next position
+          0,          // start at the beginning of the buffer
+        );
+
+        // Draw
+        this.gl.drawArrays(this.gl.TRIANGLES, 0, 6);
+      }
+    }
+
+    // Initialize the gradient when the page loads
+    window.addEventListener('load', () => {
+      // new LiquidGradient();
+    });
+
+    const iframe = document.querySelector('iframe');
+
+    let holdScroll = -1;
+
+    setInterval(() => {
+      if (holdScroll !== -1 && window.pageYOffset !== holdScroll) {
+        window.scrollTo({ top: holdScroll, behavior: "instant" });
+      }
+    }, 10);
+
+    iframe.addEventListener('mouseenter', function (e) {
+      holdScroll = window.pageYOffset;
+      console.log("iframe mouse enter", holdScroll);
+      // Disable scrolling
+      document.body.style.overflow = 'hidden';
+    });
+
+    iframe.addEventListener('mouseleave', function (e) {
+      console.log("iframe mouse leave")
+      holdScroll = -1;
+      // Re-enable scrolling
+      document.body.style.overflow = '';
+    });    
+  </script>
+
+
+
+</body></html>

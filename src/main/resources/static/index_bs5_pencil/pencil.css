@@ -1,0 +1,97 @@
+@import url("https://fonts.googleapis.com/css?family=Neucha|Patrick+Hand+SC&display=swap");
+
+body {
+  font-family: 'Neucha';
+  font-size: 110%;
+}
+
+iframe,
+section,
+footer,
+div.pencil,
+a.btn,
+button,
+input,
+textarea,
+select,
+.badge,
+.alert,
+.dropdown-menu {
+  border-bottom-left-radius: 15px 255px !important;
+  border-bottom-right-radius: 225px 15px !important;
+  border-style: solid !important;
+  border-top-left-radius: 255px 15px !important;
+  border-top-right-radius: 15px 225px !important;
+  border-width: 2px !important;
+}
+
+.carousel-control-prev,
+.carousel-control-next
+{
+  border-style: none !important;
+}
+
+.navbar,
+table.table-bordered,
+.modal-dialog,
+.modal-content,
+.list-group,
+.card {
+  /* Change these properties */
+  --border: 1px solid #cccccc;
+
+  border-bottom-left-radius: 8px 255px !important;
+  border-bottom-right-radius: 225px 8px !important;
+  border-style: solid !important;
+  border-top-left-radius: 255px 8px !important;
+  border-top-right-radius: 8px 225px !important;
+  border-width: 2px !important;
+
+  /* Don't change these properties */
+  border-spacing: 0;
+  border-collapse: separate;
+  border: var(--border);
+  /* overflow: hidden; */
+}
+
+.accordion,
+.accordion-button,
+.carousel {
+  /* Change these properties */
+  --border: 1px solid #cccccc ;
+
+  border-bottom-left-radius: 4px 255px !important;
+  border-bottom-right-radius: 225px 4px !important;
+  border-style: solid !important;
+  border-top-left-radius: 255px 4px !important;
+  border-top-right-radius: 4px 225px !important;
+  border-width: 2px !important;
+
+  /* Don't change these properties */
+  border-spacing: 0;
+  border-collapse: separate;
+  border: var(--border);
+  overflow: hidden;
+}
+
+/* Apply a border to the right of all but the last column */
+table.table-bordered th:not(:last-child),
+table.table-bordered td:not(:last-child) {
+  border-right: var(--border);
+}
+
+/* Apply a border to the bottom of all but the last row */
+table.table-bordered>thead>tr:not(:last-child)>th,
+table.table-bordered>thead>tr:not(:last-child)>td,
+table.table-bordered>tbody>tr:not(:last-child)>th,
+table.table-bordered>tbody>tr:not(:last-child)>td,
+table.table-bordered>tfoot>tr:not(:last-child)>th,
+table.table-bordered>tfoot>tr:not(:last-child)>td,
+table.table-bordered>tr:not(:last-child)>td,
+table.table-bordered>tr:not(:last-child)>th,
+table.table-bordered>thead:not(:last-child),
+table.table-bordered>tbody:not(:last-child),
+table.table-bordered>tfoot:not(:last-child),
+.table-bordered>:not(caption)>*>* {
+  border-bottom: var(--border);
+}
