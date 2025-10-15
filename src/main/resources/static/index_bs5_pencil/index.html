@@ -16,7 +16,7 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="cerulean.css" />
+    <link rel="stylesheet" href="pencil.css" />
     <style>
       body {
         /* font-family: 'Inter', sans-serif; */
@@ -67,7 +67,7 @@
 
       .card:hover {
         transform: translateY(-5px);
-        /* box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3) !important; */
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3) !important;
       }
 
       .btn.watch-demo {
@@ -1031,10 +1031,11 @@
 
           this.speed = 0.5;
           this.scale = 1.0;
+
           this.colorStops = [
-            [34 / 255, 34 / 255, 34 / 255, 1], // #222222
-            [68 / 255, 68 / 255, 68 / 255, 1], // #444444
-            [68 / 255, 68 / 255, 68 / 255, 1], // #444444
+            [10 / 255, 88 / 255, 202 / 255, 1], // #0a58ca
+            [8 / 255, 66 / 255, 152 / 255, 1], // #084298
+            [5 / 255, 44 / 255, 101 / 255, 1], // #052c65
           ];
 
           this.vertexShaderSource = `
@@ -1255,7 +1256,7 @@
 
       // Initialize the gradient when the page loads
       window.addEventListener("load", () => {
-        // new LiquidGradient();
+        new LiquidGradient();
       });
 
       const iframe = document.querySelector("iframe");
