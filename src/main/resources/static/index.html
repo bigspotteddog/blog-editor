@@ -10,8 +10,47 @@
     integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
   <link rel="stylesheet" data-name="vs/editor/editor.main" href="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs/editor/editor.main.min.css">
+  <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/gh/mdbassit/Coloris@latest/dist/coloris.min.css">
+  <style type="text/css">
+    .border-color input,
+    .fill-color input,
+    .text-color input {
+      width: 40px;
+      height: 40px;
+      border: none;
+    }
 
-  <style>
+    .border-color button,
+    .fill-color button,
+    .text-color button {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+    }
+
+    .border-color svg,
+    .fill-color svg,
+    .text-color svg {
+      position: absolute;
+      margin: 6px;
+      z-index: 1;
+    }
+
+    .clr-picker.clr-open {
+      margin-top: 10px;
+      z-index: 10000;
+    }
+
+    .border-color .clr-field input,
+    .fill-color .clr-field input,
+    .text-color .clr-field input {
+      padding-left: 36px;
+    }
+  </style>
+
+
+
+<style>
     .editable {
       position: relative;
     }
@@ -583,8 +622,7 @@
       padding-right: 4px;
       padding-bottom: 2px;
     }
-
-  </style>
+</style>
 </head>
 
 <body>
@@ -633,14 +671,39 @@
         <div class="accordion" id="accordionPanelsStayOpenExample">
           <div class="accordion-item">
             <h2 class="accordion-header">
-              <button class="accordion-button bg-white fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseOne" aria-expanded="true" aria-controls="panelsStayOpen-collapseOne">
-                Elements
+              <button class="accordion-button bg-white fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseFour" aria-expanded="true" aria-controls="panelsStayOpen-collapseFour">
+                Properties
               </button>
             </h2>
-            <div id="panelsStayOpen-collapseOne" class="accordion-collapse collapse show" style="">
+            <div id="panelsStayOpen-collapseFour" class="accordion-collapse collapse show" style="">
               <div class="accordion-body">
-                <div id="component-selector" class="component-selector">
-                  <div class="hierarchy-menu"></div>
+                <div class="container p-4">
+                  <div class="row">
+                    <div class="col-sm-4 btn-group d-block text-center fs-6 fill-color">
+                      <div class="pb-2">
+                        <input id="fill-color-input" type="text" class="coloris instance2" value="#fafafa">
+                      </div>
+                      <div>
+                        Background Color
+                      </div>
+                    </div>
+                    <div class="col-sm-4 btn-group d-block text-center fs-6 text-color">
+                      <div class="pb-2">
+                        <input id="text-color-input" type="text" class="coloris instance3" value="#000000">
+                      </div>
+                      <div>
+                        Text Color
+                      </div>
+                    </div>
+                    <div class="col-sm-4 btn-group d-block text-center fs-6 border-color">
+                      <div class="pb-2">
+                        <input id="border-color-input" type="text" class="coloris instance1" value="#333333">
+                      </div>
+                      <div class="tool-bar-button">
+                        Border Color
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -665,6 +728,20 @@
                     </thead>
                     <tbody></tbody>
                   </table>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="accordion-item">
+            <h2 class="accordion-header">
+              <button class="accordion-button bg-white fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseOne" aria-expanded="true" aria-controls="panelsStayOpen-collapseOne">
+                Elements
+              </button>
+            </h2>
+            <div id="panelsStayOpen-collapseOne" class="accordion-collapse collapse show" style="">
+              <div class="accordion-body">
+                <div id="component-selector" class="component-selector">
+                  <div class="hierarchy-menu"></div>
                 </div>
               </div>
             </div>
@@ -1294,6 +1371,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs/loader.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs/editor/editor.main.nls.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs/editor/editor.main.js"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/gh/mdbassit/Coloris@latest/dist/coloris.min.js"></script>
 
   <!-- Toolbar initialization script -->
   <script>
@@ -1817,6 +1895,36 @@
       }
     }
 
+    function setColor(colorPicker, element, attribute) {
+      // Get the computed background color of the element
+      const computedStyle = window.getComputedStyle(element);
+      const color = computedStyle[attribute];
+      
+      // Convert RGB to hex if needed
+      if (color && color.startsWith('rgb')) {
+        // Convert RGB to hex
+        const rgbValues = color.match(/\d+/g);
+        if (rgbValues && rgbValues.length >= 3) {
+          const r = parseInt(rgbValues[0]);
+          const g = parseInt(rgbValues[1]);
+          const b = parseInt(rgbValues[2]);
+          const hexColor = "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+          colorPicker.value = hexColor;
+          // Update the Coloris picker value
+          colorPicker.setAttribute('data-coloris', hexColor);
+        }
+      } else if (color) {
+        colorPicker.value = color;
+        // Update the Coloris picker value
+        colorPicker.setAttribute('data-coloris', color);
+      } else {
+        colorPicker.value = "#ffffff"; // Default to white if no background color
+        // Update the Coloris picker value
+        colorPicker.setAttribute('data-coloris', '#ffffff');
+      }
+      colorPicker.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+
     function updateStylesDialog(element) {
       const stylesDialogElement = document.querySelector(".styles-dialog-element");
       stylesDialogElement.innerHTML = getElementDisplayName(element);
@@ -1825,6 +1933,22 @@
       const editorPanel = document.querySelector('.editor-panel');
       if (editorPanel) {
         editorPanel.style.display = 'none';
+      }
+      
+      // Update the background color picker to match the selected element
+      const bgColorPicker = document.getElementById('fill-color-input');
+      if (bgColorPicker) {
+        setColor(bgColorPicker, element, 'background-color');
+      }
+
+      const borderColorPicker = document.getElementById('border-color-input');
+      if (borderColorPicker) {
+        setColor(borderColorPicker, element, 'border-color');
+      }
+
+      const textColorPicker = document.getElementById('text-color-input');
+      if (textColorPicker) {
+        setColor(textColorPicker, element, 'color');
       }
 
       // If the element is not a style element, add class list and inline styles
@@ -3815,7 +3939,7 @@
       const url = document.querySelector("input[type=search]").value;
       console.log(url);
       document.cookie = "proxy=" + url + "; path=/;";
-      iframe.src = "editor/" + "?url=" + url + "&t=" + new Date().getTime();
+      iframe.src = "/" + url;
       
       // Clear expanded nodes when loading a new page
       expandedNodes.clear();
@@ -3870,6 +3994,206 @@
       // Clean up
       URL.revokeObjectURL(url);
     });
+
+    Coloris({
+      el: '.coloris',
+      swatches: [
+        '#ffffff',
+        '#000000',
+        '#FF0000',
+        '#FF7F00',
+        '#FFFF00',
+        '#008000',
+        '#0000FF',
+        '#4da6ff',
+        '#9400D3',
+        '#aaaaaa',
+        '#ffffff00'
+      ],
+      theme: 'polaroid'
+    });
+
+    const setBackgroundColor = (color) => {
+      console.log("background-color", color);
+      activeContainer.style["background-color"] = color;
+      activeContainer.style.setProperty("background-color", color.replace("!important", "").trim(), "important");
+    }
+
+    const setBorderColor = (color) => {
+      console.log("border-color", color);
+      activeContainer.style.setProperty("border-color", color.replace("!important", "").trim(), "important");
+    }
+
+    const setTextColor = (color) => {
+      console.log("text-color", color);
+      activeContainer.style.setProperty("color", color.replace("!important", "").trim(), "important");
+    }
+
+    document.addEventListener('coloris:pick', event => {
+      console.log(event);
+      if (event.detail.currentEl.id === "fill-color-input") {
+        setBackgroundColor(event.detail.color);
+      } else if (event.detail.currentEl.id === "border-color-input") {
+        setBorderColor(event.detail.color);
+      } else if (event.detail.currentEl.id === "text-color-input") {
+        setTextColor(event.detail.color);
+      }
+    });
+
+    // document.querySelector('.border-color svg').addEventListener('click', e => {
+    //   document.querySelector('.border-color input').click();
+    //   Coloris.setInstance('.instance1', {
+    //   });
+    // });
+
+    // document.querySelector('.fill-color svg').addEventListener('click', e => {
+    //   document.querySelector('.fill-color input').click();
+    //   Coloris.setInstance('.instance2', {
+    //   });
+    // });
+
+    // document.querySelector('.text-color svg').addEventListener('click', e => {
+    //   document.querySelector('.text-color input').click();
+    //   Coloris.setInstance('.instance3', {
+    //   });
+    // });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    // Initialize Coloris for background color picker
+    // Coloris({
+    //   el: '#bg-color-picker',
+    //   theme: 'pill',
+    //   themeMode: 'light',
+    //   format: 'hex',
+    //   swatches: [
+    //     '#ff0000',
+    //     '#00ff00',
+    //     '#0000ff',
+    //     '#ffff00',
+    //     '#00ffff',
+    //     '#ff00ff',
+    //     '#000000',
+    //     '#ffffff',
+    //     '#808080',
+    //     '#0d6efd',
+    //     '#198754',
+    //     '#ffc107',
+    //     '#dc3545'
+    //   ]
+    // });
+
+    // // Add background color functionality to update the element in real-time
+    // document.getElementById('bg-color-picker').addEventListener('input', function() {
+    //   if (activeContainer) {
+    //     const selectedColor = this.value;
+        
+    //     // Set the background color of the selected element
+    //     activeContainer.style.backgroundColor = selectedColor;
+        
+    //     // Update the styles dialog to reflect the new background color
+    //     const stylesTable = document.querySelector('.styles-dialog table tbody');
+    //     if (stylesTable) {
+    //       // Look for an existing background-color row and update it
+    //       let foundBgRow = false;
+    //       const rows = stylesTable.querySelectorAll('tr');
+    //       rows.forEach(row => {
+    //         const propertyCell = row.querySelector('td[contenteditable="true"]');
+    //         if (propertyCell && propertyCell.textContent.trim() === 'background-color') {
+    //           const valueCell = propertyCell.nextElementSibling;
+    //           if (valueCell) {
+    //             valueCell.textContent = selectedColor;
+    //             foundBgRow = true;
+    //           }
+    //         }
+    //       });
+          
+    //       // If no background-color row exists, add a new one
+    //       if (!foundBgRow) {
+    //         const row = document.createElement('tr');
+    //         row.innerHTML = `
+    //           <td contenteditable="true">background-color</td>
+    //           <td contenteditable="true">${selectedColor}</td>
+    //           <td><button class="btn btn-sm btn-outline-danger remove-inline-style" title="Remove style"><i class="bi bi-trash3"></i></button></td>
+    //         `;
+            
+    //         // Add change handlers for both cells
+    //         const cells = row.querySelectorAll('td[contenteditable="true"]');
+    //         const removeButton = row.querySelector('.remove-inline-style');
+    //         cells[0].addEventListener('keydown', (e) => {
+    //           if (e.key === 'Enter') {
+    //             e.preventDefault();
+    //             updateInlineStyle(e);
+    //           }
+    //         });
+    //         cells[1].addEventListener('keydown', (e) => {
+    //           if (e.key === 'Enter') {
+    //             e.preventDefault();
+    //             updateInlineStyle(e);
+    //           } else if (e.key === 'Tab' && !(event.ctrlKey || event.altKey || event.shiftKey || event.metaKey)) {
+    //             e.preventDefault();
+    //             updateInlineStyle(e);
+    //             setTimeout(() => {
+    //               addInlineStyle();
+    //             }, 100);
+    //           }
+    //         });
+            
+    //         cells[0].addEventListener('focus', focusSelect);
+    //         cells[1].addEventListener('focus', focusSelect);
+            
+    //         // Add click handler for remove button
+    //         removeButton.addEventListener('click', (e) => {
+    //           const row = e.target.closest('tr');
+    //           const propertyCell = row.querySelector('td[contenteditable="true"]');
+    //           const property = propertyCell.textContent.trim();
+              
+    //           if (activeContainer && property) {
+    //             activeContainer.style.removeProperty(property);
+    //             row.remove();
+    //           }
+    //         });
+
+    //         // Insert after the inline styles header row
+    //         const inlineStylesHeader = stylesTable.querySelector('tr#inline-styles-header');
+    //         if (inlineStylesHeader) {
+    //           inlineStylesHeader.after(row);
+    //         } else {
+    //           // Fallback - append to table
+    //           stylesTable.appendChild(row);
+    //         }
+    //       }
+    //     }
+    //   }
+    // });
+
+    // // Apply button can still be used to ensure the value is applied even after direct input
+    // document.getElementById('apply-bg-color').addEventListener('click', function() {
+    //   // Trigger the input event to apply the current color value
+    //   const colorPicker = document.getElementById('bg-color-picker');
+    //   colorPicker.dispatchEvent(new Event('input'));
+    // });
+
+
+
+
+
+
+
+
+
+
 
     // Attach click event listener to the save button
     const saveButton = document.getElementById('save-editor-changes');
