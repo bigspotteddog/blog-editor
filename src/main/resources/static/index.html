@@ -679,6 +679,9 @@
               <div class="accordion-body">
                 <div class="container p-4">
                   <div class="row">
+                    <div class="col-sm-12 selector-input-container mb-2">
+                      <input type="text" class="form-control" id="element-selector" placeholder="Element selector will appear here">
+                    </div>
                     <div class="col-sm-4 btn-group d-block text-center fs-6 fill-color">
                       <div class="pb-2">
                         <input id="fill-color-input" type="text" class="coloris instance2" value="#fafafa">
@@ -1762,6 +1765,84 @@
       return selector;
     }
 
+    // Function to update element based on a CSS selector string
+    function updateElementFromSelector(element, selector) {
+      if (!element) return;
+      
+      // Parse the selector to extract tag name, id, and classes
+      // Remove any leading/trailing whitespace
+      selector = selector.trim();
+      
+      // Get tag name (everything before the first # or .)
+      let tagName = element.tagName.toLowerCase();
+      let id = element.id || '';
+      let classes = element.className || '';
+      
+      // Extract the tag name from the selector
+      const tagMatch = selector.match(/^([a-zA-Z0-9]+)/);
+      if (tagMatch) {
+        tagName = tagMatch[1].toLowerCase();
+      }
+      
+      // Extract id if present
+      const idMatch = selector.match(/#([a-zA-Z0-9_-]+)/);
+      if (idMatch) {
+        id = idMatch[1];
+      }
+      
+      // Extract classes if present (everything after dots)
+      const classMatches = selector.match(/\.([a-zA-Z0-9_-]+)/g);
+      if (classMatches) {
+        classes = classMatches.map(cls => cls.substring(1)).join(' ');
+      }
+      
+      // Update the element if tag name has changed
+      if (tagName && tagName !== element.tagName.toLowerCase()) {
+        // Create new element with the same attributes and content
+        const newElement = document.createElement(tagName);
+        
+        // Copy all attributes
+        for (let i = 0; i < element.attributes.length; i++) {
+          const attr = element.attributes[i];
+          newElement.setAttribute(attr.name, attr.value);
+        }
+        
+        // Update id and class specifically
+        newElement.id = id;
+        newElement.className = classes;
+        
+        // Copy all child nodes
+        while (element.firstChild) {
+          newElement.appendChild(element.firstChild);
+        }
+        
+        // Replace the old element with the new one
+        element.parentNode.replaceChild(newElement, element);
+        
+        // Update the activeContainer reference
+        activeContainer = newElement;
+      } else {
+        // If tag name isn't changing, just update id and class
+        if (element.id !== id) {
+          element.id = id;
+        }
+        
+        if (element.className !== classes) {
+          element.className = classes;
+        }
+      }
+      
+      // Update the styles dialog to reflect changes
+      const stylesTable = document.querySelector('.styles-dialog table tbody');
+      if (stylesTable) {
+        stylesTable.innerHTML = '';
+        updateStylesDialog(activeContainer);
+      }
+      
+      // Update the component selector to reflect changes
+      refreshSelector(activeContainer);
+    }
+
     function processStyleElementUpdate(activeContainer, editorValue, inHead, parentSelector) {
       // Extract content between style tags if the editor shows full tags
       const styleTagMatch = editorValue.match(/<style[^>]*>([\s\S]*?)<\/style>/i);
@@ -1933,6 +2014,29 @@
       const editorPanel = document.querySelector('.editor-panel');
       if (editorPanel) {
         editorPanel.style.display = 'none';
+      }
+      
+      // Update the element selector input field
+      const selectorInput = document.getElementById('element-selector');
+      if (selectorInput) {
+        // Generate a CSS selector for the element
+        const cssSelector = getCssSelector(element);
+        selectorInput.value = cssSelector;
+        
+        // Add event listener to update element when selector is changed
+        if (!selectorInput.hasAttribute('data-selector-listener')) {
+          selectorInput.setAttribute('data-selector-listener', 'true');
+          selectorInput.addEventListener('blur', function() {
+            updateElementFromSelector(activeContainer, this.value);
+          });
+          
+          // Update on Enter key press as well
+          selectorInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+              updateElementFromSelector(activeContainer, this.value);
+            }
+          });
+        }
       }
       
       // Update the background color picker to match the selected element
