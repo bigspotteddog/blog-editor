@@ -671,39 +671,80 @@
         <div class="accordion" id="accordionPanelsStayOpenExample">
           <div class="accordion-item">
             <h2 class="accordion-header">
-              <button class="accordion-button bg-white fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseFour" aria-expanded="true" aria-controls="panelsStayOpen-collapseFour">
+              <button class="accordion-button bg-white fw-semibold" type="button" data-bs-toggle="collapse"
+                data-bs-target="#panelsStayOpen-collapseFour" aria-expanded="true" aria-controls="panelsStayOpen-collapseFour">
                 Properties
               </button>
             </h2>
             <div id="panelsStayOpen-collapseFour" class="accordion-collapse collapse show" style="">
               <div class="accordion-body">
-                <div class="container p-4">
-                  <div class="row">
+                <div class="container" style="font-size: 12px;">
+                  <div class="row mt-3 mb-3">
+                    <div class="col-sm-12 selector-input-container mb-3">
+                      <input type="text" class="form-control" id="element-selector"
+                        placeholder="Element selector will appear here" style="font-size: 12px;">
+                    </div>
                     <div class="col-sm-12 selector-input-container mb-2">
-                      <input type="text" class="form-control" id="element-selector" placeholder="Element selector will appear here">
+                      <h6 class="form-label fw-bold" contenteditable="false" style="outline: none;">Colors</h6>
                     </div>
-                    <div class="col-sm-4 btn-group d-block text-center fs-6 fill-color">
+                    <div class="col-sm-4 btn-group d-block text-center fill-color">
                       <div class="pb-2">
-                        <input id="fill-color-input" type="text" class="coloris instance2" value="#fafafa">
+                        <div class="clr-field" style="color: rgb(250, 250, 250);">
+                          <button type="button" aria-labelledby="clr-open-label"></button><input id="fill-color-input" type="text"
+                            class="coloris instance2" value="#fafafa">
+                        </div>
                       </div>
-                      <div>
-                        Background Color
-                      </div>
+                      <div>Background Color</div>
                     </div>
-                    <div class="col-sm-4 btn-group d-block text-center fs-6 text-color">
+                    <div class="col-sm-4 btn-group d-block text-center text-color">
                       <div class="pb-2">
-                        <input id="text-color-input" type="text" class="coloris instance3" value="#000000">
+                        <div class="clr-field" style="color: rgb(0, 0, 0);">
+                          <button type="button" aria-labelledby="clr-open-label"></button><input id="text-color-input" type="text"
+                            class="coloris instance3" value="#000000">
+                        </div>
                       </div>
-                      <div>
-                        Text Color
-                      </div>
+                      <div>Text Color</div>
                     </div>
-                    <div class="col-sm-4 btn-group d-block text-center fs-6 border-color">
+                    <div class="col-sm-4 btn-group d-block text-center border-color">
                       <div class="pb-2">
-                        <input id="border-color-input" type="text" class="coloris instance1" value="#333333">
+                        <div class="clr-field" style="color: rgb(51, 51, 51);">
+                          <button type="button" aria-labelledby="clr-open-label"></button><input id="border-color-input"
+                            type="text" class="coloris instance1" value="#333333">
+                        </div>
                       </div>
                       <div class="tool-bar-button">
                         Border Color
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row editable">
+                    <div class="col-sm-12 border-management-container mt-3 mb-3">
+                      <h6 class="form-label fw-bold">Border</h6>
+                      <div class="row g-2">
+                        <div class="col-12">
+                          <input type="range" class="form-range" id="border-width" min="0" max="20" value="0" step="1">
+                          <div class="d-flex justify-content-between">
+                            <span>0px</span>
+                            <span id="border-width-value">0px</span>
+                            <span>20px</span>
+                          </div>
+                        </div>
+                        <div class="col-12">
+                          <label for="border-style" class="form-label">Style</label>
+                          <div style="display: inline-block;">
+                            <select class="form-select" id="border-style" style="font-size: 12px;">
+                              <option value="">None</option>
+                              <option value="solid">Solid</option>
+                              <option value="dashed">Dashed</option>
+                              <option value="dotted">Dotted</option>
+                              <option value="double">Double</option>
+                              <option value="groove">Groove</option>
+                              <option value="ridge">Ridge</option>
+                              <option value="inset">Inset</option>
+                              <option value="outset">Outset</option>
+                            </select>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -718,7 +759,7 @@
               </button>
             </h2>
             <div id="panelsStayOpen-collapseTwo" class="accordion-collapse collapse show" style="">
-              <div class="accordion-body">
+              <div class="accordion-body">                
                 <div class="styles-dialog">
                   <div class="styles-dialog-element"></div>
                   <table>
@@ -2053,6 +2094,26 @@
       const textColorPicker = document.getElementById('text-color-input');
       if (textColorPicker) {
         setColor(textColorPicker, element, 'color');
+      }
+      
+      // Update border controls
+      const borderWidthControl = document.getElementById('border-width');
+      const borderWidthValue = document.getElementById('border-width-value');
+      const borderStyleControl = document.getElementById('border-style');
+      
+      if (borderWidthControl && borderWidthValue && borderStyleControl) {
+        // Get computed styles for border properties
+        const computedStyle = window.getComputedStyle(element);
+        
+        // Update border width
+        const borderWidth = computedStyle.borderWidth;
+        const borderWidthNum = borderWidth.replace('px', '');
+        borderWidthControl.value = borderWidthNum;
+        borderWidthValue.textContent = borderWidthNum + 'px';
+        
+        // Update border style
+        const borderStyle = computedStyle.borderStyle;
+        borderStyleControl.value = borderStyle || '';        
       }
 
       // If the element is not a style element, add class list and inline styles
@@ -4133,6 +4194,80 @@
       activeContainer.style.setProperty("color", color.replace("!important", "").trim(), "important");
     }
 
+    // Function to update or add a style property in the styles table
+    function updateStyleInTable(stylesTable, property, value) {
+      if (!stylesTable) return;
+      
+      let foundPropertyRow = false;
+      const rows = stylesTable.querySelectorAll('tr');
+      rows.forEach(row => {
+        const propertyCell = row.querySelector('td[contenteditable="true"]');
+        if (propertyCell && propertyCell.textContent.trim() === property) {
+          const valueCell = propertyCell.nextElementSibling;
+          if (valueCell) {
+            valueCell.textContent = value;
+            foundPropertyRow = true;
+          }
+        }
+      });
+      
+      // If the property doesn't exist, add a new row
+      if (!foundPropertyRow && value) {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td contenteditable="true">${property}</td>
+          <td contenteditable="true">${value}</td>
+          <td><button class="btn btn-sm btn-outline-danger remove-inline-style" title="Remove style"><i class="bi bi-trash3"></i></button></td>
+        `;
+        
+        // Add change handlers for both cells
+        const cells = row.querySelectorAll('td[contenteditable="true"]');
+        const removeButton = row.querySelector('.remove-inline-style');
+        cells[0].addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            updateInlineStyle(e);
+          }
+        });
+        cells[1].addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            updateInlineStyle(e);
+          } else if (e.key === 'Tab' && !(event.ctrlKey || event.altKey || event.shiftKey || event.metaKey)) {
+            e.preventDefault();
+            updateInlineStyle(e);
+            setTimeout(() => {
+              addInlineStyle();
+            }, 100);
+          }
+        });
+        
+        cells[0].addEventListener('focus', focusSelect);
+        cells[1].addEventListener('focus', focusSelect);
+        
+        // Add click handler for remove button
+        removeButton.addEventListener('click', (e) => {
+          const row = e.target.closest('tr');
+          const propertyCell = row.querySelector('td[contenteditable="true"]');
+          const property = propertyCell.textContent.trim();
+          
+          if (activeContainer && property) {
+            activeContainer.style.removeProperty(property);
+            row.remove();
+          }
+        });
+
+        // Insert after the inline styles header row
+        const inlineStylesHeader = stylesTable.querySelector('tr#inline-styles-header');
+        if (inlineStylesHeader) {
+          inlineStylesHeader.after(row);
+        } else {
+          // Fallback - append to table
+          stylesTable.appendChild(row);
+        }
+      }
+    }
+
     document.addEventListener('coloris:pick', event => {
       console.log(event);
       if (event.detail.currentEl.id === "fill-color-input") {
@@ -4141,6 +4276,46 @@
         setBorderColor(event.detail.color);
       } else if (event.detail.currentEl.id === "text-color-input") {
         setTextColor(event.detail.color);
+      } else if (event.detail.currentEl.id === "border-color") {
+        if (activeContainer) {
+          activeContainer.style.borderColor = event.detail.color;
+          
+          // Update the styles dialog to reflect the new border color
+          const stylesTable = document.querySelector('.styles-dialog table tbody');
+          if (stylesTable) {
+            updateStyleInTable(stylesTable, 'border-color', event.detail.color);
+          }
+        }
+      }
+    });
+
+    // Border width and style event listeners
+    document.getElementById('border-width').addEventListener('input', function() {
+      const borderWidth = this.value + 'px';
+      document.getElementById('border-width-value').textContent = borderWidth;
+      
+      if (activeContainer) {
+        activeContainer.style.borderWidth = borderWidth;
+        
+        // Update the styles dialog to reflect the new border width
+        const stylesTable = document.querySelector('.styles-dialog table tbody');
+        if (stylesTable) {
+          updateStyleInTable(stylesTable, 'border-width', borderWidth);
+        }
+      }
+    });
+
+    document.getElementById('border-style').addEventListener('change', function() {
+      const borderStyle = this.value;
+      
+      if (activeContainer) {
+        activeContainer.style.borderStyle = borderStyle;
+        
+        // Update the styles dialog to reflect the new border style
+        const stylesTable = document.querySelector('.styles-dialog table tbody');
+        if (stylesTable) {
+          updateStyleInTable(stylesTable, 'border-style', borderStyle);
+        }
       }
     });
 
